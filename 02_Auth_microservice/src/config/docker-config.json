@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "root",
+    "password": "12345",
+    "database": "ecommerce",
+    "host": "mysql_service",
+    "port": 3306,
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "12345",
+    "database": "ecommerce",
+    "host": "mysql_service",
+    "port": 3306,
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "12345",
+    "database": "ecommerce",
+    "host": "mysql_service",
+    "port": 3306,
+    "dialect": "mysql"
+  }
+}

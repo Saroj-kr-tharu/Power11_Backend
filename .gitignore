@@ -1,0 +1,16 @@
+01_Apigateway_microservice/.env
+01_Apigateway_microservice/node_modules
+01_Apigateway_microservice/.dockerignore
+
+02_Auth_microservice/.env
+02_Auth_microservice/node_modules
+02_Auth_microservice/.dockerignore
+
+03_Remainder_microservice/.env
+03_Remainder_microservice/node_modules
+03_Remainder_microservice/.dockerignore
+
+05_Payment_microservice/.env
+05_Payment_microservice/node_modules
+05_Payment_microservice/.dockerignore
+

@@ -1,0 +1,31 @@
+PORT = 3009
+
+#moviebookingurl 
+MOVIE_BOOKING_URL = "http://localhost:3005/api/v1"
+
+#Rabbitmq configuration 
+EXCHANGE_NAME= AUTH_MICROSERVICE
+REMINDER_BINDING_KEY = REMINDER_AUTH_SERVICE
+MESSAGE_BROKER_URL='amqp://guest:guest@localhost:5672'
+
+#esewa configuration
+ESEWA_SECRET_KEY= "8gBm/:&EnhH.1/q" # DEFAULT PRROVIEDED BY ESEWA
+ESEWA_GATEWAY_URL = "https://rc-epay.esewa.com.np"
+ESEWA_PRODUCT_CODE = "EPAYTEST"
+BACKEND_URI = "http://localhost:3001"
+
+
+
+# Khalti Configuration
+KHALTI_SECRET_KEY= "SECRET_KEY"
+KHALTI_PUBLIC_KEY="public_Khalti_Key"
+KHALTI_PAYMENT_URL=https://a.khalti.com/api/v2/epayment/initiate/
+KHALTI_VERIFICATION_URL=https://a.khalti.com/api/v2/epayment/lookup/
+
+#stripe 
+STRIPE_PUBLISHABLE_KEY= "publishKey"
+STRIPE_SECRET_KEY= "SECRET_KEY"
+STRIPE_SUCCESS_URL="http://localhost:3000/payment/stripe-complete-payment"
+STRIPE_FAILED_URL="http://localhost:3000/payment/stripe-failed-payment"
+# STRIPE_SUCCESS_URL="http://localhost:3009/api/v1/stripe-complete-payment"
+# STRIPE_FAILED_URL="http://localhost:3009/api/v1/stripe-failed-payment"
