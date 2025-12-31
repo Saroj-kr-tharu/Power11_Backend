@@ -121,7 +121,7 @@ class AuthController {
     async veriyToken(req,res) {
         try {
             
-            
+            console.log('heelo')
             const token = req?.headers['x-access-token'];
             const response = await userService.verifyToken(token);
 

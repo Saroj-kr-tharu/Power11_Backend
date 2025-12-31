@@ -5,7 +5,7 @@ const {INTERNAL_SERVER_TOKEN} = require('../config/server.config')
 class InternalServiceMiddleware {
     
    checkInternalServiceToken(req, res, next) {
-      console.log("internal server token =>", req.headers);
+      
 
       if (!req.headers["x-internal-server-token"]) {
           console.log("Try to access without Internal Service Token");
@@ -17,9 +17,8 @@ class InternalServiceMiddleware {
           return res.status(ClientErrorsCodes.UNAUTHORIZED).json({ message: "Unauthorized", success: false });
       }
 
-     
       next();
-  }
+    }
     
    
 

@@ -6,6 +6,8 @@ const cors = require("cors");
 
 const {  FORTEND_URL, AUTH_BACKEND_URL,INTERNAL_SERVER_TOKEN, PAYMENT_BACKEND_URL } = require("./serverConfig/server.config");
 
+const {authRoutes, paymentRoutes} = require('./routes/index')
+
 const app = express();
 const PORT = 3000;
 
@@ -44,34 +46,9 @@ app.use(
 );
 
 
-const createInternalProxy = (target, pathRewrite) =>
-  createProxyMiddleware({
-    target,
-    changeOrigin: true,
-    pathRewrite,
-    
-    headers: {
-      "x-internal-server-token": INTERNAL_SERVER_TOKEN
-    },
-    logLevel: 'debug' 
-  });
 
-const authProxy = createInternalProxy(
-  AUTH_BACKEND_URL,
-  //  { "^/auth": "" }
-  { "": "auth/" }
-);
-
-const paymentProxy = createInternalProxy(
-  PAYMENT_BACKEND_URL,
-  { "^/payment": "" }
-);
-
-
-
-
-app.use("/auth",authProxy );
-app.use("/payment", paymentProxy);
+app.use("/auth",authRoutes );
+app.use("/payment", paymentRoutes);
 
 app.listen(PORT, () => {
   console.log(`Api Gateway started At :- ${PORT}`);

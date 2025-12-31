@@ -19,17 +19,17 @@ router.get("/esewa", function (req, res) {
     res.sendFile(filePath);
 });
 router.post("/initialize-esewa",internalMw.checkInternalServiceToken, eSewaMw.intilize, eSewaCtrl.intilizeEsewa);
-router.get("/complete-payment", eSewaMw.completePayment, eSewaCtrl.completePayment);
+router.get("/complete-payment", internalMw.checkInternalServiceToken, eSewaMw.completePayment, eSewaCtrl.completePayment);
 
 
 // khalti
 router.post("/epayment/initiate/",internalMw.checkInternalServiceToken, khaltiMw.intilize, khaltiCtrl.intilizeKhalti);
-router.get("/khalti/complete/payment", khaltiMw.completePayment, khaltiCtrl.completePayment);
+router.get("/khalti/complete/payment",internalMw.checkInternalServiceToken, khaltiMw.completePayment, khaltiCtrl.completePayment);
 
 //stripe
 router.post("/stripe-initiate/",internalMw.checkInternalServiceToken, stripeMw.intilize, stripeCtrl.intilizeStripe);
-router.get("/stripe-complete-payment", stripeMw.completePayment, stripeCtrl.completePayment);
-router.get("/stripe-failed-payment", stripeMw.completePayment, stripeCtrl.failedPayment);
+router.get("/stripe-complete-payment",internalMw.checkInternalServiceToken, stripeMw.completePayment, stripeCtrl.completePayment);
+router.get("/stripe-failed-payment",internalMw.checkInternalServiceToken, stripeMw.completePayment, stripeCtrl.failedPayment);
 
 //cod 
 router.post("/cod-initiate",internalMw.checkInternalServiceToken, codCtrl.intilizeCod);
