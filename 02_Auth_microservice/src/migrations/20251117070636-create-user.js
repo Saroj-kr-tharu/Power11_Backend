@@ -3,11 +3,11 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Users', {
-      id: {
+     id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4
       },
       email: {
         type: Sequelize.STRING,
@@ -33,24 +33,26 @@ module.exports = {
         allowNull: true,
     },
 
-      role: {
-        allowNull: false,
+    role: {
         type: Sequelize.ENUM("CUSTOMER", "ADMIN"),
+        allowNull: false,
         defaultValue: "CUSTOMER"
       },
 
       isActive: {
-        allowNull: false,
         type: Sequelize.BOOLEAN,
+        allowNull: false,
         defaultValue: false
     },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('NOW()')
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('NOW()')
       }
     });
   },

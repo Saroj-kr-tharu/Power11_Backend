@@ -1,86 +1,183 @@
-# RemainderMicroService
+﻿<div align="center">
 
-## Overview
+#  Reminder Microservice
 
-RemainderMicroService is a microservice designed to handle email-based reminders and notifications. It is part of the **Auth_Service** project and is built using **Node.js**. This service integrates with RabbitMQ for message brokering, Nodemailer for email delivery, and cron jobs for scheduling tasks.
+### Power11 Fantasy Sports Platform
 
-## Features
+[![Node.js](https://img.shields.io/badge/Node.js-18.x-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.x-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.x-FF6600?style=flat-square&logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
 
-- **Email Notifications**:
-  - Login Information
-  - Payment Information
-  - Order Details
+*Automated email notifications and reminder service with cron job scheduling and message queue processing.*
 
-- **RabbitMQ Message Broker**: Handles asynchronous communication between services.
-- **Nodemailer**: Sends email notifications directly to users.
-- **Cron Jobs**:
-  - Sends reminders at specific intervals.
-  - Updates email statuses to "success" after delivery.
-  - Deletes emails with "success" status at different scheduled times.
+</div>
 
-## Installation
+---
 
-1. Clone the repository:
+##  Overview
+
+The Reminder Microservice handles all **email notifications and scheduled reminders** for the Power11 fantasy sports platform. It processes messages from RabbitMQ queues, sends transactional emails, and manages scheduled tasks using cron jobs.
+
+##  Features
+
+| Feature | Description |
+|---------|-------------|
+|  **Email Notifications** | Transactional emails for login, payments, and orders |
+|  **RabbitMQ Integration** | Asynchronous message processing from other services |
+|  **Cron Job Scheduling** | Automated task execution at specified intervals |
+|  **Status Tracking** | Email delivery status management |
+|  **Auto Cleanup** | Automatic deletion of processed emails |
+|  **Nodemailer** | Reliable email delivery via SMTP |
+
+##  Architecture
+
+```
+                      REMINDER MICROSERVICE
+
+                    RabbitMQ Consumer                            
+              (Listens for email requests)                       
+
+                              
+                              
+
+                    Email Service (Nodemailer)                   
+
+                              
+         
+                                                 
+            
+    Cron Job          PostgreSQL         Email     
+    Scheduler          Database          Queue     
+            
+```
+
+##  Project Structure
+
+```
+03_Remainder_microservice/
+  Dockerfile              # Docker configuration
+  package.json            # Dependencies and scripts
+  readme.md               # This file
+  src/
+      index.js            # Application entry point
+      config/
+         config.json     # Database configuration
+         email.config.js # Email service settings
+         server.config.js    # Server settings
+      Controllers/        # Request handlers
+      Middlewares/        # Custom middleware
+      migrations/         # Database migrations
+      models/             # Sequelize models
+      Repository/         # Data access layer
+      Routes/             # API routes
+      seeders/            # Database seeders
+      Services/           # Business logic
+      utlis/              # Utilities
+```
+
+##  Quick Start
+
+### Prerequisites
+
+- Node.js v18.x or higher
+- PostgreSQL v15.x
+- RabbitMQ v3.x
+- npm v9.x or higher
+
+### Installation
+
+1. **Navigate to the service directory**
    ```bash
-   git clone https://github.com/yourusername/RemainderMicroService.git
+   cd 03_Remainder_microservice
    ```
-2. Navigate to the project directory:
-   ```bash
-   cd RemainderMicroService
-   ```
-3. Install dependencies:
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-## Usage
+3. **Configure environment variables**
+   
+   Create a `.env` file:
+   ```env
+   PORT=3007
+   NODE_ENV=development
+   
+   # Email Configuration
+   EMAIL_ID=your-email@gmail.com
+   EMAIL_PASS=your-app-password
+   EMAIL_SENDER=noreply@power11.com
+   
+   # RabbitMQ Configuration
+   MESSAGE_BROKER_URL=amqp://localhost
+   EXCHANGE_NAME=AUTH_MICROSERVICE
+   REMINDER_BINDING_KEY=REMINDER_AUTH_SERVICE
+   
+   # Cron Job Schedule
+   CRON_SEND_REMINDERS=*/5 * * * *
+   CRON_UPDATE_STATUS=*/10 * * * *
+   CRON_DELETE_SUCCESS=*/30 * * * *
+   ```
 
-1. Start the server:
+4. **Run database migrations**
+   ```bash
+   npx sequelize-cli db:migrate
+   ```
+
+5. **Start the server**
    ```bash
    npm start
    ```
-2. The service will be available at `http://localhost:3004`.
 
-## Environment Configuration
+##  Cron Job Schedule
 
-Create a `.env` file in the root directory of the project and add the following environment variables:
+| Job | Schedule | Description |
+|-----|----------|-------------|
+| Send Reminders | Every 5 min | Process pending email queue |
+| Update Status | Every 10 min | Update delivery status |
+| Delete Success | Every 30 min | Clean up delivered emails |
 
-```env
-PORT=3004
+##  Email Types
 
-EMAIL_ID=your_email@example.com
-EMAIL_PASS='your_email_password'
-EMAIL_SENDER=your_sender_email@example.com
+| Type | Trigger | Description |
+|------|---------|-------------|
+| **Login Alert** | User login | Notify user of new login |
+| **Payment Confirmation** | Payment success | Payment receipt |
+| **Contest Entry** | Join contest | Contest entry confirmation |
+| **Match Reminder** | Before match | Upcoming match notification |
 
-EXCHANGE_NAME=AUTH_MICROSERVICE
-REMINDER_BINDING_KEY=REMINDER_AUTH_SERVICE
-MESSAGE_BROKER_URL='amqp://localhost'
+##  Dependencies
 
-CRON_SEND_REMINDERS=*/5 * * * *  # Cron job to send reminders every 5 minutes
-CRON_UPDATE_STATUS=*/10 * * * * # Cron job to update email status every 10 minutes
-CRON_DELETE_SUCCESS=*/30 * * * * # Cron job to delete success emails every 30 minutes
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `express` | ^4.21.2 | Web framework |
+| `sequelize` | ^6.37.5 | PostgreSQL ORM |
+| `pg` | ^8.16.3 | PostgreSQL driver |
+| `amqplib` | ^0.10.8 | RabbitMQ client |
+| `nodemailer` | ^6.9.16 | Email sending |
+| `node-cron` | ^3.0.3 | Job scheduling |
+| `dotenv` | ^16.4.7 | Environment config |
+
+##  Docker
+
+```bash
+# Build Image
+docker build -t power11-reminder-service .
+
+# Run Container
+docker run -d --name reminder-service -p 3007:3007 --env-file .env power11-reminder-service
 ```
 
-## Workflow
+##  License
 
-1. **Send Reminders**:
-   - Emails are sent for login information, payment details, top 10 movie shows, and ticket details.
-   - Scheduled using cron jobs.
+This project is licensed under the **MIT License**.
 
-2. **Update Email Status**:
-   - After successful delivery, email statuses are updated to "success".
+---
 
-3. **Delete Success Emails**:
-   - Emails with "success" status are deleted periodically to optimize storage.
+<div align="center">
 
-## Contributing
+**[ Back to Main README](../README.md)**
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Commit your changes (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Create a new Pull Request.
-
-## License
-
-This project is licensed under the MIT License.
+</div>

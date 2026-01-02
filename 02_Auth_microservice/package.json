@@ -1,5 +1,5 @@
 {
-  "name": "01_authmicroservice",
+  "name": "auth_microservice",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,6 @@
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7",
-    "sequelize-cli": "^6.6.3",
-    "uuid": "^13.0.0"
+    "sequelize-cli": "^6.6.3"
   }
 }

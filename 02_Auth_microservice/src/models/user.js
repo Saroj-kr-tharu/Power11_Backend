@@ -18,14 +18,17 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User.init({
-   email: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          unique: true,
-          validate: {
-          isEmail: true,
-        },
-      },
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: { isEmail: true }
+    },
 
     username: {
           type: DataTypes.STRING,
@@ -41,20 +44,24 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
     },
 
-      role: {
-          allowNull: false,
-          type: DataTypes.ENUM("CUSTOMER", "ADMIN"),
-          defaultValue:"CUSTOMER"
-      },
-      isActive: {
-        allowNull: false,
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
+    role: {
+      type: DataTypes.ENUM("CUSTOMER", "ADMIN"),
+      allowNull: false,
+      defaultValue:"CUSTOMER"
+    },
+    isActive: {
+      allowNull: false,
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
 
   }, {
     sequelize,
     modelName: 'User',
+  });
+
+  User.beforeValidate((user) => {
+    if (user.email) user.email = user.email.toLowerCase();
   });
 
   User.beforeCreate((user) => {
