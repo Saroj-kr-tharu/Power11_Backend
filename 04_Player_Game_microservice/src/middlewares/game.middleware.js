@@ -19,6 +19,21 @@ class GameMiddleware {
       next();
     };
     
+    addPlayer  (req, res, next) {
+   
+     const { name, roles, gameId, team,baseCredits,} = req.body;
+     if ( !name || !roles || !gameId || !team || !baseCredits   ) {
+         console.log("Something went wrong in game middleware");
+ 
+         return res.status(ClientErrorsCodes.BAD_REQUEST).json({
+             data: {},
+             message: "Required Field is missing",
+             success: false,
+         });
+     }
+ 
+       next();
+     };
    
 
 }
