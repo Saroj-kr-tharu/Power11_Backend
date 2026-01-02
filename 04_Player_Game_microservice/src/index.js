@@ -19,7 +19,7 @@ const serverSetupAndStart = async () => {
     app.use("/api", appRoutes)
 
     app.listen(PORT, async () => {
-        console.log(` Auth Server start at ${PORT}`)
+        console.log(` PlayerGame Server start at ${PORT}`)
         await connect();
         console.log('Mongodb Connected');
     })

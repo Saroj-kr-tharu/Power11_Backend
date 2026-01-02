@@ -18,7 +18,7 @@ class curdService {
 
     async deleteService(id) {
         try {
-            const result = await this.repo.delete(id);
+            const result = await this.repo.destroy(id);
             return result;
         } catch (error) {
             console.error(

@@ -1,12 +1,10 @@
 const express = require("express");
 const morgan = require("morgan");
-const { createProxyMiddleware } = require("http-proxy-middleware");
 const { default: rateLimit } = require("express-rate-limit");
 const cors = require("cors");
 
-const {  FORTEND_URL, AUTH_BACKEND_URL,INTERNAL_SERVER_TOKEN, PAYMENT_BACKEND_URL } = require("./serverConfig/server.config");
 
-const {authRoutes, paymentRoutes} = require('./routes/index')
+const {authRoutes, paymentRoutes, gamePlayerRoutes} = require('./routes/index')
 
 const app = express();
 const PORT = 3000;
@@ -49,6 +47,7 @@ app.use(
 
 app.use("/auth",authRoutes );
 app.use("/payment", paymentRoutes);
+app.use("/gameplayer", gamePlayerRoutes);
 
 app.listen(PORT, () => {
   console.log(`Api Gateway started At :- ${PORT}`);

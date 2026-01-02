@@ -9,20 +9,18 @@ class UserMiddleware {
             if (!token ) {
                 
                 return res.status(ClientErrorsCodes.BAD_REQUEST).json({
-                data: {},
-                message: "token is missing   ",
-                success: false,
+                    data: {},
+                    message: "token is missing   ",
+                    success: false,
                 });
             }
 
             
             try {
                 const response = await JwtHelper.verifyToken(token)
-
-                const role = response?.role;
+                const role = response?.data?.role;
                 if(role == 'ADMIN'){
-                return  next();
-                
+                    return  next();
                 }
 
                 return res.status(ClientErrorsCodes.UNAUTHORIZED).json({
@@ -39,14 +37,10 @@ class UserMiddleware {
                     success: false,
                 });
                 }
-        };
+    };
 
     async  verifyUser  (req, res, next)  {
-
-        
           const token = req?.headers['x-access-token'];
-
-          // console.log('token => ', token)  
           if (!token ) {
               
               return res.status(ClientErrorsCodes.BAD_REQUEST).json({
@@ -56,12 +50,18 @@ class UserMiddleware {
               });
           }
 
-          
           try {
               const response = await JwtHelper.verifyToken(token)
-              console.log('response => ', response)
-              if(!response) throw new error
-              next();
+               const role = response?.data?.role;
+                console.log(' res =:  ', role)
+                 if(role == 'CUSTOMER'){
+                     return  next();
+                    }   
+              return res.status(ClientErrorsCodes.UNAUTHORIZED).json({
+                    data: {},
+                    message: "Invalid or Token Expired",
+                    success: false,
+                });
               
               
               } catch (error) {
@@ -72,6 +72,40 @@ class UserMiddleware {
               });
               }
       };
+
+
+    async verifyToken  (req, res, next)  {
+        const token = req?.headers['x-access-token'];
+        if (!token ) {
+            
+            return res.status(ClientErrorsCodes.BAD_REQUEST).json({
+                data: {},
+                message: "token is missing   ",
+                success: false,
+            });
+        }
+
+            
+            try {
+            const response = await JwtHelper.verifyToken(token)     
+           
+                if(response) {
+                   
+                    return  next()
+                }; 
+                return res.status(ClientErrorsCodes.UNAUTHORIZED).json({
+                    data: {},
+                    message: "Invalid token or Token expired",
+                    success: false,
+                });
+            } catch (error) {
+                return res.status(ClientErrorsCodes.UNAUTHORIZED).json({
+                    data: {},
+                    message: "Invalid token or Token expired",
+                    success: false,
+                });
+            }
+    };
  
 
 

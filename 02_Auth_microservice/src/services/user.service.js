@@ -25,7 +25,7 @@ class userService extends CurdService {
 
 
             // access token
-            const token = await JwtHelper.createToken({...data, id: infoUser?.dataValues?.id,});
+            const token = await JwtHelper.createToken({...data, id: infoUser?.dataValues?.id,role: infoUser?.dataValues?.role});
             
             // refresh token 
             const refreshToken = await JwtHelper.createRefreshToken({email, id: infoUser?.dataValues?.id,});

@@ -1,9 +1,8 @@
 const express = require('express');
 
 const router = express.Router();
-
-const {userMw, internalTokenMw} = require('../../middlewares/index')
-
+const {gameCtrl} = require('../../controllers/index')
+const { internalTokenMw, gameMw} = require('../../middlewares/index')
 
 
 router.get("/player/check", (req, res) => {
@@ -11,6 +10,10 @@ router.get("/player/check", (req, res) => {
 });
 
 
+router.post( "/game",internalTokenMw.checkInternalServiceToken, gameMw.addGame,  gameCtrl.addGame );
+router.get( "/game",   gameCtrl.getAllGame );
+router.delete( "/game/:gameId",internalTokenMw.checkInternalServiceToken,  gameCtrl.deleteGame );
+router.patch( "/game/:gameId",internalTokenMw.checkInternalServiceToken,  gameCtrl.updateGame );
 
  
  

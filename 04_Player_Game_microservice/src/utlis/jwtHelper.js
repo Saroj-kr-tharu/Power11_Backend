@@ -1,6 +1,6 @@
 
 const jwt = require('jsonwebtoken');
-const { PRIVATEJWT,  RefreshPRIVATEJWT } = require("../serverConfig/server.config");
+const { PRIVATEJWT,  RefreshPRIVATEJWT } = require("../config/server.config");
 
 
 class JWT {
@@ -8,6 +8,7 @@ class JWT {
 
   async verifyToken(token ) {
     try {
+      
       const response = jwt.verify(token, PRIVATEJWT);
       if (!response) throw   new Error('Invalid Token ')
     

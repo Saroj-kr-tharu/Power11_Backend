@@ -1,12 +1,14 @@
-const curdService = require("./curdService");
+const curdService = require("./curd.service");
 const {gameRepo} = require('../repository')
 
 
 class GameService extends curdService{
 
-       constructor(){
+    constructor(){
         super(gameRepo) 
     }
+
+    
 
 }
 
