@@ -1,6 +1,6 @@
 ﻿<div align="center">
 
-#  Leaderboard Microservice
+# 📊 Leaderboard Microservice
 
 ### Power11 Fantasy Sports Platform
 
@@ -15,64 +15,104 @@
 
 ---
 
-##  Overview
+## 📖 Overview
 
 The Leaderboard Microservice handles all **rankings, points calculation, and leaderboard management** for the Power11 fantasy sports platform. It provides real-time score updates and contest standings.
 
-##  Features
+## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
-|  **Live Rankings** | Real-time leaderboard updates |
-|  **Points Calculation** | Automated fantasy points scoring |
-|  **Contest Standings** | Per-contest rankings |
-|  **Performance Tracking** | Historical performance data |
-|  **Real-time Updates** | Live score synchronization |
-|  **Winner Declaration** | Automated winner calculation |
+| 🏅 **Live Rankings** | Real-time leaderboard updates |
+| 🧮 **Points Calculation** | Automated fantasy points scoring |
+| 📋 **Contest Standings** | Per-contest rankings |
+| 📈 **Performance Tracking** | Historical performance data |
+| ⚡ **Real-time Updates** | Live score synchronization |
+| 🏆 **Winner Declaration** | Automated winner calculation |
 
-##  Architecture
+## 🏗️ Architecture
 
 ```
-                    LEADERBOARD MICROSERVICE
-
-     Routes         Controllers        Services                
-─
-                              
-                              
-
-                      Repository Layer                           
-
-                              
-         
-                                                 
-            
-     MongoDB           Contest           Player    
-  (Leaderboard)        Service           Service   
-            
+                              ┌─────────────────────┐
+                              │   🌐 API Gateway    │
+                              │      (:3000)        │
+                              └──────────┬──────────┘
+                                         │
+                                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                📊 LEADERBOARD MICROSERVICE (:3005)                 │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────┐   ┌─────────────┐   ┌─────────────┐               │
+│  │ Routes  │──▶│ Controllers │──▶│  Services   │               │
+│  │  Layer  │   │    Layer    │   │    Layer    │               │
+│  └─────────┘   └─────────────┘   └──────┬──────┘               │
+│                                       │                         │
+│                              ┌────────┴────────┐                  │
+│                              │   Repository   │                  │
+│                              │     Layer      │                  │
+│                              └────────┬────────┘                  │
+└─────────────────────────────────┼──────────────────────────────┘
+                                         │
+        ┌─────────────────────────────┼─────────────────────────────┐
+        ▼                             ▼                             ▼
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│  🗄️ MongoDB   │       │ 🏆 Contest Svc │       │ 🏏 Player Svc │
+│  (Leaderboard) │       │   (:3004)     │       │    (:3002)    │
+└─────────────────┘       └─────────────────┘       └─────────────────┘
 ```
 
-##  Project Structure
+## � Security & Service Communication
+
+### Internal Service Token
+
+This microservice uses **Internal Service Token** for secure service-to-service communication.
+
+```
+┌─────────────────┐     INTERNAL_SERVER_TOKEN      ┌─────────────────┐
+│Leaderboard Svc  │ ─────────────────────────────▶ │ Contest Service │
+│    (:3005)      │   Header: x-internal-token     │    (:3004)      │
+└─────────────────┘                                └─────────────────┘
+```
+
+| Security Feature | Description |
+|-----------------|-------------|
+| 🔑 **Internal Token** | Shared secret for service-to-service auth |
+| 🛡️ **JWT Validation** | User requests validated via API Gateway |
+| 🔒 **Header Auth** | `x-internal-token` header for internal calls |
+
+### Environment Variables for Security
+
+```env
+# Internal Service Communication
+INTERNAL_SERVER_TOKEN=your_secure_internal_token
+
+# Service URLs (for internal communication)
+CONTEST_SERVICE_URL=http://localhost:3004
+PLAYER_SERVICE_URL=http://localhost:3002
+```
+
+## �📁 Project Structure
 
 ```
 07_Leaderboard_microservice/
-  dockerfile              # Docker configuration
-  package.json            # Dependencies and scripts
-  README.md               # This file
-  src/
-      index.js            # Application entry point
-      config/
-         database.js     # MongoDB connection
-         server.config.js    # Server settings
-      controllers/        # Request handlers
-      middlewares/        # Custom middleware
-      models/             # Mongoose models
-      repository/         # Data access layer
-      Routes/             # API routes
-      services/           # Business logic
-      utlis/              # Utilities
+├── 📄 dockerfile                    # Docker configuration
+├── 📄 package.json                  # Dependencies and scripts
+├── 📄 README.md                     # This file
+└── 📁 src/
+    ├── 📄 index.js                  # Application entry point
+    ├── 📁 config/
+    │   ├── 📄 database.js           # MongoDB connection
+    │   └── 📄 server.config.js      # Server settings
+    ├── 📁 controllers/              # Request handlers
+    ├── 📁 middlewares/              # Custom middleware
+    ├── 📁 models/                   # Mongoose models
+    ├── 📁 repository/               # Data access layer
+    ├── 📁 Routes/                   # API routes
+    ├── 📁 services/                 # Business logic
+    └── 📁 utlis/                    # Utilities
 ```
 
-##  Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -113,7 +153,7 @@ The Leaderboard Microservice handles all **rankings, points calculation, and lea
 
    The service will be running at `http://localhost:3005`
 
-##  API Endpoints
+## 📡 API Endpoints
 
 ### Leaderboard
 
@@ -138,7 +178,7 @@ The Leaderboard Microservice handles all **rankings, points calculation, and lea
 | Economy Rate Bonus | Variable |
 | Strike Rate Bonus | Variable |
 
-##  Dependencies
+## 📦 Dependencies
 
 | Package | Version | Purpose |
 |---------|---------|---------|
@@ -149,7 +189,7 @@ The Leaderboard Microservice handles all **rankings, points calculation, and lea
 | `uuid` | ^13.0.0 | UUID generation |
 | `dotenv` | ^17.2.3 | Environment config |
 
-##  Docker
+## 🐳 Docker
 
 ```bash
 # Build Image
@@ -159,7 +199,7 @@ docker build -t power11-leaderboard-service .
 docker run -d --name leaderboard-service -p 3005:3005 --env-file .env power11-leaderboard-service
 ```
 
-##  License
+## 📄 License
 
 This project is licensed under the **MIT License**.
 
@@ -167,6 +207,6 @@ This project is licensed under the **MIT License**.
 
 <div align="center">
 
-**[ Back to Main README](../README.md)**
+**[⬆ Back to Main README](../README.md)**
 
 </div>

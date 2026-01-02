@@ -1,6 +1,6 @@
 ﻿<div align="center">
 
-#  Payment Microservice
+# 💳 Payment Microservice
 
 ### Power11 Fantasy Sports Platform
 
@@ -16,76 +16,80 @@
 
 ---
 
-##  Overview
+## 📖 Overview
 
 The Payment Microservice handles all **payment transactions and gateway integrations** for the Power11 fantasy sports platform. It supports multiple payment providers including eSewa, Khalti, and Stripe for seamless transactions.
 
-##  Features
+## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
-|  **Multi-Gateway Support** | eSewa, Khalti, Stripe integration |
-|  **Secure Transactions** | PCI-compliant payment processing |
-|  **Transaction History** | Complete payment audit trail |
-|  **Wallet System** | User wallet management |
-|  **Refund Processing** | Automated refund handling |
-|  **Payment Notifications** | Email confirmations via RabbitMQ |
+| 🔄 **Multi-Gateway Support** | eSewa, Khalti, Stripe integration |
+| 🔐 **Secure Transactions** | PCI-compliant payment processing |
+| 📜 **Transaction History** | Complete payment audit trail |
+| 💰 **Wallet System** | User wallet management |
+| ↩️ **Refund Processing** | Automated refund handling |
+| 📧 **Payment Notifications** | Email confirmations via RabbitMQ |
 
-##  Architecture
+## 🏗️ Architecture
 
 ```
-                      PAYMENT MICROSERVICE
-
-     Routes         Controllers        Services                
-
-                              
-                              
-
-                      Repository Layer                           
-
-                              
-         
-                                                 
-            
-   PostgreSQL          Payment          RabbitMQ   
-   (Payments)         Gateways           Queue     
-            
-                              
-         
-                                                 
-                            
-      eSewa            Khalti           Stripe
-                            
+                              ┌─────────────────────┐
+                              │   🌐 API Gateway    │
+                              │      (:3000)        │
+                              └──────────┬──────────┘
+                                         │
+                                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   💳 PAYMENT MICROSERVICE (:3006)                   │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────┐   ┌─────────────┐   ┌─────────────┐               │
+│  │ Routes  │──▶│ Controllers │──▶│  Services   │               │
+│  │  Layer  │   │    Layer    │   │    Layer    │               │
+│  └─────────┘   └─────────────┘   └──────┬──────┘               │
+│                                       │                         │
+│                              ┌────────┴────────┐                  │
+│                              │   Repository   │                  │
+│                              │     Layer      │                  │
+│                              └────────┬────────┘                  │
+└─────────────────────────────────┼──────────────────────────────┘
+                                         │
+      ┌─────────────┬─────────────┬───┼───┼─────────────┼─────────────┐
+      ▼             ▼             ▼       ▼             ▼             ▼
+┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐
+│PostgreSQL│ │🐰RabbitMQ│ │  eSewa  │ │ Khalti  │ │ Stripe  │ │  Auth   │
+│ Database │ │  Queue  │ │ Gateway │ │ Gateway │ │ Gateway │ │ Service │
+└─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘
 ```
 
-##  Project Structure
+## 📁 Project Structure
 
 ```
 08_Payment_microservice/
-  Dockerfile              # Docker configuration
-  package.json            # Dependencies and scripts
-  readme.md               # This file
-  src/
-      index.js            # Application entry point
-      config/
-         config.json     # Database configuration
-         esewa.config.js # eSewa gateway config
-         khalti.config.js    # Khalti gateway config
-         stripe.config.js    # Stripe gateway config
-         stripe.connect.js   # Stripe connection
-         server.config.js    # Server settings
-      Controllers/        # Request handlers
-      Middlewares/        # Custom middleware
-      migrations/         # Database migrations
-      models/             # Sequelize models
-      Repository/         # Data access layer
-      Route/              # API routes
-      seeders/            # Database seeders
-      Services/           # Business logic
-      Utlis/              # Utilities
+├── 📄 Dockerfile                    # Docker configuration
+├── 📄 package.json                  # Dependencies and scripts
+├── 📄 readme.md                     # This file
+└── 📁 src/
+    ├── 📄 index.js                  # Application entry point
+    ├── 📁 config/
+    │   ├── 📄 config.json           # Database configuration
+    │   ├── 📄 esewa.config.js       # eSewa gateway config
+    │   ├── 📄 khalti.config.js      # Khalti gateway config
+    │   ├── 📄 stripe.config.js      # Stripe gateway config
+    │   ├── 📄 stripe.connect.js     # Stripe connection
+    │   └── 📄 server.config.js      # Server settings
+    ├── 📁 Controllers/              # Request handlers
+    ├── 📁 Middlewares/              # Custom middleware
+    ├── 📁 migrations/               # Database migrations
+    ├── 📁 models/                   # Sequelize models
+    ├── 📁 Repository/               # Data access layer
+    ├── 📁 Route/                    # API routes
+    ├── 📁 seeders/                  # Database seeders
+    ├── 📁 Services/                 # Business logic
+    └── 📁 Utlis/                    # Utilities
 ```
 
-##  Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -145,7 +149,7 @@ The Payment Microservice handles all **payment transactions and gateway integrat
 
    The service will be running at `http://localhost:3006`
 
-##  API Endpoints
+## 📡 API Endpoints
 
 ### Payments
 
@@ -161,9 +165,9 @@ The Payment Microservice handles all **payment transactions and gateway integrat
 
 | Gateway | Type | Currency | Status |
 |---------|------|----------|--------|
-| **eSewa** | Digital Wallet | NPR |  Active |
-| **Khalti** | Digital Wallet | NPR |  Active |
-| **Stripe** | Card Payment | USD/NPR |  Active |
+| **eSewa** | Digital Wallet | NPR | ✅ Active |
+| **Khalti** | Digital Wallet | NPR | ✅ Active |
+| **Stripe** | Card Payment | USD/NPR | ✅ Active |
 
 ### Payment Flow
 
@@ -176,7 +180,7 @@ The Payment Microservice handles all **payment transactions and gateway integrat
 6. Send confirmation email via RabbitMQ
 ```
 
-##  Dependencies
+## 📦 Dependencies
 
 | Package | Version | Purpose |
 |---------|---------|---------|
@@ -189,7 +193,7 @@ The Payment Microservice handles all **payment transactions and gateway integrat
 | `crypto` | ^1.0.1 | Cryptographic functions |
 | `dotenv` | ^17.2.3 | Environment config |
 
-##  Security
+## 🔐 Security
 
 - **PCI Compliance**: Secure payment data handling
 - **HMAC Verification**: Signature validation for callbacks
@@ -197,7 +201,7 @@ The Payment Microservice handles all **payment transactions and gateway integrat
 - **Audit Logging**: Complete transaction audit trail
 - **Rate Limiting**: API abuse prevention
 
-##  Docker
+## 🐳 Docker
 
 ```bash
 # Build Image
@@ -207,7 +211,7 @@ docker build -t power11-payment-service .
 docker run -d --name payment-service -p 3006:3006 --env-file .env power11-payment-service
 ```
 
-##  Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/new-feature`)
@@ -215,7 +219,7 @@ docker run -d --name payment-service -p 3006:3006 --env-file .env power11-paymen
 4. Push to branch (`git push origin feature/new-feature`)
 5. Open a Pull Request
 
-##  License
+## 📄 License
 
 This project is licensed under the **MIT License**.
 
@@ -223,6 +227,6 @@ This project is licensed under the **MIT License**.
 
 <div align="center">
 
-**[ Back to Main README](../README.md)**
+**[⬆ Back to Main README](../README.md)**
 
 </div>

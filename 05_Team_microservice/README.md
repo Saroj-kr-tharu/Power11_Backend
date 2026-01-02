@@ -1,6 +1,6 @@
 ﻿<div align="center">
 
-#  Team Microservice
+# 👥 Team Microservice
 
 ### Power11 Fantasy Sports Platform
 
@@ -15,64 +15,143 @@
 
 ---
 
-##  Overview
+## 📖 Overview
 
 The Team Microservice handles all **fantasy team creation, management, and validation** for the Power11 platform. Users can create teams by selecting players, manage multiple teams, and participate in contests.
 
-##  Features
+## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
-|  **Team Creation** | Create fantasy teams with player selection |
-|  **Team Management** | Edit and update existing teams |
-|  **Team Validation** | Validate team composition rules |
-|  **Captain Selection** | Captain and vice-captain assignment |
-|  **Team Analytics** | Team performance tracking |
-|  **Multi-Team Support** | Manage multiple teams per match |
+| ➕ **Team Creation** | Create fantasy teams with player selection |
+| ✏️ **Team Management** | Edit and update existing teams |
+| ✅ **Team Validation** | Validate team composition rules |
+| 👑 **Captain Selection** | Captain and vice-captain assignment |
+| 📊 **Team Analytics** | Team performance tracking |
+| 📋 **Multi-Team Support** | Manage multiple teams per match |
 
-##  Architecture
+## 🏗️ Architecture
 
 ```
-                      TEAM MICROSERVICE
-
-     Routes         Controllers        Services                
-
-                              
-                              
-
-                      Repository Layer                           
-
-                              
-         
-                                                 
-            
-     MongoDB           Player           Contest    
-    (Teams)            Service          Service    
-            
+                              ┌─────────────────────┐
+                              │   🌐 API Gateway    │
+                              │      (:3000)        │
+                              └──────────┬──────────┘
+                                         │
+                                         ▼
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                         👥 TEAM MICROSERVICE (:3003)                           │
+├────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                │
+│   ┌─────────────┐    ┌─────────────────┐    ┌─────────────────┐               │
+│   │   Routes    │───▶│   Controllers   │───▶│    Services     │               │
+│   │   Layer     │    │     Layer       │    │     Layer       │               │
+│   └─────────────┘    └─────────────────┘    └────────┬────────┘               │
+│                                                      │                         │
+│                                             ┌────────┴────────┐                │
+│                                             ▼                 ▼                │
+│                                    ┌─────────────┐   ┌─────────────────┐       │
+│                                    │ Repository  │   │ External Service│       │
+│                                    │   Layer     │   │    Calls        │       │
+│                                    └──────┬──────┘   └────────┬────────┘       │
+│                                           │                   │                │
+└───────────────────────────────────────────┼───────────────────┼────────────────┘
+                                            │                   │
+                    ┌───────────────────────┘                   └────────────────┐
+                    ▼                                                            │
+          ┌─────────────────┐                                                    │
+          │    🗄️ MongoDB   │                  ┌─────────────────────────────────┼────┐
+          │   (Teams DB)    │                  │    🔗 External Services         │    │
+          └─────────────────┘                  │    (via Internal Token)         ▼    │
+                                               │  ┌──────────────┐  ┌──────────────┐  │
+                                               │  │🏏 Player Svc │  │🏆 Contest Svc│  │
+                                               │  │   (:3002)    │  │   (:3004)    │  │
+                                               │  └──────────────┘  └──────────────┘  │
+                                               └──────────────────────────────────────┘
 ```
 
-##  Project Structure
+## 🔐 Security & Service Communication
+
+### Internal Service Token
+
+This microservice uses **Internal Service Token** authentication for secure service-to-service communication.
+
+```
+┌─────────────────┐     INTERNAL_SERVER_TOKEN      ┌─────────────────┐
+│  Team Service   │ ─────────────────────────────▶ │  Player Service │
+│    (:3003)      │   Header: x-internal-token     │    (:3002)      │
+└─────────────────┘                                └─────────────────┘
+```
+
+| Security Feature | Description |
+|-----------------|-------------|
+| 🔑 **Internal Token** | Shared secret token for service-to-service auth |
+| 🛡️ **JWT Validation** | User requests validated via JWT from API Gateway |
+| 🔒 **Header Auth** | `x-internal-token` header for internal calls |
+| ✅ **Token Verification** | Middleware validates token before processing |
+
+### Environment Variables for Security
+
+```env
+# Internal Service Communication
+INTERNAL_SERVER_TOKEN=your_secure_internal_token
+
+# JWT Configuration  
+PRIVATEJWT=your_jwt_secret_key
+
+# Service URLs
+PLAYER_SERVICE_URL=http://localhost:3002
+CONTEST_SERVICE_URL=http://localhost:3004
+```
+
+### Service-to-Service Communication Flow
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                        SERVICE COMMUNICATION FLOW                            │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  1. User Request                                                             │
+│     ┌────────┐    JWT Token    ┌─────────────┐                               │
+│     │ Client │ ───────────────▶│ API Gateway │                               │
+│     └────────┘                 └──────┬──────┘                               │
+│                                       │                                      │
+│  2. Validated Request                 ▼                                      │
+│                               ┌───────────────┐                              │
+│                               │ Team Service  │                              │
+│                               └───────┬───────┘                              │
+│                                       │                                      │
+│  3. Internal Service Call             │  x-internal-token: <token>           │
+│     (Fetch Player Data)               ▼                                      │
+│                               ┌───────────────┐                              │
+│                               │Player Service │                              │
+│                               └───────────────┘                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+## 📁 Project Structure
 
 ```
 05_Team_microservice/
-  dockerfile              # Docker configuration
-  package.json            # Dependencies and scripts
-  README.md               # This file
-  src/
-      index.js            # Application entry point
-      config/
-         database.js     # MongoDB connection
-         server.config.js    # Server settings
-      controllers/        # Request handlers
-      middlewares/        # Custom middleware
-      models/             # Mongoose models
-      repository/         # Data access layer
-      Routes/             # API routes
-      services/           # Business logic
-      utlis/              # Utilities
+├── 📄 dockerfile                    # Docker configuration
+├── 📄 package.json                  # Dependencies and scripts
+├── 📄 README.md                     # This file
+└── 📁 src/
+    ├── 📄 index.js                  # Application entry point
+    ├── 📁 config/
+    │   ├── 📄 database.js           # MongoDB connection
+    │   └── 📄 server.config.js      # Server settings
+    ├── 📁 controllers/              # Request handlers
+    ├── 📁 middlewares/              # Custom middleware
+    ├── 📁 models/                   # Mongoose models
+    ├── 📁 repository/               # Data access layer
+    ├── 📁 Routes/                   # API routes
+    ├── 📁 services/                 # Business logic
+    └── 📁 utlis/                    # Utilities
 ```
 
-##  Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -113,7 +192,7 @@ The Team Microservice handles all **fantasy team creation, management, and valid
 
    The service will be running at `http://localhost:3003`
 
-##  API Endpoints
+## 📡 API Endpoints
 
 ### Teams
 
@@ -136,7 +215,7 @@ The Team Microservice handles all **fantasy team creation, management, and valid
 - **Captain**: 2x points multiplier
 - **Vice-Captain**: 1.5x points multiplier
 
-##  Dependencies
+## 📦 Dependencies
 
 | Package | Version | Purpose |
 |---------|---------|---------|
@@ -147,7 +226,7 @@ The Team Microservice handles all **fantasy team creation, management, and valid
 | `uuid` | ^13.0.0 | UUID generation |
 | `dotenv` | ^17.2.3 | Environment config |
 
-##  Docker
+## 🐳 Docker
 
 ```bash
 # Build Image
@@ -157,7 +236,7 @@ docker build -t power11-team-service .
 docker run -d --name team-service -p 3003:3003 --env-file .env power11-team-service
 ```
 
-##  License
+## 📄 License
 
 This project is licensed under the **MIT License**.
 
@@ -165,6 +244,6 @@ This project is licensed under the **MIT License**.
 
 <div align="center">
 
-**[ Back to Main README](../README.md)**
+**[⬆ Back to Main README](../README.md)**
 
 </div>

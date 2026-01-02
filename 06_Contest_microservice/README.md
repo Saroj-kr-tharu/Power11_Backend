@@ -1,6 +1,6 @@
 ﻿<div align="center">
 
-#  Contest Microservice
+# 🏆 Contest Microservice
 
 ### Power11 Fantasy Sports Platform
 
@@ -15,64 +15,104 @@
 
 ---
 
-##  Overview
+## 📖 Overview
 
 The Contest Microservice manages all **contest creation, user entries, and prize distribution** for the Power11 fantasy sports platform. It handles different contest types, entry fees, and winning calculations.
 
-##  Features
+## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
-|  **Contest Creation** | Create various contest types |
-|  **Entry Management** | Handle user contest entries |
-|  **Prize Pool** | Dynamic prize pool calculation |
-|  **Contest Analytics** | Real-time contest statistics |
-|  **Contest Types** | Free, paid, mega contests |
-|  **Entry Validation** | Validate entries and payments |
+| 🎯 **Contest Creation** | Create various contest types |
+| 📝 **Entry Management** | Handle user contest entries |
+| 💰 **Prize Pool** | Dynamic prize pool calculation |
+| 📊 **Contest Analytics** | Real-time contest statistics |
+| 🎮 **Contest Types** | Free, paid, mega contests |
+| ✅ **Entry Validation** | Validate entries and payments |
 
-##  Architecture
+## 🏗️ Architecture
 
 ```
-                      CONTEST MICROSERVICE
-
-     Routes         Controllers        Services                
-
-                              
-                              
-
-                      Repository Layer                           
-
-                              
-         
-                                                 
-            
-     MongoDB           Payment            Team     
-   (Contests)          Service           Service   
-            
+                              ┌─────────────────────┐
+                              │   🌐 API Gateway    │
+                              │      (:3000)        │
+                              └──────────┬──────────┘
+                                         │
+                                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  🏆 CONTEST MICROSERVICE (:3004)                   │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────┐   ┌─────────────┐   ┌─────────────┐               │
+│  │ Routes  │──▶│ Controllers │──▶│  Services   │               │
+│  │  Layer  │   │    Layer    │   │    Layer    │               │
+│  └─────────┘   └─────────────┘   └──────┬──────┘               │
+│                                       │                         │
+│                              ┌────────┴────────┐                  │
+│                              │   Repository   │                  │
+│                              │     Layer      │                  │
+│                              └────────┬────────┘                  │
+└─────────────────────────────────┼──────────────────────────────┘
+                                         │
+        ┌─────────────────────────────┼─────────────────────────────┐
+        ▼                             ▼                             ▼
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│  🗄️ MongoDB   │       │ 💳 Payment Svc │       │  👥 Team Svc   │
+│   (Contests)   │       │   (:3006)     │       │    (:3003)    │
+└─────────────────┘       └─────────────────┘       └─────────────────┘
 ```
 
-##  Project Structure
+## � Security & Service Communication
+
+### Internal Service Token
+
+This microservice uses **Internal Service Token** for secure service-to-service communication.
+
+```
+┌─────────────────┐     INTERNAL_SERVER_TOKEN      ┌─────────────────┐
+│ Contest Service │ ─────────────────────────────▶ │ Payment Service │
+│    (:3004)      │   Header: x-internal-token     │    (:3006)      │
+└─────────────────┘                                └─────────────────┘
+```
+
+| Security Feature | Description |
+|-----------------|-------------|
+| 🔑 **Internal Token** | Shared secret for service-to-service auth |
+| 🛡️ **JWT Validation** | User requests validated via API Gateway |
+| 🔒 **Header Auth** | `x-internal-token` header for internal calls |
+
+### Environment Variables for Security
+
+```env
+# Internal Service Communication
+INTERNAL_SERVER_TOKEN=your_secure_internal_token
+
+# Service URLs (for internal communication)
+PAYMENT_SERVICE_URL=http://localhost:3006
+TEAM_SERVICE_URL=http://localhost:3003
+```
+
+## �📁 Project Structure
 
 ```
 06_Contest_microservice/
-  dockerfile              # Docker configuration
-  package.json            # Dependencies and scripts
-  README.md               # This file
-  src/
-      index.js            # Application entry point
-      config/
-         database.js     # MongoDB connection
-         server.config.js    # Server settings
-      controllers/        # Request handlers
-      middlewares/        # Custom middleware
-      models/             # Mongoose models
-      repository/         # Data access layer
-      Routes/             # API routes
-      services/           # Business logic
-      utlis/              # Utilities
+├── 📄 dockerfile                    # Docker configuration
+├── 📄 package.json                  # Dependencies and scripts
+├── 📄 README.md                     # This file
+└── 📁 src/
+    ├── 📄 index.js                  # Application entry point
+    ├── 📁 config/
+    │   ├── 📄 database.js           # MongoDB connection
+    │   └── 📄 server.config.js      # Server settings
+    ├── 📁 controllers/              # Request handlers
+    ├── 📁 middlewares/              # Custom middleware
+    ├── 📁 models/                   # Mongoose models
+    ├── 📁 repository/               # Data access layer
+    ├── 📁 Routes/                   # API routes
+    ├── 📁 services/                 # Business logic
+    └── 📁 utlis/                    # Utilities
 ```
 
-##  Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -113,7 +153,7 @@ The Contest Microservice manages all **contest creation, user entries, and prize
 
    The service will be running at `http://localhost:3004`
 
-##  API Endpoints
+## 📡 API Endpoints
 
 ### Contests
 
@@ -136,7 +176,7 @@ The Contest Microservice manages all **contest creation, user entries, and prize
 | **Head-to-Head** | ₹10-1000 | 2x Entry | 2 |
 | **Private** | Custom | Custom | Custom |
 
-##  Dependencies
+## 📦 Dependencies
 
 | Package | Version | Purpose |
 |---------|---------|---------|
@@ -147,7 +187,7 @@ The Contest Microservice manages all **contest creation, user entries, and prize
 | `uuid` | ^13.0.0 | UUID generation |
 | `dotenv` | ^17.2.3 | Environment config |
 
-##  Docker
+## 🐳 Docker
 
 ```bash
 # Build Image
@@ -157,7 +197,7 @@ docker build -t power11-contest-service .
 docker run -d --name contest-service -p 3004:3004 --env-file .env power11-contest-service
 ```
 
-##  License
+## 📄 License
 
 This project is licensed under the **MIT License**.
 
@@ -165,6 +205,6 @@ This project is licensed under the **MIT License**.
 
 <div align="center">
 
-**[ Back to Main README](../README.md)**
+**[⬆ Back to Main README](../README.md)**
 
 </div>

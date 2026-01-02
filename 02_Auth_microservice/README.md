@@ -1,6 +1,6 @@
 ﻿<div align="center">
 
-#  Auth Microservice
+# 🔐 Auth Microservice
 
 ### Power11 Fantasy Sports Platform
 
@@ -16,89 +16,96 @@
 
 ---
 
-##  Overview
+## 📖 Overview
 
 The Auth Microservice handles all **authentication and authorization** operations for the Power11 fantasy sports platform. It provides secure user registration, login, JWT token management, and role-based access control.
 
-##  Features
+## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
-|  **JWT Authentication** | Secure access and refresh token management |
-|  **User Registration** | Complete user signup with email verification |
-|  **Password Security** | Bcrypt hashing with configurable salt rounds |
-|  **Role-Based Access** | Admin, User role management |
-|  **Email Integration** | Email notifications via RabbitMQ |
-|  **Token Refresh** | Seamless token renewal mechanism |
-|  **Internal Auth** | Service-to-service authentication |
+| 🔑 **JWT Authentication** | Secure access and refresh token management |
+| 👤 **User Registration** | Complete user signup with email verification |
+| 🔒 **Password Security** | Bcrypt hashing with configurable salt rounds |
+| 👑 **Role-Based Access** | Admin, User role management |
+| 📧 **Email Integration** | Email notifications via RabbitMQ |
+| 🔄 **Token Refresh** | Seamless token renewal mechanism |
+| 🔗 **Internal Auth** | Service-to-service authentication |
 
-##  Architecture
-
-```
-
-                        AUTH MICROSERVICE                        
-
-                   
-     Routes        Controllers      Services            
-                   
-                                                                 
-                                                                 
-                          
-                                  Repository                   
-                          
-                                                                 
-              
-                                                              
-                        
-   PostgreSQL                        RabbitMQ      JWT     
-    Database                          Queue       Tokens   
-                        
+## 🏗️ Architecture
 
 ```
+                              ┌─────────────────────┐
+                              │   🌐 API Gateway    │
+                              │      (:3000)        │
+                              └──────────┬──────────┘
+                                         │
+                                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    🔐 AUTH MICROSERVICE (:3001)                  │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────┐   ┌─────────────┐   ┌─────────────┐               │
+│  │ Routes  │──▶│ Controllers │──▶│  Services   │               │
+│  │  Layer  │   │    Layer    │   │    Layer    │               │
+│  └─────────┘   └─────────────┘   └──────┬──────┘               │
+│                                       │                         │
+│                              ┌────────┴────────┐                  │
+│                              │   Repository   │                  │
+│                              │     Layer      │                  │
+│                              └────────┬────────┘                  │
+└─────────────────────────────────┼───────────────────────────────┘
+                                         │
+        ┌─────────────────────────────┼─────────────────────────────┐
+        ▼                             ▼                             ▼
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│ 🗄️ PostgreSQL  │       │  🐰 RabbitMQ   │       │   🔑 JWT       │
+│    Database    │       │     Queue      │       │    Tokens      │
+└─────────────────┘       └─────────────────┘       └─────────────────┘
+```
 
-##  Project Structure
+## 📁 Project Structure
 
 ```
 02_Auth_microservice/
-  dockerfile              # Docker configuration
-  package.json            # Dependencies and scripts
-  README.md               # This file
-  src/
-      index.js            # Application entry point
-      config/
-         config.json     # Database configuration
-         docker-config.json  # Docker DB config
-         server.config.js    # Server settings
-      controllers/
-         index.js        # Controller exports
-         auth.controller.js  # Auth request handlers
-      middlewares/
-         index.js        # Middleware exports
-         internal.service.middleware.js  # Service auth
-         user.middleware.js  # User authentication
-      migrations/
-         20251117070636-create-user.js  # User table migration
-      models/
-         index.js        # Sequelize initialization
-         user.js         # User model definition
-      repository/
-         curd.repo.js    # Generic CRUD repository
-         user.repo.js    # User-specific repository
-      services/
-         index.js        # Service exports
-         curdService.js  # Generic CRUD service
-         user.service.js # User business logic
-         queue.service.js    # Message queue service
-      Routes/
-         index.js        # Route definitions
-      utlis/
-          index.js        # Utility exports
-          bcryptHelper.js # Password hashing utilities
-          jwtHelper.js    # JWT token utilities
-          messageQueue.js # RabbitMQ utilities
+├── 📄 dockerfile                    # Docker configuration
+├── 📄 package.json                  # Dependencies and scripts
+├── 📄 README.md                     # This file
+└── 📁 src/
+    ├── 📄 index.js                  # Application entry point
+    ├── 📁 config/
+    │   ├── 📄 config.json           # Database configuration
+    │   ├── 📄 docker-config.json    # Docker DB config
+    │   └── 📄 server.config.js      # Server settings
+    ├── 📁 controllers/
+    │   ├── 📄 index.js              # Controller exports
+    │   └── 📄 auth.controller.js    # Auth request handlers
+    ├── 📁 middlewares/
+    │   ├── 📄 index.js              # Middleware exports
+    │   ├── 📄 internal.service.middleware.js  # Service auth
+    │   └── 📄 user.middleware.js    # User authentication
+    ├── 📁 migrations/
+    │   └── 📄 20251117070636-create-user.js  # User table migration
+    ├── 📁 models/
+    │   ├── 📄 index.js              # Sequelize initialization
+    │   └── 📄 user.js               # User model definition
+    ├── 📁 repository/
+    │   ├── 📄 curd.repo.js          # Generic CRUD repository
+    │   └── 📄 user.repo.js          # User-specific repository
+    ├── 📁 services/
+    │   ├── 📄 index.js              # Service exports
+    │   ├── 📄 curdService.js        # Generic CRUD service
+    │   ├── 📄 user.service.js       # User business logic
+    │   └── 📄 queue.service.js      # Message queue service
+    ├── 📁 Routes/
+    │   └── 📄 index.js              # Route definitions
+    └── 📁 utlis/
+        ├── 📄 index.js              # Utility exports
+        ├── 📄 bcryptHelper.js       # Password hashing utilities
+        ├── 📄 jwtHelper.js          # JWT token utilities
+        └── 📄 messageQueue.js       # RabbitMQ utilities
 ```
 
-##  Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -175,7 +182,7 @@ The Auth Microservice handles all **authentication and authorization** operation
 
    The service will be running at `http://localhost:3001`
 
-##  API Endpoints
+## 📡 API Endpoints
 
 ### Authentication
 
@@ -243,7 +250,7 @@ Content-Type: application/json
 }
 ```
 
-##  Database Schema
+## 🗃️ Database Schema
 
 ### User Model
 
@@ -257,7 +264,7 @@ Content-Type: application/json
 | `createdAt` | TIMESTAMP | Auto-generated |
 | `updatedAt` | TIMESTAMP | Auto-generated |
 
-##  Dependencies
+## 📦 Dependencies
 
 | Package | Version | Purpose |
 |---------|---------|---------|
@@ -272,7 +279,7 @@ Content-Type: application/json
 | `dotenv` | ^17.2.3 | Environment config |
 | `axios` | ^1.13.2 | HTTP client |
 
-##  Security
+## 🔐 Security
 
 - **Password Hashing**: Bcrypt with salt rounds
 - **JWT Tokens**: Access (15min) + Refresh (7d) tokens
@@ -280,7 +287,7 @@ Content-Type: application/json
 - **Input Validation**: Request body validation
 - **Rate Limiting**: Applied via API Gateway
 
-##  Docker
+## 🐳 Docker
 
 ### Build Image
 ```bash
@@ -296,7 +303,7 @@ docker run -d \
   power11-auth-service
 ```
 
-##  Development
+## 🔧 Development
 
 ```bash
 # Start with hot reload
@@ -312,7 +319,7 @@ npx sequelize-cli migration:generate --name migration-name
 npx sequelize-cli db:migrate:undo
 ```
 
-##  Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/new-feature`)
@@ -320,7 +327,7 @@ npx sequelize-cli db:migrate:undo
 4. Push to branch (`git push origin feature/new-feature`)
 5. Open a Pull Request
 
-##  License
+## 📄 License
 
 This project is licensed under the **MIT License**.
 
@@ -328,6 +335,6 @@ This project is licensed under the **MIT License**.
 
 <div align="center">
 
-**[ Back to Main README](../README.md)**
+**[⬆ Back to Main README](../README.md)**
 
 </div>

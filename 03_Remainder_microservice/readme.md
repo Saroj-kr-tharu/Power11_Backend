@@ -1,6 +1,6 @@
 ﻿<div align="center">
 
-#  Reminder Microservice
+# 📧 Reminder Microservice
 
 ### Power11 Fantasy Sports Platform
 
@@ -16,68 +16,80 @@
 
 ---
 
-##  Overview
+## 📖 Overview
 
 The Reminder Microservice handles all **email notifications and scheduled reminders** for the Power11 fantasy sports platform. It processes messages from RabbitMQ queues, sends transactional emails, and manages scheduled tasks using cron jobs.
 
-##  Features
+## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
-|  **Email Notifications** | Transactional emails for login, payments, and orders |
-|  **RabbitMQ Integration** | Asynchronous message processing from other services |
-|  **Cron Job Scheduling** | Automated task execution at specified intervals |
-|  **Status Tracking** | Email delivery status management |
-|  **Auto Cleanup** | Automatic deletion of processed emails |
-|  **Nodemailer** | Reliable email delivery via SMTP |
+| 📬 **Email Notifications** | Transactional emails for login, payments, and orders |
+| 🐰 **RabbitMQ Integration** | Asynchronous message processing from other services |
+| ⏰ **Cron Job Scheduling** | Automated task execution at specified intervals |
+| 📊 **Status Tracking** | Email delivery status management |
+| 🧹 **Auto Cleanup** | Automatic deletion of processed emails |
+| ✉️ **Nodemailer** | Reliable email delivery via SMTP |
 
-##  Architecture
+## 🏗️ Architecture
 
 ```
-                      REMINDER MICROSERVICE
-
-                    RabbitMQ Consumer                            
-              (Listens for email requests)                       
-
-                              
-                              
-
-                    Email Service (Nodemailer)                   
-
-                              
-         
-                                                 
-            
-    Cron Job          PostgreSQL         Email     
-    Scheduler          Database          Queue     
-            
+                     ┌─────────────────────────┐
+                     │  🐰 RabbitMQ Consumer   │
+                     │  (Message from Auth/   │
+                     │   Payment Services)    │
+                     └────────────┬────────────┘
+                                  │
+                                  ▼
+┌───────────────────────────────────────────────────────────┐
+│                 📧 REMINDER MICROSERVICE (:3007)              │
+├───────────────────────────────────────────────────────────┤
+│                                                           │
+│  ┌─────────────────┐     ┌─────────────────────────┐         │
+│  │ Message Consumer│────▶│  Email Service        │         │
+│  └─────────────────┘     │     (Nodemailer)      │         │
+│                          └────────────┬────────────┘         │
+│                                       │                    │
+│  ┌─────────────────┐            ┌──────┴───────┐            │
+│  │ Cron Scheduler  │───────────▶│ Status Update│            │
+│  │ (node-cron)     │            │  & Cleanup   │            │
+│  └─────────────────┘            └──────┬───────┘            │
+│                                       │                    │
+└─────────────────────────────────────┬─────────────────────┘
+                                        │
+                  ┌─────────────────────┴─────────────────────┐
+                  ▼                                           ▼
+         ┌─────────────────┐                       ┌─────────────────┐
+         │ 🗄️ PostgreSQL  │                       │  📤 SMTP Server │
+         │    Database    │                       │  (Gmail/SMTP)  │
+         └─────────────────┘                       └─────────────────┘
 ```
 
-##  Project Structure
+## 📁 Project Structure
 
 ```
 03_Remainder_microservice/
-  Dockerfile              # Docker configuration
-  package.json            # Dependencies and scripts
-  readme.md               # This file
-  src/
-      index.js            # Application entry point
-      config/
-         config.json     # Database configuration
-         email.config.js # Email service settings
-         server.config.js    # Server settings
-      Controllers/        # Request handlers
-      Middlewares/        # Custom middleware
-      migrations/         # Database migrations
-      models/             # Sequelize models
-      Repository/         # Data access layer
-      Routes/             # API routes
-      seeders/            # Database seeders
-      Services/           # Business logic
-      utlis/              # Utilities
+├── 📄 Dockerfile                    # Docker configuration
+├── 📄 package.json                  # Dependencies and scripts
+├── 📄 readme.md                     # This file
+└── 📁 src/
+    ├── 📄 index.js                  # Application entry point
+    ├── 📁 config/
+    │   ├── 📄 config.json           # Database configuration
+    │   ├── 📄 email.config.js       # Email service settings
+    │   └── 📄 server.config.js      # Server settings
+    ├── 📁 Controllers/              # Request handlers
+    ├── 📁 Middlewares/              # Custom middleware
+    ├── 📁 migrations/               # Database migrations
+    ├── 📁 models/                   # Sequelize models
+    ├── 📁 Repository/               # Data access layer
+    ├── 📁 Routes/                   # API routes
+    ├── 📁 seeders/                  # Database seeders
+    ├── 📁 Services/                 # Business logic
+    └── 📁 utlis/                    # Utilities
 ```
 
-##  Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -131,7 +143,7 @@ The Reminder Microservice handles all **email notifications and scheduled remind
    npm start
    ```
 
-##  Cron Job Schedule
+## ⏰ Cron Job Schedule
 
 | Job | Schedule | Description |
 |-----|----------|-------------|
@@ -139,7 +151,7 @@ The Reminder Microservice handles all **email notifications and scheduled remind
 | Update Status | Every 10 min | Update delivery status |
 | Delete Success | Every 30 min | Clean up delivered emails |
 
-##  Email Types
+## 📬 Email Types
 
 | Type | Trigger | Description |
 |------|---------|-------------|
@@ -148,7 +160,7 @@ The Reminder Microservice handles all **email notifications and scheduled remind
 | **Contest Entry** | Join contest | Contest entry confirmation |
 | **Match Reminder** | Before match | Upcoming match notification |
 
-##  Dependencies
+## 📦 Dependencies
 
 | Package | Version | Purpose |
 |---------|---------|---------|
@@ -160,7 +172,7 @@ The Reminder Microservice handles all **email notifications and scheduled remind
 | `node-cron` | ^3.0.3 | Job scheduling |
 | `dotenv` | ^16.4.7 | Environment config |
 
-##  Docker
+## 🐳 Docker
 
 ```bash
 # Build Image
@@ -170,7 +182,7 @@ docker build -t power11-reminder-service .
 docker run -d --name reminder-service -p 3007:3007 --env-file .env power11-reminder-service
 ```
 
-##  License
+## 📄 License
 
 This project is licensed under the **MIT License**.
 
@@ -178,6 +190,6 @@ This project is licensed under the **MIT License**.
 
 <div align="center">
 
-**[ Back to Main README](../README.md)**
+**[⬆ Back to Main README](../README.md)**
 
 </div>

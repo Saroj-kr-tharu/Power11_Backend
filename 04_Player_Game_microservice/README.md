@@ -1,6 +1,6 @@
 ﻿<div align="center">
 
-#  Player & Game Microservice
+# 🏏 Player & Game Microservice
 
 ### Power11 Fantasy Sports Platform
 
@@ -15,63 +15,76 @@
 
 ---
 
-##  Overview
+## 📖 Overview
 
 The Player & Game Microservice manages all **player data, match information, and game statistics** for the Power11 fantasy sports platform. It provides real-time player stats, match schedules, and performance data for fantasy team creation.
 
-##  Features
+## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
-|  **Player Management** | Complete player profiles and statistics |
-|  **Match Data** | Live match schedules and results |
-|  **Performance Stats** | Real-time player performance tracking |
-|  **Fantasy Points** | Points calculation for fantasy gaming |
-|  **Live Updates** | Real-time data synchronization |
-|  **Search & Filter** | Advanced player search capabilities |
+| 👤 **Player Management** | Complete player profiles and statistics |
+| 📅 **Match Data** | Live match schedules and results |
+| 📈 **Performance Stats** | Real-time player performance tracking |
+| ⭐ **Fantasy Points** | Points calculation for fantasy gaming |
+| ⚡ **Live Updates** | Real-time data synchronization |
+| 🔍 **Search & Filter** | Advanced player search capabilities |
 
-##  Architecture
-
-```
-                    PLAYER & GAME MICROSERVICE
-
-     Routes         Controllers        Services                
-
-                              
-                              
-─
-                      Repository Layer                           
-
-                              
-                              
-
-                    MongoDB Database                             
-         (Players, Matches, Statistics Collections)              
+## 🏗️ Architecture
 
 ```
+                              ┌─────────────────────┐
+                              │   🌐 API Gateway    │
+                              │      (:3000)        │
+                              └──────────┬──────────┘
+                                         │
+                                         ▼
+┌───────────────────────────────────────────────────────────────┐
+│               🏏 PLAYER & GAME MICROSERVICE (:3002)           │
+├───────────────────────────────────────────────────────────────┤
+│  ┌─────────┐   ┌─────────────┐   ┌─────────────┐              │
+│  │ Routes  │──▶│ Controllers │──▶│  Services  │              │
+│  │  Layer  │   │    Layer    │   │    Layer    │              │
+│  └─────────┘   └─────────────┘   └──────┬──────┘              │
+│                                       │                       │
+│                              ┌────────┴────────┐              │
+│                              │   Repository   │               │
+│                              │     Layer      │               |
+│                              └────────┬────────┘              │
+└─────────────────────────────────┼─────────────────────────────┘
+                                         │
+                                         ▼
+                              ┌─────────────────────┐
+                              │   🗄️ MongoDB        │
+                              ├─────────────────────┤
+                              │ • Players           │
+                              │ • Matches           │
+                              │ • Statistics        │
+                              └─────────────────────┘
+```
 
-##  Project Structure
+## 📁 Project Structure
 
 ```
 04_Player_Game_microservice/
-  dockerfile              # Docker configuration
-  package.json            # Dependencies and scripts
-  README.md               # This file
-  src/
-      index.js            # Application entry point
-      config/
-         database.js     # MongoDB connection
-         server.config.js    # Server settings
-      controllers/        # Request handlers
-      middlewares/        # Custom middleware
-      models/             # Mongoose models
-      repository/         # Data access layer
-      Routes/             # API routes
-      services/           # Business logic
-      utlis/              # Utilities
+├── 📄 dockerfile                    # Docker configuration
+├── 📄 package.json                  # Dependencies and scripts
+├── 📄 README.md                     # This file
+└── 📁 src/
+    ├── 📄 index.js                  # Application entry point
+    ├── 📁 config/
+    │   ├── 📄 database.js           # MongoDB connection
+    │   └── 📄 server.config.js      # Server settings
+    ├── 📁 controllers/              # Request handlers
+    ├── 📁 middlewares/              # Custom middleware
+    ├── 📁 models/                   # Mongoose models
+    ├── 📁 repository/               # Data access layer
+    ├── 📁 Routes/                   # API routes
+    ├── 📁 services/                 # Business logic
+    └── 📁 utlis/                    # Utilities
 ```
 
-##  Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -112,7 +125,7 @@ The Player & Game Microservice manages all **player data, match information, and
 
    The service will be running at `http://localhost:3002`
 
-##  API Endpoints
+## 📡 API Endpoints
 
 ### Players
 
@@ -133,7 +146,7 @@ The Player & Game Microservice manages all **player data, match information, and
 | `GET` | `/api/v1/matches/upcoming` | Get upcoming matches |
 | `GET` | `/api/v1/matches/live` | Get live matches |
 
-##  Dependencies
+## 📦 Dependencies
 
 | Package | Version | Purpose |
 |---------|---------|---------|
@@ -144,7 +157,7 @@ The Player & Game Microservice manages all **player data, match information, and
 | `uuid` | ^13.0.0 | UUID generation |
 | `dotenv` | ^17.2.3 | Environment config |
 
-##  Docker
+## 🐳 Docker
 
 ```bash
 # Build Image
@@ -154,7 +167,7 @@ docker build -t power11-player-game-service .
 docker run -d --name player-game-service -p 3002:3002 --env-file .env power11-player-game-service
 ```
 
-##  License
+## 📄 License
 
 This project is licensed under the **MIT License**.
 
@@ -162,6 +175,6 @@ This project is licensed under the **MIT License**.
 
 <div align="center">
 
-**[ Back to Main README](../README.md)**
+**[⬆ Back to Main README](../README.md)**
 
 </div>
