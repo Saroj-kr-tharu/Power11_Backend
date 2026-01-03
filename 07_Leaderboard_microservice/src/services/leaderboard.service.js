@@ -1,4 +1,4 @@
-const curdService = require("./curdService");
+const curdService = require("./curd.service");
 const {leaderboardRepo} = require('../repository')
 
 

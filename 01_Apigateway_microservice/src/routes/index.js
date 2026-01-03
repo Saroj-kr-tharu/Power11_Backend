@@ -4,4 +4,7 @@ module.exports = {
     paymentRoutes : require('./payment.routes'),
     gamePlayerRoutes : require('./gameplayer.routes'),
     teamRoutes : require('./team.routes'),
+    contestRoutes : require('./contest.routes'),
+    leaderboardRoutes : require('./leaderboard.routes'),
+
 }

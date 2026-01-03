@@ -1,5 +1,5 @@
 
 module.exports = {
     
-      ContestService : require('./contest.service'),
+      contestService : require('./contest.service'),
 }

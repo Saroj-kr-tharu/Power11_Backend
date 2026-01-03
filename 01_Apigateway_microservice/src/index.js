@@ -4,7 +4,7 @@ const { default: rateLimit } = require("express-rate-limit");
 const cors = require("cors");
 
 
-const {authRoutes, paymentRoutes, gamePlayerRoutes, teamRoutes} = require('./routes/index')
+const {authRoutes, paymentRoutes, gamePlayerRoutes, teamRoutes, contestRoutes, leaderboardRoutes} = require('./routes/index')
 
 const app = express();
 const PORT = 3000;
@@ -14,6 +14,8 @@ const limiter = rateLimit({
   max: 50,
 });
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("combined"));
 app.use(limiter);
 
@@ -48,7 +50,9 @@ app.use(
 app.use("/auth",authRoutes );
 app.use("/payment", paymentRoutes);
 app.use("/gameplayer", gamePlayerRoutes);
-app.use("/teamservice", teamRoutes);
+app.use("/team", teamRoutes);
+app.use("/contest", contestRoutes);
+app.use("/leaderboard", leaderboardRoutes);
 
 app.listen(PORT, () => {
   console.log(`Api Gateway started At :- ${PORT}`);

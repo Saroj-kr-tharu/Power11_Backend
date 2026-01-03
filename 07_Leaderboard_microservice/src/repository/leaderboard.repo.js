@@ -1,4 +1,4 @@
-const CurdRepo = require("./curdRepo");
+const CurdRepo = require("./curd.repo");
 const  leaderboardModel = require('../models/leaderboard')
 
 

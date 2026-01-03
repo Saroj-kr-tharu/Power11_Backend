@@ -8,17 +8,17 @@ const router = express.Router();
 const teamProxy = createProxyMiddleware({
   target: TEAM_BACKEND_URL,
   changeOrigin: true,
-  pathRewrite: { "^/teamservice": "" }, 
+  pathRewrite: { "^/": "/team" },
   headers: { "x-internal-server-token": INTERNAL_SERVER_TOKEN },
   logLevel: "debug",
 });
 
 
 // team 
-router.post( "/team",userMw.verifyUser,   teamProxy);
-router.get( "/team",userMw.verifyUser,   teamProxy );
-router.delete( "/team/:teamId",userMw.verifyUser,  teamProxy );
-router.patch( "/team/:teamId",userMw.verifyUser,  teamProxy );
+router.post( "/",userMw.verifyUser,   teamProxy);
+router.get( "/",userMw.verifyUser,   teamProxy );
+router.delete( "/:teamId",userMw.verifyUser,  teamProxy );
+router.patch( "/:teamId",userMw.verifyUser,  teamProxy );
 
 
 

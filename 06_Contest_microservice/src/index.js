@@ -14,8 +14,7 @@ const serverSetupAndStart = async () => {
     app.use(bodyParser.urlencoded({extended: true}))
     app.use(cookieParser());
 
-    
-    
+
     app.use("/api", appRoutes)
 
     app.listen(PORT, async () => {

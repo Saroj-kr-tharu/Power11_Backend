@@ -16,26 +16,7 @@ class InternalServiceMiddleware {
           return res.status(ClientErrorsCodes.UNAUTHORIZED).json({ message: "Unauthorized", success: false });
         }
         
-        const token = req?.headers['x-access-token'];
-        if (!token ) 
-            return res.status(ClientErrorsCodes.BAD_REQUEST).json({ message: "token is missing ", success: false, });
-
-        try {
-            const response = await JwtHelper.verifyToken(token)   
-                // console.log('response => ', response)            
-            if(response) {
-                req.userId= response?.data?.id;
-                req.email = response?.data?.email;
-                return  next();
-            } 
-           throw new Error("Token Expired")
-        } catch (error) {
-            return res.status(ClientErrorsCodes.UNAUTHORIZED).json({
-                data: {},
-                message: "Invalid token or Token expired",
-                success: false,
-            });
-        }
+        
 
     }
     
