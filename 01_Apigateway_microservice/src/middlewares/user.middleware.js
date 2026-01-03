@@ -44,9 +44,9 @@ class UserMiddleware {
           if (!token ) {
               
               return res.status(ClientErrorsCodes.BAD_REQUEST).json({
-              data: {},
-              message: "token is missing   ",
-              success: false,
+                data: {},
+                message: "token is missing   ",
+                success: false,
               });
           }
 
@@ -89,10 +89,7 @@ class UserMiddleware {
             try {
             const response = await JwtHelper.verifyToken(token)     
            
-                if(response) {
-                   
-                    return  next()
-                }; 
+                if(response)  return  next()  
                 return res.status(ClientErrorsCodes.UNAUTHORIZED).json({
                     data: {},
                     message: "Invalid token or Token expired",

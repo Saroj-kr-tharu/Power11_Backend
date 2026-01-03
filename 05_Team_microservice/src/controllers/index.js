@@ -1,5 +1,5 @@
 
 module.exports = {
-    authCtrl : require('./auth.controller'),
+    teamCtrl : require('./team.controller'),
    
 }

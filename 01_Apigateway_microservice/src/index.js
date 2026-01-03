@@ -4,7 +4,7 @@ const { default: rateLimit } = require("express-rate-limit");
 const cors = require("cors");
 
 
-const {authRoutes, paymentRoutes, gamePlayerRoutes} = require('./routes/index')
+const {authRoutes, paymentRoutes, gamePlayerRoutes, teamRoutes} = require('./routes/index')
 
 const app = express();
 const PORT = 3000;
@@ -48,6 +48,7 @@ app.use(
 app.use("/auth",authRoutes );
 app.use("/payment", paymentRoutes);
 app.use("/gameplayer", gamePlayerRoutes);
+app.use("/teamservice", teamRoutes);
 
 app.listen(PORT, () => {
   console.log(`Api Gateway started At :- ${PORT}`);

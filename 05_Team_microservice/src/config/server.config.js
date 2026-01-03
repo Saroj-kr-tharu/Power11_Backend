@@ -5,7 +5,8 @@ dotenv.config()
 
 module.exports = { 
     PORT  : process.env.PORT,
-  
+    PRIVATEJWT  : process.env.PRIVATEJWT,
+    
     INTERNAL_SERVER_TOKEN: process.env.INTERNAL_SERVER_TOKEN,
     MANGODB_URL: process.env.MANGODB_URL,
 

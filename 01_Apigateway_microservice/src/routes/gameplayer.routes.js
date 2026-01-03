@@ -20,6 +20,14 @@ router.get("/game", userMw.verifyToken , gamePlayerProxy);
 router.delete("/game/:gameId", userMw.verifyAdmin , gamePlayerProxy);
 router.patch("/game/:gameId", userMw.verifyAdmin , gamePlayerProxy);
 
+// player
+router.post("/player", userMw.verifyAdmin , gamePlayerProxy);
+router.get("/player", userMw.verifyToken , gamePlayerProxy);
+router.delete("/player/:playerId", userMw.verifyAdmin , gamePlayerProxy);
+router.patch("/player/:playerId", userMw.verifyAdmin , gamePlayerProxy);
+
+
+
 
 
 module.exports = router;
