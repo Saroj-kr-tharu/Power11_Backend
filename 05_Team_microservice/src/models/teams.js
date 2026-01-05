@@ -9,21 +9,19 @@ const TeamSchema = new mongoose.Schema({
     },
 
 
-    players: {
-        type: Map,
-        of: {
-            playerId: {
+    players: [
+        {
+            matchPlayerId: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "MatchPlayer",
                 required: true
             },
-            role: { type: String, required: true },
-            credits: { type: Number, required: true },
-            isCaptain: { type: Boolean, default: false },
-            isViceCaptain: { type: Boolean, default: false }
-        },
-        required: true
-    },
+            role: String,
+            credits: Number,
+            isCaptain: Boolean,
+            isViceCaptain: Boolean
+        }
+    ],
 
 
     contestId: {

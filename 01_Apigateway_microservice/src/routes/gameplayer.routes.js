@@ -5,6 +5,12 @@ const { INTERNAL_SERVER_TOKEN, PLAYER_GAME_BACKEND_URL } = require("../serverCon
 
 const router = express.Router();
 
+router.use((req, res, next) => {
+  console.log('playerGame route hit:', req.method, req.path);
+  console.log('PLAYER_GAME_BACKEND_URL:', PLAYER_GAME_BACKEND_URL);
+  next();
+});
+
 const gamePlayerProxy = createProxyMiddleware({
   target: PLAYER_GAME_BACKEND_URL,
   changeOrigin: true,
@@ -14,7 +20,7 @@ const gamePlayerProxy = createProxyMiddleware({
 });
 
 
-
+// game 
 router.post("/game", userMw.verifyAdmin , gamePlayerProxy);
 router.get("/game", userMw.verifyToken , gamePlayerProxy);
 router.delete("/game/:gameId", userMw.verifyAdmin , gamePlayerProxy);
@@ -28,6 +34,11 @@ router.patch("/player/:playerId", userMw.verifyAdmin , gamePlayerProxy);
 
 
 
+// team master
+router.post( "/teammaster", userMw.verifyAdmin,   gamePlayerProxy);
+router.get( "/teammaster", userMw.verifyUser,  gamePlayerProxy);
+router.delete( "/teammaster/:teammasterId", userMw.verifyAdmin,  gamePlayerProxy);
+router.patch( "/teammaster/:teammasterId", userMw.verifyAdmin,  gamePlayerProxy);
 
 
 module.exports = router;

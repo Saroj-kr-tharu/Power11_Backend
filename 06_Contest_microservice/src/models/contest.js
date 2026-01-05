@@ -6,6 +6,12 @@ const ContestSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    matchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Match",
+      required: true,
+      index: true
+    },
 
     gameId: {
       type: mongoose.Schema.Types.ObjectId,

@@ -1,23 +1,24 @@
-const {gameService} = require('../services/index')
+const {matchService} = require('../services/index')
 const {SucessCode, ServerErrosCodes} = require('../utlis/Errors/https_codes')
 
-class GameController { 
+class MatchController { 
 
-    async addGame(req,res) {
+    async addMatch(req,res) {
         try {
-            console.log(' welcome added  ')
-            const {name,maxPlayers, creditLimit, rolesConfig, scoringRules, status, rulesVersion} = req?.body; 
-            const response = await gameService.createService({name,maxPlayers, creditLimit, rolesConfig, scoringRules, status, rulesVersion});
+
+            const {gameId, title, matchType, teams, venue, startTime, endTime, status, squadAnnounced, result, metadata, createdBy} = req?.body; 
+            const response = await matchService.createService({gameId, title, matchType, teams, venue, startTime, endTime, status, squadAnnounced, result, metadata, createdBy});
             
+        
             return res.status(SucessCode.OK).json({
-                message: "Successfully AddGame",
+                message: "Successfully addMatch",
                 success: true,
                 data: response,
                 err: {},
             });
 
         } catch (error) {
-            console.log("something went wrong in controller  level  (addGame) ")
+            console.log("something went wrong in controller  level  (addTeam) ")
             
             return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
                 message: error.message,
@@ -29,11 +30,11 @@ class GameController {
     }
 
 
-    async getAllGame(req,res) {
+    async getAllMatch(req,res) {
         try {
-            const response = await gameService.getAllService();
+            const response = await matchService.getAllService();
             return res.status(SucessCode.OK).json({
-                message: "Successfully getAllGame",
+                message: "Successfully getAllMatch",
                 success: true,
                 data: response,
                 err: {},
@@ -50,11 +51,11 @@ class GameController {
         }
     }
 
-    async updateGame(req,res) {
+    async updateMatch(req,res) {
         try {
-            const { gameId } = req.params; 
+            const { matchId } = req.params; 
             const data = req?.body; 
-            const response = await gameService.updateService(gameId,data);
+            const response = await matchService.updateService(matchId,data);
             return res.status(SucessCode.OK).json({
                 message: "Successfully updateGame",
                 success: true,
@@ -73,11 +74,11 @@ class GameController {
         }
     }
 
-    async deleteGame(req,res) {
+    async deleteMatch(req,res) {
         try {
-            const { gameId } = req.params; 
+            const { matchId } = req.params; 
             
-            const response = await gameService.deleteService(gameId);
+            const response = await matchService.deleteService(matchId);
             return res.status(SucessCode.OK).json({
                 message: "Successfully deleteGame",
                 success: true,
@@ -100,7 +101,5 @@ class GameController {
 }
 
 
-
-const gameController = new GameController();
-
-module.exports = gameController;
+const matchController = new MatchController();
+module.exports = matchController;

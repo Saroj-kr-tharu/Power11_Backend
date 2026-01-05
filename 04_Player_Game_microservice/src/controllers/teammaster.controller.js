@@ -1,23 +1,23 @@
-const {gameService} = require('../services/index')
+const {teamMasterService} = require('../services/index')
 const {SucessCode, ServerErrosCodes} = require('../utlis/Errors/https_codes')
 
-class GameController { 
+class TeamMasterController { 
 
-    async addGame(req,res) {
+    async addTeamMaster(req,res) {
         try {
-            console.log(' welcome added  ')
-            const {name,maxPlayers, creditLimit, rolesConfig, scoringRules, status, rulesVersion} = req?.body; 
-            const response = await gameService.createService({name,maxPlayers, creditLimit, rolesConfig, scoringRules, status, rulesVersion});
+            const { name, shortName, logo, country, homeCity, status, metadata, createdBy, roles, gameId, team, baseCredits } = req.body;
+
+            const response = await teamMasterService.createService({name, shortName, logo, country, homeCity, status, metadata, createdBy, roles, gameId, team, baseCredits} );
             
             return res.status(SucessCode.OK).json({
-                message: "Successfully AddGame",
+                message: "Successfully addTeamMaster",
                 success: true,
                 data: response,
                 err: {},
             });
 
         } catch (error) {
-            console.log("something went wrong in controller  level  (addGame) ")
+            console.log("something went wrong in controller  level  (addTeamMaster) ")
             
             return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
                 message: error.message,
@@ -29,18 +29,18 @@ class GameController {
     }
 
 
-    async getAllGame(req,res) {
+    async getAllTeamMaster(req,res) {
         try {
-            const response = await gameService.getAllService();
+            const response = await teamMasterService.getAllService();
             return res.status(SucessCode.OK).json({
-                message: "Successfully getAllGame",
+                message: "Successfully getAllTeamMaster",
                 success: true,
                 data: response,
                 err: {},
             });
 
         } catch (error) {
-            console.log("something went wrong in controller  level  (getAllGame) ")
+            console.log("something went wrong in controller  level  (getAllTeamMaster) ")
             return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
                 message: error.message,
                 sucess: false,
@@ -50,20 +50,20 @@ class GameController {
         }
     }
 
-    async updateGame(req,res) {
+    async updateTeamMaster(req,res) {
         try {
-            const { gameId } = req.params; 
+            const { teammasterId } = req.params; 
             const data = req?.body; 
-            const response = await gameService.updateService(gameId,data);
+            const response = await teamMasterService.updateService(teammasterId,data);
             return res.status(SucessCode.OK).json({
-                message: "Successfully updateGame",
+                message: "Successfully updateTeamMaster",
                 success: true,
                 data: response,
                 err: {},
             });
 
         } catch (error) {
-            console.log("something went wrong in controller  level  (updateGame) ")
+            console.log("something went wrong in controller  level  (updateTeamMaster) ")
             return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
                 message: error.message,
                 sucess: false,
@@ -73,20 +73,20 @@ class GameController {
         }
     }
 
-    async deleteGame(req,res) {
+    async deleteTeamMaster(req,res) {
         try {
-            const { gameId } = req.params; 
-            
-            const response = await gameService.deleteService(gameId);
+            const { teammasterId } = req.params; 
+
+            const response = await teamMasterService.deleteService(teammasterId);
             return res.status(SucessCode.OK).json({
-                message: "Successfully deleteGame",
+                message: "Successfully deleteTeamMaster",
                 success: true,
                 data: response,
                 err: {},
             });
 
         } catch (error) {
-            console.log("something went wrong in controller  level  (deleteGame) ")
+            console.log("something went wrong in controller  level  (deleteTeamMaster) ")
             return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
                 message: error.message,
                 sucess: false,
@@ -101,6 +101,5 @@ class GameController {
 
 
 
-const gameController = new GameController();
-
-module.exports = gameController;
+const teamMasterController = new TeamMasterController();
+module.exports = teamMasterController;

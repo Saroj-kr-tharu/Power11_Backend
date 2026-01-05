@@ -28,8 +28,13 @@ const matchPlayerSchema = new mongoose.Schema({
 
   roles: {
     type: [String],
-    validate: v => v.length > 0
+    required: true,
+    validate: {
+      validator: v => Array.isArray(v) && v.length > 0,
+      message: "At least one role is required"
+    }
   },
+
 
 
   isPlaying: {

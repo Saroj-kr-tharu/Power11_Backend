@@ -20,11 +20,13 @@ const gameSchema = new mongoose.Schema({
 
     rolesConfig: {
         type: Map,
-            of: {
-                min: { type: Number, required: true },
-                max: { type: Number, required: true }
-            }
+        of: {
+            min: { type: Number, required: true },
+            max: { type: Number, required: true }
+        },
+        required: true
     },
+
 
     scoringRules: {
         type: Map,

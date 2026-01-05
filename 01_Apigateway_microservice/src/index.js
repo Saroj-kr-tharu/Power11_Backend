@@ -4,7 +4,7 @@ const { default: rateLimit } = require("express-rate-limit");
 const cors = require("cors");
 
 
-const {authRoutes, paymentRoutes, gamePlayerRoutes, teamRoutes, contestRoutes, leaderboardRoutes} = require('./routes/index')
+const {authRoutes, paymentRoutes, gamePlayerRoutes, teamRoutes, contestRoutes, leaderboardRoutes, matchRoutes} = require('./routes/index')
 
 const app = express();
 const PORT = 3000;
@@ -46,6 +46,7 @@ app.use("/gameplayer", gamePlayerRoutes);
 app.use("/team", teamRoutes);
 app.use("/contest", contestRoutes);
 app.use("/leaderboard", leaderboardRoutes);
+app.use("/match", matchRoutes);
 
 
 app.use(express.json());
@@ -54,7 +55,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/ping', (req, res) => {
   res.status(200).json({ message: 'api gateway is good to go' });
 });
-
+ 
 app.listen(PORT, () => {
   console.log(`Api Gateway started At :- ${PORT}`);
 });

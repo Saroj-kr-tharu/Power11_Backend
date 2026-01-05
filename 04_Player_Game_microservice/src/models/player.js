@@ -8,7 +8,7 @@ const playerSchema = new mongoose.Schema({
 
     gameId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'game',
+        ref: 'Game',
         required: true
     },
 
