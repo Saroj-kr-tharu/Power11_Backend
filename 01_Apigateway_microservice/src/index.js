@@ -14,15 +14,6 @@ const limiter = rateLimit({
   max: 50,
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan("combined"));
-app.use(limiter);
-
-app.get('/ping', (req, res) => {
-  res.status(200).json({ message: 'api gateway is good to go' });
-});
-
 const allowedOrigins = ['http://localhost:4200'];
 
 app.use(
@@ -45,14 +36,24 @@ app.use(
   })
 );
 
+app.use(morgan("combined"));
+app.use(limiter);
 
 
-app.use("/auth",authRoutes );
+app.use("/auth", authRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/gameplayer", gamePlayerRoutes);
 app.use("/team", teamRoutes);
 app.use("/contest", contestRoutes);
 app.use("/leaderboard", leaderboardRoutes);
+
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.get('/ping', (req, res) => {
+  res.status(200).json({ message: 'api gateway is good to go' });
+});
 
 app.listen(PORT, () => {
   console.log(`Api Gateway started At :- ${PORT}`);
