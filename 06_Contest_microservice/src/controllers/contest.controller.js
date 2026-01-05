@@ -1,4 +1,4 @@
-const {ContestService} = require('../services/index')
+const {contestService} = require('../services/index')
 const {SucessCode, ServerErrosCodes} = require('../utlis/Errors/https_codes')
 
 class ContestController { 
@@ -7,7 +7,7 @@ class ContestController {
         try {
 
             const {userId, players, contestId, gameId, totalCredits} = req?.body; 
-            const response = await ContestService.createService({userId, players, contestId, gameId, totalCredits});
+            const response = await contestService.createService({userId, players, contestId, gameId, totalCredits});
             
         
             return res.status(SucessCode.OK).json({
@@ -32,7 +32,7 @@ class ContestController {
 
     async getAllContest(req,res) {
         try {
-            const response = await ContestService.getAllService();
+            const response = await contestService.getAllService();
             return res.status(SucessCode.OK).json({
                 message: "Successfully getAllGame",
                 success: true,
@@ -55,7 +55,7 @@ class ContestController {
         try {
             const { teamId } = req.params; 
             const data = req?.body; 
-            const response = await ContestService.updateService(teamId,data);
+            const response = await contestService.updateService(teamId,data);
             return res.status(SucessCode.OK).json({
                 message: "Successfully updateGame",
                 success: true,
@@ -78,7 +78,7 @@ class ContestController {
         try {
             const { teamId } = req.params; 
             
-            const response = await ContestService.deleteService(teamId);
+            const response = await contestService.deleteService(teamId);
             return res.status(SucessCode.OK).json({
                 message: "Successfully deleteGame",
                 success: true,

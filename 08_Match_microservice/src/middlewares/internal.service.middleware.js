@@ -1,7 +1,7 @@
 
 const {ClientErrorsCodes} = require('../utlis/Errors/https_codes')
 const {INTERNAL_SERVER_TOKEN} = require('../config/server.config')
-const {JwtHelper} = require("../utlis/index")
+
 
 class InternalServiceMiddleware {
     
@@ -16,7 +16,7 @@ class InternalServiceMiddleware {
           return res.status(ClientErrorsCodes.UNAUTHORIZED).json({ message: "Unauthorized", success: false });
         }
         
-        
+        next()
 
     }
     

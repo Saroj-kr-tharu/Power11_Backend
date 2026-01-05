@@ -17,6 +17,8 @@ class InternalServiceMiddleware {
           return res.status(ClientErrorsCodes.UNAUTHORIZED).json({ message: "Unauthorized", success: false });
         }
 
+        next();
+
     }
     
 

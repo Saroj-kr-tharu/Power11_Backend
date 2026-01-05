@@ -5,7 +5,7 @@ class MatchController {
 
     async addMatch(req,res) {
         try {
-
+           
             const {gameId, title, matchType, teams, venue, startTime, endTime, status, squadAnnounced, result, metadata, createdBy} = req?.body; 
             const response = await matchService.createService({gameId, title, matchType, teams, venue, startTime, endTime, status, squadAnnounced, result, metadata, createdBy});
             

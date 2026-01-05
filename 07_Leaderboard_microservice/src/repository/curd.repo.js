@@ -16,7 +16,7 @@ class CurdRepo {
 
     async getAll() {
         try {
-            const tag = await this.model.findById({});
+            const tag = await this.model.find({});
             return tag;
         } catch (error) {
             console.log('Something went wrong in repo (getAll)');
@@ -49,7 +49,7 @@ class CurdRepo {
         try {
             const options = {};
             if (session) options.session = session;
-            console.log('id => ', id  , " and session => ", session )
+           
             const result = await this.model.findByIdAndDelete(id, options);
             return result;
         } catch (error) {

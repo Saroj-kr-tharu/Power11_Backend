@@ -17,11 +17,11 @@ class UserMiddleware {
 
             
             try {
+                const token = req?.headers['x-access-token'];
                 const response = await JwtHelper.verifyToken(token)
+                
                 const role = response?.data?.role;
-                if(role == 'ADMIN'){
-                    return  next();
-                }
+                if(role.toLowerCase() == 'admin') return  next(); 
 
                 return res.status(ClientErrorsCodes.UNAUTHORIZED).json({
                     data: {},
@@ -31,11 +31,11 @@ class UserMiddleware {
 
                 
                 } catch (error) {
-                return res.status(ClientErrorsCodes.UNAUTHORIZED).json({
-                    data: {},
-                    message: "Invalid token or Token expired",
-                    success: false,
-                });
+                    return res.status(ClientErrorsCodes.UNAUTHORIZED).json({
+                        data: {},
+                        message: "Invalid token or failed Token expired",
+                        success: false,
+                    });
                 }
     };
 

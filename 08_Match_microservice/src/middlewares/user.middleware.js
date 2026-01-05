@@ -31,7 +31,7 @@ class UserMiddleware {
         }
         try {
             const response = await JwtHelper.verifyToken(token)   
-                // console.log('response => ', response)            
+                console.log('response => ', response)            
             if(response) {
                 req.userId= response?.data?.id;
                 req.email = response?.data?.email;

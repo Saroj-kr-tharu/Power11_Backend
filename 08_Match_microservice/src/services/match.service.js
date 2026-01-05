@@ -9,5 +9,5 @@ class MatchService extends curdService{
 
 }
 
-const MatchService = new MatchService()
-module.exports = MatchService;
+const matchService = new MatchService()
+module.exports = matchService;

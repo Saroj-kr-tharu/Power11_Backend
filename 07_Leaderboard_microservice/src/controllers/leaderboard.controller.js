@@ -6,8 +6,8 @@ class LeaderboardController {
     async addLeaderboard(req,res) {
         try {
 
-            const {userId, players, contestId, gameId, totalCredits} = req?.body; 
-            const response = await leaderboardService.createService({userId, players, contestId, gameId, totalCredits});
+            const {contestId, teamId, userId, totalPoints, rank} = req?.body; 
+            const response = await leaderboardService.createService({contestId, teamId, userId, totalPoints, rank});
             
         
             return res.status(SucessCode.OK).json({
@@ -77,8 +77,8 @@ class LeaderboardController {
     async deleteLeaderboard(req,res) {
         try {
             const { leaderboardId } = req.params; 
-            
-            const response = await leaderboardService.deleteLeaderboard(leaderboardId);
+           
+            const response = await leaderboardService.deleteService(leaderboardId);
             return res.status(SucessCode.OK).json({
                 message: "Successfully deleteGame",
                 success: true,

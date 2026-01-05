@@ -8,7 +8,7 @@ const router = express.Router();
 const contestProxy = createProxyMiddleware({
   target: CONTEST_BACKEND_URL,
   changeOrigin: true,
-  pathRewrite: { "^/": "/contest" },
+  pathRewrite: { "^/": "/contest/" },
   headers: { "x-internal-server-token": INTERNAL_SERVER_TOKEN },
   logLevel: "debug",
 });

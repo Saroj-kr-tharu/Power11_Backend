@@ -5,10 +5,10 @@ const { LEADERBOARD_BACKEND_URL, INTERNAL_SERVER_TOKEN } = require("../serverCon
 
 const router = express.Router();
 
-const leaderboardProxy = createProxyMiddleware({
+const leaderboardProxy = createProxyMiddleware({ 
   target: LEADERBOARD_BACKEND_URL,
   changeOrigin: true,
-  pathRewrite: { "^/": "/leaderboard" },
+  pathRewrite: { "^/": "/leaderboard/" },
   headers: { "x-internal-server-token": INTERNAL_SERVER_TOKEN },
   logLevel: "debug",
 });

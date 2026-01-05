@@ -20,6 +20,8 @@ const gamePlayerProxy = createProxyMiddleware({
 });
 
 
+router.get("/player/check",userMw.verifyAdmin, gamePlayerProxy);
+
 // game 
 router.post("/game", userMw.verifyAdmin , gamePlayerProxy);
 router.get("/game", userMw.verifyToken , gamePlayerProxy);

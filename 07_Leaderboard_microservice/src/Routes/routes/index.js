@@ -11,10 +11,10 @@ router.get("/leaderboard/check", (req, res) => {
 });
 
 
-router.post( "/contest",internalTokenMw.checkInternalServiceToken, userMw.validateToken,   leaderboardCtrl.addLeaderboard );
-router.get( "/contest",   leaderboardCtrl.getAllLeaderboard );
-router.delete( "/contest/:leaderboardId",internalTokenMw.checkInternalServiceToken,userMw.validateToken,  leaderboardCtrl.deleteLeaderboard );
-router.patch( "/contest/:leaderboardId",internalTokenMw.checkInternalServiceToken, userMw.validateToken, leaderboardCtrl.updateLeaderboard);
+router.post( "/leaderboard",internalTokenMw.checkInternalServiceToken, userMw.validateToken,   leaderboardCtrl.addLeaderboard );
+router.get( "/leaderboard",   leaderboardCtrl.getAllLeaderboard );
+router.delete( "/leaderboard/:leaderboardId",internalTokenMw.checkInternalServiceToken,userMw.validateToken,  leaderboardCtrl.deleteLeaderboard );
+router.patch( "/leaderboard/:leaderboardId",internalTokenMw.checkInternalServiceToken, userMw.validateToken, leaderboardCtrl.updateLeaderboard);
 
  
 

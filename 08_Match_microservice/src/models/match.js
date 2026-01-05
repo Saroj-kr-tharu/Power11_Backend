@@ -11,7 +11,8 @@ const MatchSchema = new mongoose.Schema(
 
     title: {
       type: String,
-      required: true
+      required: true,
+      trim: true
     },
 
     matchType: {
@@ -20,12 +21,18 @@ const MatchSchema = new mongoose.Schema(
       default: "TEAM"
     },
 
+    
     teams: [
       {
-        teamId: String,   // "IND", "AUS", "MU"
-        name: String,
-        shortName: String,
-        logo: String
+        teamId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "TeamMaster",
+          required: true
+        },
+        isHome: {
+          type: Boolean,
+          default: false
+        }
       }
     ],
 
@@ -34,6 +41,13 @@ const MatchSchema = new mongoose.Schema(
     },
 
     startTime: {
+      type: Date,
+      required: true,
+      index: true
+    },
+
+  
+    lockTime: {
       type: Date,
       required: true,
       index: true
@@ -56,12 +70,17 @@ const MatchSchema = new mongoose.Schema(
     },
 
     result: {
-    winnerTeamId: String,
-    isDraw: Boolean,
-    summary: String,
-    winMargin: String
-  },
-
+      winnerTeamId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "TeamMaster"
+      },
+      isDraw: {
+        type: Boolean,
+        default: false
+      },
+      summary: String,
+      winMargin: String
+    },
 
     metadata: {
       type: Map,
@@ -69,16 +88,15 @@ const MatchSchema = new mongoose.Schema(
     },
 
     createdBy: {
-      type: String 
+      type: String // admin / system
     }
   },
   { timestamps: true }
 );
 
-
+/* Indexes */
 MatchSchema.index({ gameId: 1, startTime: 1 });
 MatchSchema.index({ status: 1, startTime: 1 });
 
-
-const matchModel = mongoose.model('Match', MatchSchema);
-module.exports = matchModel; 
+const matchModel = mongoose.model("Match", MatchSchema);
+module.exports = matchModel;
