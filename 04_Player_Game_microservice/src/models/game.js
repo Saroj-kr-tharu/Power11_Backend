@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const gameSchema = new mongoose.Schema({
     name: {
         type: String,
-        enum: ['CRICKET', 'FOOTBALL', 'BADMINTON'],
+        enum: ['CRICKET', 'FOOTBALL'],
         unique: true,
         required: true,
     },

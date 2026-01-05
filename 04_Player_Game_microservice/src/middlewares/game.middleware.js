@@ -21,19 +21,83 @@ class GameMiddleware {
     
     addPlayer  (req, res, next) {
    
-     const { name, roles, gameId, team,baseCredits,} = req.body;
-     if ( !name || !roles || !gameId || !team || !baseCredits   ) {
-         console.log("Something went wrong in game middleware");
- 
-         return res.status(ClientErrorsCodes.BAD_REQUEST).json({
-             data: {},
-             message: "Required Field is missing",
-             success: false,
-         });
-     }
+      const { name, roles, gameId, team,baseCredits,} = req.body;
+      if ( !name || !roles || !gameId || !team || !baseCredits   ) {
+          console.log("Something went wrong in game middleware");
+      
+          return res.status(ClientErrorsCodes.BAD_REQUEST).json({
+              data: {},
+              message: "Required Field is missing",
+              success: false,
+          });
+      }
  
        next();
      };
+
+    addTeamMaster  (req, res, next) {
+   
+    const { gameId , name , shortName} = req.body;
+  
+      if ( !gameId || !name || !shortName   ) {
+          console.log("Something went wrong in game middleware");
+      
+          return res.status(ClientErrorsCodes.BAD_REQUEST).json({
+              data: {},
+              message: "Required Field is missing",
+              success: false,
+          });
+      }
+ 
+       next();
+     };
+
+
+    playerId  (req, res, next) {
+      const { playerId } = req.params;   
+      if (!playerId   ) {
+          console.log("Something went wrong in game middleware");
+      
+          return res.status(ClientErrorsCodes.BAD_REQUEST).json({
+              data: {},
+              message: "playerId  is missing",
+              success: false,
+          });
+      }
+ 
+       next();
+    };
+    
+    gameId  (req, res, next) {
+      const { gameId } = req.params;   
+      if (!gameId   ) {
+          console.log("Something went wrong in game middleware");
+      
+          return res.status(ClientErrorsCodes.BAD_REQUEST).json({
+              data: {},
+              message: "gameId is missing",
+              success: false,
+          });
+      }
+ 
+       next();
+    };
+    
+    teammasterId  (req, res, next) {
+      const { gameId } = req.params;   
+      if (!gameId   ) {
+          console.log("Something went wrong in game middleware");
+      
+          return res.status(ClientErrorsCodes.BAD_REQUEST).json({
+              data: {},
+              message: "teammasterId is missing",
+              success: false,
+          });
+      }
+ 
+       next();
+    };
+
    
 
 }

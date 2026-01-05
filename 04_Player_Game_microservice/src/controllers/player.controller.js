@@ -7,7 +7,7 @@ class PlayerController {
         try {
             const { name, roles, gameId, team,baseCredits,}  = req.body;
 
-            const response = await playerService.createService({name, roles, gameId, team,baseCredits,} );
+            const response = await playerService.addPlayer({name, roles, gameId, team,baseCredits,} );
             
             return res.status(SucessCode.OK).json({
                 message: "Successfully addPlayer",
@@ -26,6 +26,28 @@ class PlayerController {
                 err: error.explanation,
             });
         }
+    }
+
+    async getByGameId(req,res) {
+            try {
+                const { gameId } = req.params; 
+                const response = await playerService.getTeamByGame(gameId);
+                return res.status(SucessCode.OK).json({
+                    message: "Successfully getByGameId",
+                    success: true,
+                    data: response,
+                    err: {},
+                });
+    
+            } catch (error) {
+                console.log("something went wrong in controller  level  (getByGameId) ")
+                return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
+                    message: error.message,
+                    sucess: false,
+                    data: {},
+                    err: error.explanation,
+                });
+            }
     }
 
 

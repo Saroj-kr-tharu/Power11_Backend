@@ -6,8 +6,8 @@ class TeamMasterController {
     async addTeamMaster(req,res) {
         try {
             const { name, shortName, logo, country, homeCity, status, metadata, createdBy, roles, gameId, team, baseCredits } = req.body;
-
-            const response = await teamMasterService.createService({name, shortName, logo, country, homeCity, status, metadata, createdBy, roles, gameId, team, baseCredits} );
+            const data = {name, shortName, logo, country, homeCity, status, metadata, createdBy, roles, gameId, team, baseCredits};
+            const response = await teamMasterService.addTeamMaster(data );
             
             return res.status(SucessCode.OK).json({
                 message: "Successfully addTeamMaster",
@@ -41,6 +41,28 @@ class TeamMasterController {
 
         } catch (error) {
             console.log("something went wrong in controller  level  (getAllTeamMaster) ")
+            return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
+                message: error.message,
+                sucess: false,
+                data: {},
+                err: error.explanation,
+            });
+        }
+    }
+    
+    async getAllByGameId(req,res) {
+        try {
+            const { gameId } = req.params; 
+            const response = await teamMasterService.getTeamByGame(gameId);
+            return res.status(SucessCode.OK).json({
+                message: "Successfully getAllByGameId",
+                success: true,
+                data: response,
+                err: {},
+            });
+
+        } catch (error) {
+            console.log("something went wrong in controller  level  (getAllByGameId) ")
             return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
                 message: error.message,
                 sucess: false,

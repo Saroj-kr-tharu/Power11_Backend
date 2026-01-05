@@ -4,7 +4,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx nodemon src/index.js"
+    "start": "npx nodemon src/index.js",
+    "seed": "node src/seeders/index.js",
+    "seed:games": "node src/seeders/game.seed.js",
+    "seed:teams": "node src/seeders/teammaster.seed.js",
+    "seed:players": "node src/seeders/player.seed.js"
   },
   "author": "",
   "license": "ISC",

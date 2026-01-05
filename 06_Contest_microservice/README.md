@@ -1,15 +1,23 @@
-﻿<div align="center">
+<div align="center">
 
 # 🏆 Contest Microservice
 
+<img src="https://img.shields.io/badge/Service-Contest_Management-gold?style=for-the-badge" alt="Service"/>
+
 ### Power11 Fantasy Sports Platform
 
-[![Node.js](https://img.shields.io/badge/Node.js-18.x-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Express.js](https://img.shields.io/badge/Express.js-5.x-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-7.x-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+<br/>
 
-*Contest creation, entry management, and prize distribution for fantasy gaming.*
+[![Node.js](https://img.shields.io/badge/Node.js-18.x-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-5.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.x-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Mongoose](https://img.shields.io/badge/Mongoose-ODM-880000?style=for-the-badge)](https://mongoosejs.com/)
+
+<br/>
+
+**🏆 Contests** · **💰 Prizes** · **📝 Entries** · **🎮 Gaming**
+
+*Contest creation, entry management, and prize distribution system for competitive fantasy gaming.*
 
 </div>
 
@@ -17,18 +25,61 @@
 
 ## 📖 Overview
 
-The Contest Microservice manages all **contest creation, user entries, and prize distribution** for the Power11 fantasy sports platform. It handles different contest types, entry fees, and winning calculations.
+The **Contest Microservice** manages all **contest creation, user entries, and prize distribution** for the Power11 fantasy sports platform. It handles different contest types, entry fees, validation, and winning calculations.
+
+### 🎯 Key Responsibilities
+
+| Responsibility | Description |
+|:---------------|:------------|
+| 🏆 **Contest Management** | CRUD operations for contests |
+| 📝 **Entry Processing** | Handle user contest entries |
+| 💰 **Prize Distribution** | Calculate and distribute winnings |
+| ✅ **Validation** | Validate entries and payments |
+| 📊 **Analytics** | Real-time contest statistics |
+
+---
 
 ## ✨ Features
 
-| Feature | Description |
-|---------|-------------|
-| 🎯 **Contest Creation** | Create various contest types |
-| 📝 **Entry Management** | Handle user contest entries |
-| 💰 **Prize Pool** | Dynamic prize pool calculation |
-| 📊 **Contest Analytics** | Real-time contest statistics |
-| 🎮 **Contest Types** | Free, paid, mega contests |
-| ✅ **Entry Validation** | Validate entries and payments |
+<table>
+<tr>
+<td align="center">🎯</td>
+<td><b>Contest Creation</b></td>
+<td>Create various contest types with custom rules</td>
+</tr>
+<tr>
+<td align="center">📝</td>
+<td><b>Entry Management</b></td>
+<td>Handle user contest entries and validations</td>
+</tr>
+<tr>
+<td align="center">💰</td>
+<td><b>Prize Pool</b></td>
+<td>Dynamic prize pool calculation and distribution</td>
+</tr>
+<tr>
+<td align="center">📊</td>
+<td><b>Contest Analytics</b></td>
+<td>Real-time statistics and participation tracking</td>
+</tr>
+<tr>
+<td align="center">🎮</td>
+<td><b>Contest Types</b></td>
+<td>Free, paid, mega, head-to-head contests</td>
+</tr>
+<tr>
+<td align="center">✅</td>
+<td><b>Entry Validation</b></td>
+<td>Payment and team validation before entry</td>
+</tr>
+<tr>
+<td align="center">🔒</td>
+<td><b>Secure Processing</b></td>
+<td>Transaction-safe entry and payment processing</td>
+</tr>
+</table>
+
+---
 
 ## 🏗️ Architecture
 
@@ -39,153 +90,212 @@ The Contest Microservice manages all **contest creation, user entries, and prize
                               └──────────┬──────────┘
                                          │
                                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                  🏆 CONTEST MICROSERVICE (:3004)                   │
-├─────────────────────────────────────────────────────────────────┤
-│  ┌─────────┐   ┌─────────────┐   ┌─────────────┐               │
-│  │ Routes  │──▶│ Controllers │──▶│  Services   │               │
-│  │  Layer  │   │    Layer    │   │    Layer    │               │
-│  └─────────┘   └─────────────┘   └──────┬──────┘               │
-│                                       │                         │
-│                              ┌────────┴────────┐                  │
-│                              │   Repository   │                  │
-│                              │     Layer      │                  │
-│                              └────────┬────────┘                  │
-└─────────────────────────────────┼──────────────────────────────┘
-                                         │
-        ┌─────────────────────────────┼─────────────────────────────┐
-        ▼                             ▼                             ▼
-┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│  🗄️ MongoDB   │       │ 💳 Payment Svc │       │  👥 Team Svc   │
-│   (Contests)   │       │   (:3006)     │       │    (:3003)    │
-└─────────────────┘       └─────────────────┘       └─────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                        🏆 CONTEST MICROSERVICE (:3004)                           │
+├──────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                  │
+│   ┌───────────┐    ┌───────────────┐    ┌───────────────┐                       │
+│   │  Routes   │───▶│  Controllers  │───▶│   Services    │                       │
+│   │   Layer   │    │     Layer     │    │     Layer     │                       │
+│   └───────────┘    └───────────────┘    └───────┬───────┘                       │
+│                                                 │                                │
+│                                 ┌───────────────┴───────────────┐               │
+│                                 ▼                               ▼               │
+│                        ┌─────────────────┐           ┌─────────────────┐        │
+│                        │   Repository    │           │ External Service│        │
+│                        │     Layer       │           │     Calls       │        │
+│                        └────────┬────────┘           └────────┬────────┘        │
+│                                 │                             │                 │
+└─────────────────────────────────┼─────────────────────────────┼─────────────────┘
+                                  │                             │
+                                  ▼                             ▼
+                   ┌───────────────────────┐     ┌──────────────────────────────┐
+                   │      🗄️ MongoDB      │     │   🔗 External Services       │
+                   │      (Contests)       │     │  ┌────────────────────────┐  │
+                   │  ┌─────────────────┐  │     │  │ 💳 Payment Service    │  │
+                   │  │    Contests     │  │     │  │     (:3006)           │  │
+                   │  │    Entries      │  │     │  └────────────────────────┘  │
+                   │  │    Prizes       │  │     │  ┌────────────────────────┐  │
+                   │  └─────────────────┘  │     │  │ 👥 Team Service       │  │
+                   └───────────────────────┘     │  │     (:3003)           │  │
+                                                 │  └────────────────────────┘  │
+                                                 └──────────────────────────────┘
 ```
 
-## � Security & Service Communication
+---
 
-### Internal Service Token
-
-This microservice uses **Internal Service Token** for secure service-to-service communication.
+## 🔐 Service-to-Service Communication
 
 ```
-┌─────────────────┐     INTERNAL_SERVER_TOKEN      ┌─────────────────┐
-│ Contest Service │ ─────────────────────────────▶ │ Payment Service │
-│    (:3004)      │   Header: x-internal-token     │    (:3006)      │
-└─────────────────┘                                └─────────────────┘
+┌─────────────────┐    x-internal-token     ┌─────────────────┐
+│ Contest Service │ ──────────────────────▶ │ Payment Service │
+│    (:3004)      │                         │    (:3006)      │
+└─────────────────┘                         └─────────────────┘
 ```
 
-| Security Feature | Description |
-|-----------------|-------------|
-| 🔑 **Internal Token** | Shared secret for service-to-service auth |
-| 🛡️ **JWT Validation** | User requests validated via API Gateway |
-| 🔒 **Header Auth** | `x-internal-token` header for internal calls |
+---
 
-### Environment Variables for Security
-
-```env
-# Internal Service Communication
-INTERNAL_SERVER_TOKEN=your_secure_internal_token
-
-# Service URLs (for internal communication)
-PAYMENT_SERVICE_URL=http://localhost:3006
-TEAM_SERVICE_URL=http://localhost:3003
-```
-
-## �📁 Project Structure
+## 📁 Project Structure
 
 ```
 06_Contest_microservice/
+│
 ├── 📄 dockerfile                    # Docker configuration
 ├── 📄 package.json                  # Dependencies and scripts
-├── 📄 README.md                     # This file
+├── 📄 README.md                     # This documentation
+│
 └── 📁 src/
-    ├── 📄 index.js                  # Application entry point
+    ├── 📄 index.js                  # 🚀 Application entry point
+    │
     ├── 📁 config/
     │   ├── 📄 database.js           # MongoDB connection
     │   └── 📄 server.config.js      # Server settings
+    │
     ├── 📁 controllers/              # Request handlers
     ├── 📁 middlewares/              # Custom middleware
     ├── 📁 models/                   # Mongoose models
     ├── 📁 repository/               # Data access layer
     ├── 📁 Routes/                   # API routes
+    ├── 📁 seeders/                  # Database seeders
     ├── 📁 services/                 # Business logic
     └── 📁 utlis/                    # Utilities
 ```
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js v18.x or higher
-- MongoDB v7.x
-- npm v9.x or higher
+| Requirement | Version |
+|-------------|---------|
+| Node.js | v18.x or higher |
+| MongoDB | v7.x |
+| npm | v9.x or higher |
 
-### Installation
+### 📥 Installation
 
-1. **Navigate to the service directory**
-   ```bash
-   cd 06_Contest_microservice
-   ```
+```bash
+# 1️⃣ Navigate to the service directory
+cd 06_Contest_microservice
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+# 2️⃣ Install dependencies
+npm install
 
-3. **Configure environment variables**
-   
-   Create a `.env` file:
-   ```env
-   PORT=3004
-   NODE_ENV=development
-   
-   # MongoDB Configuration
-   MONGODB_URI=mongodb://localhost:27017/power11_contests
-   
-   # JWT Configuration
-   PRIVATEJWT=your_jwt_secret_key
-   ```
+# 3️⃣ Configure environment variables
+cp .env.example .env
 
-4. **Start the server**
-   ```bash
-   npm start
-   ```
+# 4️⃣ Start the server
+npm start
+```
 
-   The service will be running at `http://localhost:3004`
+### ⚙️ Environment Configuration
+
+```env
+# ═══════════════════════════════════════════════════════════
+# 🏆 CONTEST MICROSERVICE CONFIGURATION
+# ═══════════════════════════════════════════════════════════
+
+# Server Configuration
+PORT=3004
+NODE_ENV=development
+
+# ═══════════════════════════════════════════════════════════
+# 🗄️ MONGODB CONFIGURATION
+# ═══════════════════════════════════════════════════════════
+MONGODB_URI=mongodb://localhost:27017/power11_contests
+
+# ═══════════════════════════════════════════════════════════
+# 🔐 SECURITY CONFIGURATION
+# ═══════════════════════════════════════════════════════════
+PRIVATEJWT=your_jwt_secret_key
+INTERNAL_SERVER_TOKEN=your_internal_service_token
+
+# ═══════════════════════════════════════════════════════════
+# 🔗 SERVICE URLs
+# ═══════════════════════════════════════════════════════════
+PAYMENT_SERVICE_URL=http://localhost:3006
+TEAM_SERVICE_URL=http://localhost:3003
+```
+
+---
 
 ## 📡 API Endpoints
 
-### Contests
+### 🏆 Contests
 
 | Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `GET` | `/api/v1/contests` | Get all contests | No |
-| `GET` | `/api/v1/contests/:id` | Get contest by ID | No |
-| `GET` | `/api/v1/contests/match/:matchId` | Get contests by match | No |
-| `POST` | `/api/v1/contests` | Create contest (Admin) | Yes |
-| `POST` | `/api/v1/contests/:id/join` | Join contest | Yes |
-| `GET` | `/api/v1/contests/my-contests` | Get user's contests | Yes |
+|:------:|:---------|:------------|:----:|
+| `GET` | `/api/v1/contests` | Get all contests | ❌ |
+| `GET` | `/api/v1/contests/:id` | Get contest by ID | ❌ |
+| `GET` | `/api/v1/contests/match/:matchId` | Get contests by match | ❌ |
+| `POST` | `/api/v1/contests` | Create contest | 🔐 Admin |
+| `POST` | `/api/v1/contests/:id/join` | Join contest | ✅ |
+| `GET` | `/api/v1/contests/my-contests` | Get user's contests | ✅ |
+| `GET` | `/api/v1/contests/:id/leaderboard` | Get contest standings | ❌ |
 
-### Contest Types
+---
 
-| Type | Entry Fee | Prize Pool | Max Entries |
-|------|-----------|------------|-------------|
-| **Free** | ₹0 | Fixed | Unlimited |
-| **Practice** | ₹0 | None | Unlimited |
-| **Mega** | ₹49-499 | Variable | 10,000+ |
-| **Head-to-Head** | ₹10-1000 | 2x Entry | 2 |
-| **Private** | Custom | Custom | Custom |
+## 🎮 Contest Types
+
+| Type | Icon | Entry Fee | Prize Pool | Max Entries |
+|:-----|:----:|:---------:|:----------:|:-----------:|
+| **Free** | 🆓 | ₹0 | Fixed | Unlimited |
+| **Practice** | 📝 | ₹0 | None | Unlimited |
+| **Mega** | 🏆 | ₹49-499 | Variable | 10,000+ |
+| **Head-to-Head** | ⚔️ | ₹10-1000 | 2x Entry | 2 |
+| **Private** | 🔒 | Custom | Custom | Custom |
+| **Winner Takes All** | 👑 | Variable | 100% | Variable |
+
+---
+
+## 💰 Prize Distribution
+
+### Prize Breakdown Structure
+
+| Rank | Percentage | Example (₹10,000 Pool) |
+|:----:|:----------:|:----------------------:|
+| 1st | 50% | ₹5,000 |
+| 2nd | 25% | ₹2,500 |
+| 3rd | 15% | ₹1,500 |
+| 4th-10th | 10% | ₹143 each |
+
+### Contest Schema
+
+```javascript
+{
+  contestId: String,        // Unique contest ID
+  matchId: String,          // Associated match
+  contestName: String,      // Display name
+  contestType: String,      // FREE, PAID, MEGA, H2H
+  entryFee: Number,         // Entry fee amount
+  prizePool: Number,        // Total prize pool
+  maxEntries: Number,       // Maximum participants
+  currentEntries: Number,   // Current count
+  prizeBreakup: [{
+    rank: Number,
+    prize: Number
+  }],
+  status: String,           // UPCOMING, LIVE, COMPLETED
+  startTime: Date,
+  endTime: Date
+}
+```
+
+---
 
 ## 📦 Dependencies
 
 | Package | Version | Purpose |
-|---------|---------|---------|
+|:--------|:--------|:--------|
 | `express` | ^5.1.0 | Web framework |
 | `mongoose` | ^9.1.1 | MongoDB ODM |
 | `jsonwebtoken` | ^9.0.2 | JWT authentication |
 | `axios` | ^1.13.2 | HTTP client |
 | `uuid` | ^13.0.0 | UUID generation |
-| `dotenv` | ^17.2.3 | Environment config |
+| `dotenv` | ^17.2.3 | Environment configuration |
+
+---
 
 ## 🐳 Docker
 
@@ -194,8 +304,15 @@ TEAM_SERVICE_URL=http://localhost:3003
 docker build -t power11-contest-service .
 
 # Run Container
-docker run -d --name contest-service -p 3004:3004 --env-file .env power11-contest-service
+docker run -d \
+  --name contest-service \
+  -p 3004:3004 \
+  --env-file .env \
+  --network power11-network \
+  power11-contest-service
 ```
+
+---
 
 ## 📄 License
 
@@ -206,5 +323,9 @@ This project is licensed under the **MIT License**.
 <div align="center">
 
 **[⬆ Back to Main README](../README.md)**
+
+<br/>
+
+<sub>Part of the Power11 Fantasy Sports Platform</sub>
 
 </div>

@@ -33,7 +33,7 @@ router.post("/player", userMw.verifyAdmin , gamePlayerProxy);
 router.get("/player", userMw.verifyToken , gamePlayerProxy);
 router.delete("/player/:playerId", userMw.verifyAdmin , gamePlayerProxy);
 router.patch("/player/:playerId", userMw.verifyAdmin , gamePlayerProxy);
-
+router.get( "/player/:gameId",userMw.verifyUser,  gamePlayerProxy );
 
 
 // team master
@@ -41,6 +41,7 @@ router.post( "/teammaster", userMw.verifyAdmin,   gamePlayerProxy);
 router.get( "/teammaster", userMw.verifyUser,  gamePlayerProxy);
 router.delete( "/teammaster/:teammasterId", userMw.verifyAdmin,  gamePlayerProxy);
 router.patch( "/teammaster/:teammasterId", userMw.verifyAdmin,  gamePlayerProxy);
+router.get( "/teammaster/:gameId",userMw.verifyUser,  gamePlayerProxy );
 
 
 module.exports = router;
