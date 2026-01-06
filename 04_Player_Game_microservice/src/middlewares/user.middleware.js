@@ -23,7 +23,7 @@ class UserMiddleware {
         if (!token ) {
             console.log("token is missing ");
             
-            return res.status(ClientErrorsCodes.UNAUTHORISED).json({
+            return res.status(ClientErrorsCodes.UNAUTHORIZED).json({
               data: {},
               message: "token is missing  ",
               success: false,

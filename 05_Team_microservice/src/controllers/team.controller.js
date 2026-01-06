@@ -6,13 +6,12 @@ class TeamController {
     async addTeam(req,res) {
         try {
 
-            const {userId, players, contestId, gameId, totalCredits} = req?.body; 
-            const response = await teamService.createService({userId, players, contestId, gameId, totalCredits});
-            
-           
+            const {userId, players,matchId, contestId, gameId, totalCredits} = req?.body; 
+            const token = req?.headers['x-access-token'];
+            const response = await teamService.createTeam({userId, players, contestId,matchId, gameId, totalCredits, token});
             
             return res.status(SucessCode.OK).json({
-                message: "Successfully AddGame",
+                message: "Successfully createdTeam",
                 success: true,
                 data: response,
                 err: {},

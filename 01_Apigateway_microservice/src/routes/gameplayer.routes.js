@@ -25,6 +25,7 @@ router.get("/player/check",userMw.verifyAdmin, gamePlayerProxy);
 // game 
 router.post("/game", userMw.verifyAdmin , gamePlayerProxy);
 router.get("/game", userMw.verifyToken , gamePlayerProxy);
+router.get( "/game/:gameId",userMw.verifyToken,   gamePlayerProxy );
 router.delete("/game/:gameId", userMw.verifyAdmin , gamePlayerProxy);
 router.patch("/game/:gameId", userMw.verifyAdmin , gamePlayerProxy);
 

@@ -27,8 +27,8 @@ class CurdRepo {
 
     async get(id) {
         try {
-            const tag = await this.model.findById(id);
-            return tag;
+            const res = await this.model.findById(id);
+            return res;
         } catch (error) {
             console.log('Something went wrong in repo (get)');
             throw error;

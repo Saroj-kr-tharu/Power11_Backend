@@ -13,13 +13,10 @@ const matchProxy = createProxyMiddleware({
     pathRewrite: { "^/": "/match/" },
     headers: { "x-internal-server-token": INTERNAL_SERVER_TOKEN },
     logLevel: "debug",
-    
-
 });
 
-
 router.post( "/",userMw.verifyAdmin, matchProxy );
-router.get( "/",   matchProxy );
+router.get( "/",  matchProxy );
 router.delete( "/:matchId",userMw.verifyAdmin, matchProxy );
 router.patch( "/:matchId", userMw.verifyAdmin,matchProxy);
 

@@ -1,59 +1,72 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const TeamSchema = new mongoose.Schema({
-
+const TeamSchema = new mongoose.Schema(
+  {
     userId: {
-        type: String,
-        index: true,
-        required: true
+      type: String,
+      required: true,
+      index: true
     },
 
-
-    players: [
-        {
-            matchPlayerId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "MatchPlayer",
-                required: true
-            },
-            role: String,
-            credits: Number,
-            isCaptain: Boolean,
-            isViceCaptain: Boolean
-        }
-    ],
-
+    matchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Match",
+      required: true,
+      index: true
+    },
 
     contestId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'contest',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Contest",
+      required: true,
+      index: true
     },
 
     gameId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'game',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Game",
+      required: true,
+      index: true
     },
 
+    players: [
+      {
+        matchPlayerId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "MatchPlayer",
+          required: true
+        },
+        role: {
+          type: String,
+          required: true
+        },
+        credits: {
+          type: Number,
+          required: true
+        },
+        isCaptain: {
+          type: Boolean,
+          default: false
+        },
+        isViceCaptain: {
+          type: Boolean,
+          default: false
+        }
+      }
+    ],
+
     totalCredits: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true
     }
-
-   
-}, { timestamps: true });
-
-
+  },
+  { timestamps: true }
+);
 
 TeamSchema.index(
-  { userId: 1, contestId: 1, gameId: 1 },
+  { userId: 1, contestId: 1, matchId: 1 },
   { unique: true }
 );
 
-
-TeamSchema.index({ contestId: 1 });
-TeamSchema.index({ gameId: 1 });
-
 const teamModel = mongoose.model('Team', TeamSchema);
-module.exports = teamModel; 
+module.exports = teamModel;

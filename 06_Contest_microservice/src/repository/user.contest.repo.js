@@ -2,7 +2,7 @@ const CurdRepo = require("./curd.repo");
 const  contestModel = require('../models/contest')
 
 
-class ContestRepo extends CurdRepo { 
+class UserContestRepo extends CurdRepo { 
     constructor(){
         super(contestModel)
     }; 
@@ -24,6 +24,6 @@ class ContestRepo extends CurdRepo {
 }
 
 
-const contestRepo = new ContestRepo(); 
+const userContestRepo = new UserContestRepo(); 
 
-module.exports = contestRepo; 
+module.exports = userContestRepo; 

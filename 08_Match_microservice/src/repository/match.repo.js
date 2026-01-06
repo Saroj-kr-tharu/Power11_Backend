@@ -6,6 +6,21 @@ class MatchRepo extends CurdRepo {
     constructor(){
         super(matchModel)
     }; 
+
+
+    async getByGame(gameId){
+        try {
+           const res = await matchModel.find({gameId});
+           return res; 
+
+        } catch (error) {
+            console.log("something went wrong in service  level  (getByGame) ")
+             throw error;
+           
+        }
+    }
+
+    
  
 
 

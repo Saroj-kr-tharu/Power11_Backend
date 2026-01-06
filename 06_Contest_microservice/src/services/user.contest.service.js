@@ -1,8 +1,8 @@
 const curdService = require("./curd.service");
-const {contestRepo} = require('../repository')
+const {} = require('../repository')
 
 
-class ContestService extends curdService{
+class UserContestService extends curdService{
 
     constructor(){
         super(contestRepo) 
@@ -22,5 +22,5 @@ class ContestService extends curdService{
 
 }
 
-const contestService = new ContestService()
-module.exports = contestService;
+const userContestService = new UserContestService()
+module.exports = userContestService;

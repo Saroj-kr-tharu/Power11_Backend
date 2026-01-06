@@ -12,7 +12,7 @@ router.get("/contest/check", (req, res) => {
 
 
 router.post( "/match",internalTokenMw.checkInternalServiceToken, userMw.validateToken,   matchCtrl.addMatch );
-router.get( "/match",   matchCtrl.getAllMatch );
+router.get( "/match",internalTokenMw.checkInternalServiceToken,  matchCtrl.getAllMatch );
 router.delete( "/match/:matchId",internalTokenMw.checkInternalServiceToken,userMw.validateToken,  matchCtrl.deleteMatch );
 router.patch( "/match/:matchId",internalTokenMw.checkInternalServiceToken, userMw.validateToken, matchCtrl.updateMatch );
 

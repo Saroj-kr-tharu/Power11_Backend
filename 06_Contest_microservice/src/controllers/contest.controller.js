@@ -32,16 +32,25 @@ class ContestController {
 
     async getAllContest(req,res) {
         try {
-            const response = await contestService.getAllService();
+            const { contestId, matchId } = req.query; 
+            
+            let response;
+            if (contestId) {
+                response = await contestService.getByidService(contestId);
+            } else if (matchId) {
+                response = await contestService.getByMatch(matchId);
+            } else {
+                throw new Error("Either contestId or matchId query parameter is required");
+            }
             return res.status(SucessCode.OK).json({
-                message: "Successfully getAllGame",
+                message: "Successfully getAllContest",
                 success: true,
                 data: response,
                 err: {},
             });
 
         } catch (error) {
-            console.log("something went wrong in controller  level  (getAllGame) ")
+            console.log("something went wrong in controller  level  (getAllContest) ")
             return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
                 message: error.message,
                 sucess: false,

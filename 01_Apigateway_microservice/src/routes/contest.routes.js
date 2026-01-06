@@ -16,7 +16,7 @@ const contestProxy = createProxyMiddleware({
 
 // contest routes
 router.post( "/", userMw.verifyAdmin,   contestProxy );
-router.get( "/",  userMw.verifyToken,   contestProxy );
+router.get( "/",  contestProxy );
 router.delete( "/:contestId",userMw.verifyAdmin,  contestProxy );
 router.patch( "/:contestId", userMw.verifyAdmin, contestProxy );
 

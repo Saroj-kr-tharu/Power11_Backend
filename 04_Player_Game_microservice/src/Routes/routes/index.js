@@ -11,6 +11,7 @@ router.get("/player/check", (req, res) => {
 
 // game 
 router.post( "/game",internalTokenMw.checkInternalServiceToken,userMw.validateToken ,gameMw.addGame,  gameCtrl.addGame );
+router.get( "/game/:gameId",internalTokenMw.checkInternalServiceToken,userMw.validateToken,   gameCtrl.getGame );
 router.get( "/game",internalTokenMw.checkInternalServiceToken,   gameCtrl.getAllGame );
 router.delete( "/game/:gameId",internalTokenMw.checkInternalServiceToken,gameMw.gameId  ,gameCtrl.deleteGame );
 router.patch( "/game/:gameId",internalTokenMw.checkInternalServiceToken,gameMw.gameId,  gameCtrl.updateGame );

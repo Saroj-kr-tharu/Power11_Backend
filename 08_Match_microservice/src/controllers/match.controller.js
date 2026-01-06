@@ -32,7 +32,16 @@ class MatchController {
 
     async getAllMatch(req,res) {
         try {
-            const response = await matchService.getAllService();
+
+        
+            const { gameId, matchId } = req.query; 
+            
+            let response;
+            if (matchId) {
+                response = await matchService.getByidService(matchId);
+            } else if (gameId) {
+                response = await matchService.getMatchByGame(gameId);
+            } 
             return res.status(SucessCode.OK).json({
                 message: "Successfully getAllMatch",
                 success: true,

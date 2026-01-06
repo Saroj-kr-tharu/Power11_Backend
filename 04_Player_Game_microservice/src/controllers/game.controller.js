@@ -50,6 +50,28 @@ class GameController {
         }
     }
 
+    async getGame(req,res) {
+        try {
+            const { gameId } = req.params; 
+            const response = await gameService.getByidService(gameId);
+            return res.status(SucessCode.OK).json({
+                message: `Successfully getGame ${gameId}`,
+                success: true,
+                data: response,
+                err: {},
+            });
+
+        } catch (error) {
+            console.log("something went wrong in controller  level  (getAllGame) ")
+            return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
+                message: error.message,
+                sucess: false,
+                data: {},
+                err: error.explanation,
+            });
+        }
+    }
+
     async updateGame(req,res) {
         try {
             const { gameId } = req.params; 

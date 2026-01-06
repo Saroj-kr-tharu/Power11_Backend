@@ -19,6 +19,10 @@ const ContestSchema = new mongoose.Schema(
       required: true,
       index: true
     },
+     rulesVersion: {
+      type: Number,
+      required: true
+    },
 
     entryFee: {
       type: Number,
