@@ -5,33 +5,91 @@ const connect = require('../config/database');
 /**
  * Contest Seeder for Cricket and Football
  * 
- * NOTE: This seeder requires Game and Match data to be seeded first.
- * 
- * You need to update the gameId and matchId references below with actual ObjectIds
- * from your database after running the game and match seeds.
+ * This seeder connects to multiple databases:
+ * - Contest DB: Main database for contests (via connect())
+ * - Game DB: mongodb://localhost/Battle11_PLAYERGAME_DB
+ * - Match DB: mongodb://localhost/Battle11_MATCH
  */
 
-// Helper function to generate future dates
-const getFutureDate = (daysFromNow, hours = 0) => {
-    const date = new Date();
-    date.setDate(date.getDate() + daysFromNow);
-    date.setHours(hours, 0, 0, 0);
-    return date;
+// Database URIs
+const GAME_DB_URI = "mongodb://localhost/Battle11_PLAYERGAME_DB";
+const MATCH_DB_URI = "mongodb://localhost/Battle11_MATCH";
+
+/**
+ * Create separate database connections for Game and Match databases
+ */
+const createExternalConnections = async () => {
+    const connections = {};
+
+    // Create connection to Game database (no deprecated options)
+    connections.gameDb = await mongoose.createConnection(GAME_DB_URI).asPromise();
+    console.log('Connected to Game Database:', GAME_DB_URI);
+
+    // Create connection to Match database (no deprecated options)
+    connections.matchDb = await mongoose.createConnection(MATCH_DB_URI).asPromise();
+    console.log('Connected to Match Database:', MATCH_DB_URI);
+
+    return connections;
 };
 
-const getPastDate = (daysAgo, hours = 0) => {
-    const date = new Date();
-    date.setDate(date.getDate() - daysAgo);
-    date.setHours(hours, 0, 0, 0);
-    return date;
+/**
+ * Define schemas for external databases
+ */
+const getExternalModels = (connections) => {
+    // Game Schema for Game database
+    const GameSchema = new mongoose.Schema({
+        name: { type: String, required: true },
+        description: String,
+        isActive: { type: Boolean, default: true }
+    });
+
+    // Match Schema for Match database
+    const MatchSchema = new mongoose.Schema({
+        gameId: { type: mongoose.Schema.Types.ObjectId, required: true },
+        title: { type: String, required: true },
+        team1: {
+            name: String,
+            shortName: String,
+            logo: String
+        },
+        team2: {
+            name: String,
+            shortName: String,
+            logo: String
+        },
+        startTime: { type: Date, required: true },
+        endTime: Date,
+        status: {
+            type: String,
+            enum: ['SCHEDULED', 'LIVE', 'COMPLETED', 'CANCELLED'],
+            default: 'SCHEDULED'
+        },
+        venue: String,
+        matchType: String
+    });
+
+    const Game = connections.gameDb.model('Game', GameSchema);
+    const Match = connections.matchDb.model('Match', MatchSchema);
+
+    return { Game, Match };
 };
 
-// Creates contest seeds with proper ObjectId references
+/**
+ * Generate contest seeds with proper ObjectId references
+ * @param {ObjectId} cricketGameId - Cricket game ObjectId
+ * @param {ObjectId} footballGameId - Football game ObjectId  
+ * @param {Array} cricketMatches - Array of cricket match documents
+ * @param {Array} footballMatches - Array of football match documents
+ * @returns {Array} Array of contest seed objects
+ */
 const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, footballMatches) => {
     const contests = [];
 
     // Cricket Contests for each match
-    cricketMatches.forEach((match, index) => {
+    cricketMatches.forEach((match) => {
+        const matchEndTime = match.endTime || new Date(match.startTime.getTime() + 4 * 60 * 60 * 1000);
+        const matchStatus = match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED';
+
         // Mega Contest
         contests.push({
             name: `Mega Contest - ${match.title}`,
@@ -44,8 +102,8 @@ const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, football
             maxParticipants: 5000,
             joinedParticipants: Math.floor(Math.random() * 1000),
             startTime: match.startTime,
-            endTime: match.endTime || new Date(match.startTime.getTime() + 4 * 60 * 60 * 1000),
-            status: match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED',
+            endTime: matchEndTime,
+            status: matchStatus,
             isFull: false
         });
 
@@ -61,8 +119,8 @@ const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, football
             maxParticipants: 2,
             joinedParticipants: match.status === 'COMPLETED' ? 2 : Math.floor(Math.random() * 2),
             startTime: match.startTime,
-            endTime: match.endTime || new Date(match.startTime.getTime() + 4 * 60 * 60 * 1000),
-            status: match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED',
+            endTime: matchEndTime,
+            status: matchStatus,
             isFull: match.status === 'COMPLETED'
         });
 
@@ -78,8 +136,8 @@ const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, football
             maxParticipants: 1000,
             joinedParticipants: Math.floor(Math.random() * 500),
             startTime: match.startTime,
-            endTime: match.endTime || new Date(match.startTime.getTime() + 4 * 60 * 60 * 1000),
-            status: match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED',
+            endTime: matchEndTime,
+            status: matchStatus,
             isFull: false
         });
 
@@ -95,8 +153,8 @@ const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, football
             maxParticipants: 10000,
             joinedParticipants: Math.floor(Math.random() * 5000),
             startTime: match.startTime,
-            endTime: match.endTime || new Date(match.startTime.getTime() + 4 * 60 * 60 * 1000),
-            status: match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED',
+            endTime: matchEndTime,
+            status: matchStatus,
             isFull: false
         });
 
@@ -112,14 +170,17 @@ const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, football
             maxParticipants: 100,
             joinedParticipants: Math.floor(Math.random() * 50),
             startTime: match.startTime,
-            endTime: match.endTime || new Date(match.startTime.getTime() + 4 * 60 * 60 * 1000),
-            status: match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED',
+            endTime: matchEndTime,
+            status: matchStatus,
             isFull: false
         });
     });
 
     // Football Contests for each match
-    footballMatches.forEach((match, index) => {
+    footballMatches.forEach((match) => {
+        const matchEndTime = match.endTime || new Date(match.startTime.getTime() + 2 * 60 * 60 * 1000);
+        const matchStatus = match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED';
+
         // Grand Prize Contest
         contests.push({
             name: `Grand Prize - ${match.title}`,
@@ -132,8 +193,8 @@ const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, football
             maxParticipants: 5000,
             joinedParticipants: Math.floor(Math.random() * 1500),
             startTime: match.startTime,
-            endTime: match.endTime || new Date(match.startTime.getTime() + 2 * 60 * 60 * 1000),
-            status: match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED',
+            endTime: matchEndTime,
+            status: matchStatus,
             isFull: false
         });
 
@@ -149,8 +210,8 @@ const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, football
             maxParticipants: 2,
             joinedParticipants: match.status === 'COMPLETED' ? 2 : Math.floor(Math.random() * 2),
             startTime: match.startTime,
-            endTime: match.endTime || new Date(match.startTime.getTime() + 2 * 60 * 60 * 1000),
-            status: match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED',
+            endTime: matchEndTime,
+            status: matchStatus,
             isFull: match.status === 'COMPLETED'
         });
 
@@ -166,8 +227,8 @@ const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, football
             maxParticipants: 1000,
             joinedParticipants: Math.floor(Math.random() * 300),
             startTime: match.startTime,
-            endTime: match.endTime || new Date(match.startTime.getTime() + 2 * 60 * 60 * 1000),
-            status: match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED',
+            endTime: matchEndTime,
+            status: matchStatus,
             isFull: false
         });
 
@@ -183,8 +244,8 @@ const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, football
             maxParticipants: 20000,
             joinedParticipants: Math.floor(Math.random() * 8000),
             startTime: match.startTime,
-            endTime: match.endTime || new Date(match.startTime.getTime() + 2 * 60 * 60 * 1000),
-            status: match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED',
+            endTime: matchEndTime,
+            status: matchStatus,
             isFull: false
         });
 
@@ -200,8 +261,8 @@ const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, football
             maxParticipants: 100,
             joinedParticipants: Math.floor(Math.random() * 60),
             startTime: match.startTime,
-            endTime: match.endTime || new Date(match.startTime.getTime() + 2 * 60 * 60 * 1000),
-            status: match.status === 'COMPLETED' ? 'COMPLETED' : match.status === 'LIVE' ? 'LIVE' : 'SCHEDULED',
+            endTime: matchEndTime,
+            status: matchStatus,
             isFull: false
         });
     });
@@ -211,25 +272,26 @@ const getContestSeeds = (cricketGameId, footballGameId, cricketMatches, football
 
 /**
  * Seed contests using external game and match data
- * @param {Object} params - Object containing gameIds and matches
  */
 const seedContests = async ({ cricketGameId, footballGameId, cricketMatches, footballMatches }) => {
     try {
         await connect();
-        console.log('Connected to MongoDB');
+        console.log('Connected to Contest MongoDB');
 
-        if (!cricketGameId || !footballGameId || !cricketMatches || !footballMatches) {
-            throw new Error('Game IDs and Match data are required.');
+        if (!cricketGameId || !footballGameId) {
+            throw new Error('Both cricketGameId and footballGameId are required.');
         }
 
-        // Clear existing contests
+        if (!cricketMatches || !footballMatches) {
+            throw new Error('Both cricketMatches and footballMatches arrays are required.');
+        }
+
         await Contest.deleteMany({});
         console.log('Cleared existing contests');
 
         const contestSeeds = getContestSeeds(cricketGameId, footballGameId, cricketMatches, footballMatches);
-
-        // Insert new contests
         const contests = await Contest.insertMany(contestSeeds);
+        
         console.log(`Seeded ${contests.length} contests successfully`);
         console.log('Cricket Contests:', contests.filter(c => c.gameId.equals(cricketGameId)).length);
         console.log('Football Contests:', contests.filter(c => c.gameId.equals(footballGameId)).length);
@@ -242,78 +304,121 @@ const seedContests = async ({ cricketGameId, footballGameId, cricketMatches, foo
 };
 
 /**
- * Standalone seeder - fetches game and match data from shared database
- * Use this when running seeder independently
+ * Standalone seeder - fetches game and match data from separate databases
  */
 const seedContestsStandalone = async () => {
+    let connections = null;
+
     try {
         await connect();
-        console.log('Connected to MongoDB');
+        console.log('Connected to Contest MongoDB');
 
-        // Define schemas for fetching related data
-        const Game = mongoose.model('Game', new mongoose.Schema({
-            name: String
-        }));
+        connections = await createExternalConnections();
+        const { Game, Match } = getExternalModels(connections);
 
-        const Match = mongoose.model('Match', new mongoose.Schema({
-            gameId: mongoose.Schema.Types.ObjectId,
-            title: String,
-            startTime: Date,
-            endTime: Date,
-            status: String
-        }));
-
-        // Fetch games
+        console.log('\nFetching games from Game Database...');
         const cricketGame = await Game.findOne({ name: 'CRICKET' });
         const footballGame = await Game.findOne({ name: 'FOOTBALL' });
 
         if (!cricketGame || !footballGame) {
-            console.error('Games not found. Please ensure games are seeded first.');
-            console.log('Run: node 04_Player_Game_microservice/src/seeders/game.seed.js');
-            throw new Error('Games not found');
+            console.error('\n❌ Games not found in Game Database.');
+            const availableGames = await Game.find({}).select('name');
+            console.log('Available games:', availableGames.map(g => g.name).join(', ') || 'None');
+            throw new Error('Games not found. Please seed games first.');
         }
 
-        // Fetch matches
+        console.log(`✓ Found Cricket Game: ${cricketGame._id}`);
+        console.log(`✓ Found Football Game: ${footballGame._id}`);
+
+        console.log('\nFetching matches from Match Database...');
         const cricketMatches = await Match.find({ gameId: cricketGame._id });
         const footballMatches = await Match.find({ gameId: footballGame._id });
 
         if (cricketMatches.length === 0 && footballMatches.length === 0) {
-            console.error('No matches found. Please ensure matches are seeded first.');
-            console.log('Run: node 08_Match_microservice/src/seeders/match.seed.js');
-            throw new Error('Matches not found');
+            console.error('\n❌ No matches found in Match Database.');
+            throw new Error('Matches not found. Please seed matches first.');
         }
 
-        console.log(`Found ${cricketMatches.length} cricket matches`);
-        console.log(`Found ${footballMatches.length} football matches`);
+        console.log(`✓ Found ${cricketMatches.length} cricket matches`);
+        console.log(`✓ Found ${footballMatches.length} football matches`);
 
-        // Clear existing contests
         await Contest.deleteMany({});
-        console.log('Cleared existing contests');
+        console.log('\n✓ Cleared existing contests');
 
         const contestSeeds = getContestSeeds(cricketGame._id, footballGame._id, cricketMatches, footballMatches);
-
-        // Insert new contests
         const contests = await Contest.insertMany(contestSeeds);
-        console.log(`Seeded ${contests.length} contests successfully`);
+
+        console.log(`\n${'='.repeat(50)}`);
+        console.log('           SEEDING COMPLETE');
+        console.log('='.repeat(50));
+        console.log(`Total Contests Seeded: ${contests.length}`);
+        console.log(`Cricket Contests: ${contests.filter(c => c.gameId.equals(cricketGame._id)).length}`);
+        console.log(`Football Contests: ${contests.filter(c => c.gameId.equals(footballGame._id)).length}`);
+        console.log('='.repeat(50));
 
         return contests;
     } catch (error) {
-        console.error('Error seeding contests:', error);
+        console.error('\n❌ Error seeding contests:', error.message);
+        throw error;
+    } finally {
+        if (connections) {
+            if (connections.gameDb) await connections.gameDb.close();
+            if (connections.matchDb) await connections.matchDb.close();
+            console.log('\n✓ Closed external database connections');
+        }
+    }
+};
+
+const clearContests = async () => {
+    try {
+        await connect();
+        const result = await Contest.deleteMany({});
+        console.log(`All contests cleared. Deleted: ${result.deletedCount}`);
+        return result;
+    } catch (error) {
+        console.error('Error clearing contests:', error);
         throw error;
     }
 };
 
-// Run if executed directly
+const getContestStats = async () => {
+    try {
+        await connect();
+        return {
+            total: await Contest.countDocuments(),
+            byStatus: {
+                scheduled: await Contest.countDocuments({ status: 'SCHEDULED' }),
+                live: await Contest.countDocuments({ status: 'LIVE' }),
+                completed: await Contest.countDocuments({ status: 'COMPLETED' }),
+                cancelled: await Contest.countDocuments({ status: 'CANCELLED' })
+            }
+        };
+    } catch (error) {
+        console.error('Error getting contest stats:', error);
+        throw error;
+    }
+};
+
 if (require.main === module) {
     seedContestsStandalone()
         .then(() => {
-            console.log('Contest seeding completed');
+            console.log('\n✅ Contest seeding completed successfully!');
             process.exit(0);
         })
         .catch((error) => {
-            console.error('Contest seeding failed:', error);
+            console.error('\n❌ Contest seeding failed:', error.message);
             process.exit(1);
         });
 }
 
-module.exports = { seedContests, seedContestsStandalone, getContestSeeds };
+module.exports = {
+    seedContests,
+    seedContestsStandalone,
+    getContestSeeds,
+    clearContests,
+    getContestStats,
+    createExternalConnections,
+    getExternalModels,
+    GAME_DB_URI,
+    MATCH_DB_URI
+};

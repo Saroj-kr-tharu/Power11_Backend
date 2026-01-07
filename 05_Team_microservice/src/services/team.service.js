@@ -34,7 +34,6 @@ class TeamService extends curdService{
                 const contestInfo = contest?.data;
                 if(!contestInfo) throw new Error(" Contest  is not found  ")
                     
-                    
                 //4. check the contest info and game and match is same & check the game rules 
                 if(contestInfo.matchId != matchId || contestInfo.gameId != gameId || contestInfo.rulesVersion != gameInfo.rulesVersion  || contestInfo.isFull  )
                     throw new Error("Invalid contest info ")
@@ -107,8 +106,7 @@ class TeamService extends curdService{
 
                 // 8. validate roles against game rules
                 const roleRules = gameInfo.rolesConfig;
-                
-                console.log('rulescoutes => ', roleCounts);
+                // console.log('rulescoutes => ', roleCounts);
                 
                 if (roleRules) {
                     // Validate each role defined in game rules (BATSMAN, BOWLER, ALL_ROUNDER, WICKET_KEEPER)

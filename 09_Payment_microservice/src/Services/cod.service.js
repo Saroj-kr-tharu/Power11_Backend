@@ -1,8 +1,8 @@
 
-const axios = require('axios');
-const { MARKETMANDU_URL, FORTEND_SUCESS_URL } = require('../config/server.config');
+
+const {  FORTEND_SUCESS_URL } = require('../config/server.config');
 const paymentTransactionService = require('./payment.transaction.service');
-const rabbitMqService = require('../Utlis/messageQueue');
+
 const sendMessageToQueueService = require('./queue.service');
 
 class CodService {

@@ -1,15 +1,13 @@
 const mongoose = require('mongoose');
 const Match = require('../models/match');
 const connect = require('../config/database');
+const {BATTELE_GAME_DB_URL}  = require('../config/server.config')
 
 /**
  * Match Seeder for Cricket and Football
  * 
  * NOTE: This seeder requires Game and TeamMaster data to be seeded first
- * in the Player_Game_microservice.
- * 
- * You need to update the gameId and teamId references below with actual ObjectIds
- * from your database after running the game and team seeds.
+ * in the Player_Game_microservice (Battle11_PLAYERGAME_DB).
  */
 
 // Helper function to generate future dates
@@ -27,271 +25,388 @@ const getPastDate = (daysAgo, hours = 0) => {
     return date;
 };
 
-// This function creates match seeds with proper ObjectId references
-// Call this after getting game and team IDs from the database
-const getMatchSeeds = (cricketGameId, footballGameId, cricketTeams, footballTeams) => {
-    const now = new Date();
-    
-    return [
-        // Cricket Matches - IPL Style
-        {
-            gameId: cricketGameId,
-            title: 'MI vs CSK - IPL 2026 Match 1',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: cricketTeams.MI, isHome: true },
-                { teamId: cricketTeams.CSK, isHome: false }
-            ],
-            venue: 'Wankhede Stadium, Mumbai',
-            startTime: getFutureDate(1, 19),
-            lockTime: getFutureDate(1, 18),
-            endTime: getFutureDate(1, 23),
-            status: 'UPCOMING',
-            squadAnnounced: true,
-            metadata: new Map([['tournament', 'IPL 2026'], ['matchNumber', '1']]),
-            createdBy: 'system'
-        },
-        {
-            gameId: cricketGameId,
-            title: 'RCB vs KKR - IPL 2026 Match 2',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: cricketTeams.RCB, isHome: true },
-                { teamId: cricketTeams.KKR, isHome: false }
-            ],
-            venue: 'M. Chinnaswamy Stadium, Bangalore',
-            startTime: getFutureDate(2, 15),
-            lockTime: getFutureDate(2, 14),
-            endTime: getFutureDate(2, 19),
-            status: 'UPCOMING',
-            squadAnnounced: true,
-            metadata: new Map([['tournament', 'IPL 2026'], ['matchNumber', '2']]),
-            createdBy: 'system'
-        },
-        {
-            gameId: cricketGameId,
-            title: 'DC vs RR - IPL 2026 Match 3',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: cricketTeams.DC, isHome: true },
-                { teamId: cricketTeams.RR, isHome: false }
-            ],
-            venue: 'Arun Jaitley Stadium, Delhi',
-            startTime: getFutureDate(3, 19),
-            lockTime: getFutureDate(3, 18),
-            endTime: getFutureDate(3, 23),
-            status: 'UPCOMING',
-            squadAnnounced: false,
-            metadata: new Map([['tournament', 'IPL 2026'], ['matchNumber', '3']]),
-            createdBy: 'system'
-        },
-        {
-            gameId: cricketGameId,
-            title: 'GT vs LSG - IPL 2026 Match 4',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: cricketTeams.GT, isHome: true },
-                { teamId: cricketTeams.LSG, isHome: false }
-            ],
-            venue: 'Narendra Modi Stadium, Ahmedabad',
-            startTime: getFutureDate(4, 15),
-            lockTime: getFutureDate(4, 14),
-            endTime: getFutureDate(4, 19),
-            status: 'UPCOMING',
-            squadAnnounced: false,
-            metadata: new Map([['tournament', 'IPL 2026'], ['matchNumber', '4']]),
-            createdBy: 'system'
-        },
-        {
-            gameId: cricketGameId,
-            title: 'PBKS vs SRH - IPL 2026 Match 5',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: cricketTeams.PBKS, isHome: true },
-                { teamId: cricketTeams.SRH, isHome: false }
-            ],
-            venue: 'PCA Stadium, Mohali',
-            startTime: getFutureDate(5, 19),
-            lockTime: getFutureDate(5, 18),
-            endTime: getFutureDate(5, 23),
-            status: 'UPCOMING',
-            squadAnnounced: false,
-            metadata: new Map([['tournament', 'IPL 2026'], ['matchNumber', '5']]),
-            createdBy: 'system'
-        },
-        // Completed Cricket Match
-        {
-            gameId: cricketGameId,
-            title: 'CSK vs RCB - IPL 2026 Pre-season',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: cricketTeams.CSK, isHome: true },
-                { teamId: cricketTeams.RCB, isHome: false }
-            ],
-            venue: 'MA Chidambaram Stadium, Chennai',
-            startTime: getPastDate(2, 19),
-            lockTime: getPastDate(2, 18),
-            endTime: getPastDate(2, 23),
-            status: 'COMPLETED',
-            squadAnnounced: true,
-            result: {
-                winnerTeamId: cricketTeams.CSK,
-                isDraw: false,
-                summary: 'CSK won by 6 wickets',
-                winMargin: '6 wickets'
-            },
-            metadata: new Map([['tournament', 'IPL 2026 Pre-season'], ['matchNumber', 'P1']]),
-            createdBy: 'system'
-        },
+// Helper to calculate lockTime (15 minutes before match)
+const getLockTime = (matchDate) => {
+    const lockTime = new Date(matchDate);
+    lockTime.setMinutes(lockTime.getMinutes() - 15);
+    return lockTime;
+};
 
-        // Football Matches - EPL Style
-        {
-            gameId: footballGameId,
-            title: 'Manchester United vs Manchester City - EPL Gameweek 20',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: footballTeams.MUN, isHome: true },
-                { teamId: footballTeams.MCI, isHome: false }
-            ],
-            venue: 'Old Trafford, Manchester',
-            startTime: getFutureDate(2, 17),
-            lockTime: getFutureDate(2, 16),
-            endTime: getFutureDate(2, 19),
-            status: 'UPCOMING',
-            squadAnnounced: true,
-            metadata: new Map([['tournament', 'EPL 2025-26'], ['gameweek', '20']]),
-            createdBy: 'system'
-        },
-        {
-            gameId: footballGameId,
-            title: 'Liverpool vs Chelsea - EPL Gameweek 20',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: footballTeams.LIV, isHome: true },
-                { teamId: footballTeams.CHE, isHome: false }
-            ],
-            venue: 'Anfield, Liverpool',
-            startTime: getFutureDate(3, 15),
-            lockTime: getFutureDate(3, 14),
-            endTime: getFutureDate(3, 17),
-            status: 'UPCOMING',
-            squadAnnounced: true,
-            metadata: new Map([['tournament', 'EPL 2025-26'], ['gameweek', '20']]),
-            createdBy: 'system'
-        },
-        {
-            gameId: footballGameId,
-            title: 'Arsenal vs Tottenham - North London Derby',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: footballTeams.ARS, isHome: true },
-                { teamId: footballTeams.TOT, isHome: false }
-            ],
-            venue: 'Emirates Stadium, London',
-            startTime: getFutureDate(4, 17),
-            lockTime: getFutureDate(4, 16),
-            endTime: getFutureDate(4, 19),
-            status: 'UPCOMING',
-            squadAnnounced: false,
-            metadata: new Map([['tournament', 'EPL 2025-26'], ['gameweek', '20']]),
-            createdBy: 'system'
-        },
-        {
-            gameId: footballGameId,
-            title: 'Newcastle vs West Ham - EPL Gameweek 20',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: footballTeams.NEW, isHome: true },
-                { teamId: footballTeams.WHU, isHome: false }
-            ],
-            venue: "St. James' Park, Newcastle",
-            startTime: getFutureDate(5, 15),
-            lockTime: getFutureDate(5, 14),
-            endTime: getFutureDate(5, 17),
-            status: 'UPCOMING',
-            squadAnnounced: false,
-            metadata: new Map([['tournament', 'EPL 2025-26'], ['gameweek', '20']]),
-            createdBy: 'system'
-        },
-        {
-            gameId: footballGameId,
-            title: 'Aston Villa vs Brighton - EPL Gameweek 20',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: footballTeams.AVL, isHome: true },
-                { teamId: footballTeams.BHA, isHome: false }
-            ],
-            venue: 'Villa Park, Birmingham',
-            startTime: getFutureDate(6, 15),
-            lockTime: getFutureDate(6, 14),
-            endTime: getFutureDate(6, 17),
-            status: 'UPCOMING',
-            squadAnnounced: false,
-            metadata: new Map([['tournament', 'EPL 2025-26'], ['gameweek', '20']]),
-            createdBy: 'system'
-        },
-        // Completed Football Match
-        {
-            gameId: footballGameId,
-            title: 'Chelsea vs Arsenal - EPL Gameweek 19',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: footballTeams.CHE, isHome: true },
-                { teamId: footballTeams.ARS, isHome: false }
-            ],
-            venue: 'Stamford Bridge, London',
-            startTime: getPastDate(3, 15),
-            lockTime: getPastDate(3, 14),
-            endTime: getPastDate(3, 17),
-            status: 'COMPLETED',
-            squadAnnounced: true,
-            result: {
-                winnerTeamId: footballTeams.ARS,
-                isDraw: false,
-                summary: 'Arsenal won 2-1',
-                winMargin: '2-1'
-            },
-            metadata: new Map([['tournament', 'EPL 2025-26'], ['gameweek', '19']]),
-            createdBy: 'system'
-        },
-        // Live Football Match
-        {
-            gameId: footballGameId,
-            title: 'Manchester City vs Liverpool - EPL Gameweek 19',
-            matchType: 'TEAM',
-            teams: [
-                { teamId: footballTeams.MCI, isHome: true },
-                { teamId: footballTeams.LIV, isHome: false }
-            ],
-            venue: 'Etihad Stadium, Manchester',
-            startTime: new Date(),
-            lockTime: getPastDate(0, 1),
-            endTime: getFutureDate(0, 2),
-            status: 'LIVE',
-            squadAnnounced: true,
-            metadata: new Map([['tournament', 'EPL 2025-26'], ['gameweek', '19']]),
-            createdBy: 'system'
-        }
-    ];
+// Helper to calculate endTime (3 hours after match for cricket, 2 hours for football)
+const getEndTime = (matchDate, isCricket = true) => {
+    const endTime = new Date(matchDate);
+    endTime.setHours(endTime.getHours() + (isCricket ? 3 : 2));
+    return endTime;
 };
 
 /**
- * Seed matches using external game and team data
- * @param {Object} params - Object containing gameIds and teamIds
- * @param {ObjectId} params.cricketGameId - Cricket game ObjectId
- * @param {ObjectId} params.footballGameId - Football game ObjectId
- * @param {Object} params.cricketTeams - Object mapping team shortNames to ObjectIds
- * @param {Object} params.footballTeams - Object mapping team shortNames to ObjectIds
+ * Generate match seed data
  */
-const seedMatches = async ({ cricketGameId, footballGameId, cricketTeams, footballTeams }) => {
+const getMatchSeeds = (cricketGameId, footballGameId, cricketTeams, footballTeams) => {
+    const matches = [];
+
+    // Cricket Matches
+    const cricketTeamKeys = Object.keys(cricketTeams);
+    if (cricketTeamKeys.length >= 2) {
+        const team1Key = cricketTeamKeys[0];
+        const team2Key = cricketTeamKeys[1];
+        const team3Key = cricketTeamKeys[2] || team1Key;
+        const team4Key = cricketTeamKeys[3] || team2Key;
+        const team5Key = cricketTeamKeys[4] || team1Key;
+        const team6Key = cricketTeamKeys[5] || team2Key;
+
+        // Upcoming cricket matches
+        const matchDate1 = getFutureDate(1, 14);
+        matches.push({
+            gameId: cricketGameId,
+            title: `${team1Key} vs ${team2Key} - IPL 2026`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: cricketTeams[team1Key], isHome: true },
+                { teamId: cricketTeams[team2Key], isHome: false }
+            ],
+            venue: 'Wankhede Stadium, Mumbai',
+            startTime: matchDate1,
+            lockTime: getLockTime(matchDate1),
+            status: 'UPCOMING',
+            squadAnnounced: true,
+            metadata: new Map([
+                ['series', 'IPL 2026'],
+                ['format', 'T20']
+            ]),
+            createdBy: 'system'
+        });
+
+        const matchDate2 = getFutureDate(2, 19);
+        matches.push({
+            gameId: cricketGameId,
+            title: `${team3Key} vs ${team4Key} - IPL 2026`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: cricketTeams[team3Key], isHome: true },
+                { teamId: cricketTeams[team4Key], isHome: false }
+            ],
+            venue: 'Eden Gardens, Kolkata',
+            startTime: matchDate2,
+            lockTime: getLockTime(matchDate2),
+            status: 'UPCOMING',
+            squadAnnounced: true,
+            metadata: new Map([
+                ['series', 'IPL 2026'],
+                ['format', 'T20']
+            ]),
+            createdBy: 'system'
+        });
+
+        const matchDate3 = getFutureDate(3, 15);
+        matches.push({
+            gameId: cricketGameId,
+            title: `${team5Key} vs ${team6Key} - IPL 2026`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: cricketTeams[team5Key], isHome: true },
+                { teamId: cricketTeams[team6Key], isHome: false }
+            ],
+            venue: 'M. Chinnaswamy Stadium, Bangalore',
+            startTime: matchDate3,
+            lockTime: getLockTime(matchDate3),
+            status: 'UPCOMING',
+            squadAnnounced: false,
+            metadata: new Map([
+                ['series', 'IPL 2026'],
+                ['format', 'T20']
+            ]),
+            createdBy: 'system'
+        });
+
+        // Live cricket match
+        const liveMatchDate = new Date();
+        matches.push({
+            gameId: cricketGameId,
+            title: `${team1Key} vs ${team3Key} - IPL 2026`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: cricketTeams[team1Key], isHome: true },
+                { teamId: cricketTeams[team3Key], isHome: false }
+            ],
+            venue: 'MA Chidambaram Stadium, Chennai',
+            startTime: liveMatchDate,
+            lockTime: getLockTime(liveMatchDate),
+            status: 'LIVE',
+            squadAnnounced: true,
+            metadata: new Map([
+                ['series', 'IPL 2026'],
+                ['format', 'T20']
+            ]),
+            createdBy: 'system'
+        });
+
+        // Completed cricket matches
+        const pastDate1 = getPastDate(1, 19);
+        matches.push({
+            gameId: cricketGameId,
+            title: `${team2Key} vs ${team4Key} - IPL 2026`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: cricketTeams[team2Key], isHome: true },
+                { teamId: cricketTeams[team4Key], isHome: false }
+            ],
+            venue: 'Narendra Modi Stadium, Ahmedabad',
+            startTime: pastDate1,
+            lockTime: getLockTime(pastDate1),
+            endTime: getEndTime(pastDate1, true),
+            status: 'COMPLETED',
+            squadAnnounced: true,
+            result: {
+                winnerTeamId: cricketTeams[team2Key],
+                isDraw: false,
+                summary: `${team2Key} won by 25 runs`,
+                winMargin: '25 runs'
+            },
+            metadata: new Map([
+                ['series', 'IPL 2026'],
+                ['format', 'T20']
+            ]),
+            createdBy: 'system'
+        });
+
+        const pastDate2 = getPastDate(2, 14);
+        matches.push({
+            gameId: cricketGameId,
+            title: `${team1Key} vs ${team5Key} - India Tour 2026`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: cricketTeams[team1Key], isHome: true },
+                { teamId: cricketTeams[team5Key], isHome: false }
+            ],
+            venue: 'Rajiv Gandhi Stadium, Hyderabad',
+            startTime: pastDate2,
+            lockTime: getLockTime(pastDate2),
+            endTime: getEndTime(pastDate2, true),
+            status: 'COMPLETED',
+            squadAnnounced: true,
+            result: {
+                winnerTeamId: cricketTeams[team1Key],
+                isDraw: false,
+                summary: `${team1Key} won by 5 wickets`,
+                winMargin: '5 wickets'
+            },
+            metadata: new Map([
+                ['series', 'India Tour 2026'],
+                ['format', 'ODI']
+            ]),
+            createdBy: 'system'
+        });
+
+        // Cancelled cricket match
+        const cancelledDate = getFutureDate(5, 14);
+        matches.push({
+            gameId: cricketGameId,
+            title: `${team3Key} vs ${team5Key} - IPL 2026`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: cricketTeams[team3Key], isHome: true },
+                { teamId: cricketTeams[team5Key], isHome: false }
+            ],
+            venue: 'Punjab Cricket Association Stadium, Mohali',
+            startTime: cancelledDate,
+            lockTime: getLockTime(cancelledDate),
+            status: 'CANCELLED',
+            squadAnnounced: false,
+            metadata: new Map([
+                ['series', 'IPL 2026'],
+                ['format', 'T20'],
+                ['cancelReason', 'Rain']
+            ]),
+            createdBy: 'system'
+        });
+    }
+
+    // Football Matches
+    const footballTeamKeys = Object.keys(footballTeams);
+    if (footballTeamKeys.length >= 2) {
+        const fTeam1Key = footballTeamKeys[0];
+        const fTeam2Key = footballTeamKeys[1];
+        const fTeam3Key = footballTeamKeys[2] || fTeam1Key;
+        const fTeam4Key = footballTeamKeys[3] || fTeam2Key;
+        const fTeam5Key = footballTeamKeys[4] || fTeam1Key;
+        const fTeam6Key = footballTeamKeys[5] || fTeam2Key;
+
+        // Upcoming football matches
+        const fMatchDate1 = getFutureDate(1, 20);
+        matches.push({
+            gameId: footballGameId,
+            title: `${fTeam1Key} vs ${fTeam2Key} - Premier League`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: footballTeams[fTeam1Key], isHome: true },
+                { teamId: footballTeams[fTeam2Key], isHome: false }
+            ],
+            venue: 'Old Trafford, Manchester',
+            startTime: fMatchDate1,
+            lockTime: getLockTime(fMatchDate1),
+            status: 'UPCOMING',
+            squadAnnounced: true,
+            metadata: new Map([
+                ['series', 'Premier League 2025-26'],
+                ['matchweek', '20']
+            ]),
+            createdBy: 'system'
+        });
+
+        const fMatchDate2 = getFutureDate(2, 17);
+        matches.push({
+            gameId: footballGameId,
+            title: `${fTeam3Key} vs ${fTeam4Key} - La Liga`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: footballTeams[fTeam3Key], isHome: true },
+                { teamId: footballTeams[fTeam4Key], isHome: false }
+            ],
+            venue: 'Santiago Bernabeu, Madrid',
+            startTime: fMatchDate2,
+            lockTime: getLockTime(fMatchDate2),
+            status: 'UPCOMING',
+            squadAnnounced: true,
+            metadata: new Map([
+                ['series', 'La Liga 2025-26'],
+                ['matchweek', '18']
+            ]),
+            createdBy: 'system'
+        });
+
+        const fMatchDate3 = getFutureDate(3, 21);
+        matches.push({
+            gameId: footballGameId,
+            title: `${fTeam5Key} vs ${fTeam6Key} - Bundesliga`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: footballTeams[fTeam5Key], isHome: true },
+                { teamId: footballTeams[fTeam6Key], isHome: false }
+            ],
+            venue: 'Allianz Arena, Munich',
+            startTime: fMatchDate3,
+            lockTime: getLockTime(fMatchDate3),
+            status: 'UPCOMING',
+            squadAnnounced: false,
+            metadata: new Map([
+                ['series', 'Bundesliga 2025-26'],
+                ['matchweek', '17']
+            ]),
+            createdBy: 'system'
+        });
+
+        // Live football match
+        const fLiveDate = new Date();
+        matches.push({
+            gameId: footballGameId,
+            title: `${fTeam1Key} vs ${fTeam3Key} - FA Cup`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: footballTeams[fTeam1Key], isHome: true },
+                { teamId: footballTeams[fTeam3Key], isHome: false }
+            ],
+            venue: 'Anfield, Liverpool',
+            startTime: fLiveDate,
+            lockTime: getLockTime(fLiveDate),
+            status: 'LIVE',
+            squadAnnounced: true,
+            metadata: new Map([
+                ['series', 'FA Cup 2026'],
+                ['round', 'Quarter Final']
+            ]),
+            createdBy: 'system'
+        });
+
+        // Completed football matches
+        const fPastDate1 = getPastDate(1, 20);
+        matches.push({
+            gameId: footballGameId,
+            title: `${fTeam2Key} vs ${fTeam4Key} - La Liga`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: footballTeams[fTeam2Key], isHome: true },
+                { teamId: footballTeams[fTeam4Key], isHome: false }
+            ],
+            venue: 'Camp Nou, Barcelona',
+            startTime: fPastDate1,
+            lockTime: getLockTime(fPastDate1),
+            endTime: getEndTime(fPastDate1, false),
+            status: 'COMPLETED',
+            squadAnnounced: true,
+            result: {
+                winnerTeamId: footballTeams[fTeam2Key],
+                isDraw: false,
+                summary: `${fTeam2Key} won 3-1`,
+                winMargin: '2 goals'
+            },
+            metadata: new Map([
+                ['series', 'La Liga 2025-26'],
+                ['matchweek', '17']
+            ]),
+            createdBy: 'system'
+        });
+
+        const fPastDate2 = getPastDate(3, 18);
+        matches.push({
+            gameId: footballGameId,
+            title: `${fTeam1Key} vs ${fTeam5Key} - Premier League`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: footballTeams[fTeam1Key], isHome: true },
+                { teamId: footballTeams[fTeam5Key], isHome: false }
+            ],
+            venue: 'Emirates Stadium, London',
+            startTime: fPastDate2,
+            lockTime: getLockTime(fPastDate2),
+            endTime: getEndTime(fPastDate2, false),
+            status: 'COMPLETED',
+            squadAnnounced: true,
+            result: {
+                isDraw: true,
+                summary: 'Match ended 2-2',
+                winMargin: 'Draw'
+            },
+            metadata: new Map([
+                ['series', 'Premier League 2025-26'],
+                ['matchweek', '18']
+            ]),
+            createdBy: 'system'
+        });
+
+        // Cancelled football match
+        const fCancelledDate = getFutureDate(4, 15);
+        matches.push({
+            gameId: footballGameId,
+            title: `${fTeam3Key} vs ${fTeam5Key} - Champions League`,
+            matchType: 'TEAM',
+            teams: [
+                { teamId: footballTeams[fTeam3Key], isHome: true },
+                { teamId: footballTeams[fTeam5Key], isHome: false }
+            ],
+            venue: 'San Siro, Milan',
+            startTime: fCancelledDate,
+            lockTime: getLockTime(fCancelledDate),
+            status: 'CANCELLED',
+            squadAnnounced: false,
+            metadata: new Map([
+                ['series', 'Champions League 2025-26'],
+                ['round', 'Group Stage'],
+                ['cancelReason', 'Stadium maintenance']
+            ]),
+            createdBy: 'system'
+        });
+    }
+
+    return matches;
+};
+
+/**
+ * Seed matches with provided game and team data
+ * Use this when called from master seeder
+ */
+const seedMatches = async (cricketGameId, footballGameId, cricketTeams, footballTeams) => {
     try {
-        await connect();
-        console.log('Connected to MongoDB');
-
-        if (!cricketGameId || !footballGameId || !cricketTeams || !footballTeams) {
-            throw new Error('Game IDs and Team IDs are required. Please provide them from Player_Game service data.');
-        }
-
         // Clear existing matches
         await Match.deleteMany({});
         console.log('Cleared existing matches');
@@ -301,8 +416,6 @@ const seedMatches = async ({ cricketGameId, footballGameId, cricketTeams, footba
         // Insert new matches
         const matches = await Match.insertMany(matchSeeds);
         console.log(`Seeded ${matches.length} matches successfully`);
-        console.log('Cricket Matches:', matches.filter(m => m.gameId.equals(cricketGameId)).length);
-        console.log('Football Matches:', matches.filter(m => m.gameId.equals(footballGameId)).length);
 
         return matches;
     } catch (error) {
@@ -312,37 +425,70 @@ const seedMatches = async ({ cricketGameId, footballGameId, cricketTeams, footba
 };
 
 /**
- * Standalone seeder - fetches game and team data from shared database
+ * Standalone seeder - fetches game and team data from Player_Game database
  * Use this when running seeder independently
  */
 const seedMatchesStandalone = async () => {
+    let playerGameDbConnection = null;
+
     try {
+        // Connect to Match microservice database
         await connect();
-        console.log('Connected to MongoDB');
+        console.log('Connected to Match MongoDB');
 
-        // Fetch games (assumes shared database or synced data)
-        const Game = mongoose.model('Game', new mongoose.Schema({
-            name: String
-        }));
+        // Connect to Player_Game microservice database (different DB)
+        const PLAYER_GAME_DB_URL = BATTELE_GAME_DB_URL;
+        playerGameDbConnection = mongoose.createConnection(PLAYER_GAME_DB_URL);
+
+        await new Promise((resolve, reject) => {
+            playerGameDbConnection.once('open', resolve);
+            playerGameDbConnection.once('error', reject);
+        });
+
+        console.log('Connected to Player_Game MongoDB (Battle11_PLAYERGAME_DB)');
+
+        // Define schemas for Player_Game database
+        const GameSchema = new mongoose.Schema({
+            name: String,
+            isActive: Boolean
+        });
         
-        const TeamMaster = mongoose.model('TeamMaster', new mongoose.Schema({
+        const TeamMasterSchema = new mongoose.Schema({
             gameId: mongoose.Schema.Types.ObjectId,
-            shortName: String
-        }));
+            name: String,
+            shortName: String,
+            logo: String,
+            isActive: Boolean
+        });
 
+        // Create models using Player_Game connection
+        const Game = playerGameDbConnection.model('Game', GameSchema);
+        const TeamMaster = playerGameDbConnection.model('TeamMaster', TeamMasterSchema);
+
+        // Fetch games from Player_Game database
         const cricketGame = await Game.findOne({ name: 'CRICKET' });
         const footballGame = await Game.findOne({ name: 'FOOTBALL' });
 
         if (!cricketGame || !footballGame) {
             console.error('Games not found. Please ensure games are seeded in Player_Game microservice first.');
             console.log('Run: node 04_Player_Game_microservice/src/seeders/game.seed.js');
-            throw new Error('Games not found');
+            throw new Error('Games not found in Battle11_PLAYERGAME_DB');
         }
 
-        // Fetch teams
+        console.log('Found Cricket Game:', cricketGame._id);
+        console.log('Found Football Game:', footballGame._id);
+
+        // Fetch teams from Player_Game database
         const cricketTeamDocs = await TeamMaster.find({ gameId: cricketGame._id });
         const footballTeamDocs = await TeamMaster.find({ gameId: footballGame._id });
 
+        if (cricketTeamDocs.length === 0 || footballTeamDocs.length === 0) {
+            console.error('Teams not found. Please ensure teams are seeded in Player_Game microservice first.');
+            console.log('Run: node 04_Player_Game_microservice/src/seeders/team.seed.js');
+            throw new Error('Teams not found in Battle11_PLAYERGAME_DB');
+        }
+
+        // Map teams by shortName
         const cricketTeams = {};
         cricketTeamDocs.forEach(t => { cricketTeams[t.shortName] = t._id; });
 
@@ -361,11 +507,26 @@ const seedMatchesStandalone = async () => {
         // Insert new matches
         const matches = await Match.insertMany(matchSeeds);
         console.log(`Seeded ${matches.length} matches successfully`);
+        console.log('Cricket Matches:', matches.filter(m => m.gameId.equals(cricketGame._id)).length);
+        console.log('Football Matches:', matches.filter(m => m.gameId.equals(footballGame._id)).length);
+
+        // Log match summary
+        const statusCounts = matches.reduce((acc, m) => {
+            acc[m.status] = (acc[m.status] || 0) + 1;
+            return acc;
+        }, {});
+        console.log('Match Status Summary:', statusCounts);
 
         return matches;
     } catch (error) {
         console.error('Error seeding matches:', error);
         throw error;
+    } finally {
+        // Close Player_Game database connection
+        if (playerGameDbConnection) {
+            await playerGameDbConnection.close();
+            console.log('Closed Player_Game database connection');
+        }
     }
 };
 

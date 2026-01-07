@@ -3,14 +3,19 @@ const MatchPlayer = require('../models/MatchPlayer');
 const Player = require('../models/player');
 const Game = require('../models/game');
 const connect = require('../config/database');
+const {MATCH_DB_URL} = require('../config/server.config');
 
 /**
  * MatchPlayer Seeder
  * 
- * NOTE: This seeder requires Game, Player, and Match data to be seeded first.
- * 
- * Links players to matches with specific credits, roles, and playing status.
+ * NOTE: This seeder connects to TWO databases:
+ * - Player_Game DB (default): For Players, Games, and MatchPlayers
+ * - Match DB: For fetching Match data
  */
+
+// Database URLs
+
+const MATCH_DB_URL = 'mongodb://localhost/Battle11_MATCH';
 
 // Cricket roles for reference
 const CRICKET_ROLES = ['BATSMAN', 'BOWLER', 'ALL_ROUNDER', 'WICKET_KEEPER'];
@@ -53,13 +58,35 @@ const generateMatchPlayers = (matchId, gameId, players, gameType, isCompleted = 
 };
 
 /**
+ * Create a separate connection to Match database
+ */
+const createMatchDbConnection = async () => {
+    const matchConnection = await mongoose.createConnection(MATCH_DB_URL);
+    console.log('Connected to Match database');
+    
+    // Define Match schema for the separate connection
+    const MatchSchema = new mongoose.Schema({
+        gameId: mongoose.Schema.Types.ObjectId,
+        title: String,
+        teams: [{
+            teamId: mongoose.Schema.Types.ObjectId,
+            isHome: Boolean
+        }],
+        status: String
+    });
+    
+    const MatchModel = matchConnection.model('Match', MatchSchema);
+    return { matchConnection, MatchModel };
+};
+
+/**
  * Seed match players using external data
  * @param {Object} params - Object containing matches and players data
  */
 const seedMatchPlayers = async ({ matches, players, games }) => {
     try {
         await connect();
-        console.log('Connected to MongoDB');
+        console.log('Connected to Player/Game MongoDB');
 
         if (!matches || !players || !games) {
             throw new Error('Matches, Players, and Games data are required.');
@@ -71,51 +98,27 @@ const seedMatchPlayers = async ({ matches, players, games }) => {
 
         const matchPlayerSeeds = [];
 
-        // Group players by team
+        // Group players by game
         const cricketPlayers = players.filter(p => p.gameId.equals(games.cricket._id));
         const footballPlayers = players.filter(p => p.gameId.equals(games.football._id));
-
-        // Create player lookup by team
-        const cricketPlayersByTeam = {};
-        cricketPlayers.forEach(player => {
-            if (!cricketPlayersByTeam[player.team]) {
-                cricketPlayersByTeam[player.team] = [];
-            }
-            cricketPlayersByTeam[player.team].push(player);
-        });
-
-        const footballPlayersByTeam = {};
-        footballPlayers.forEach(player => {
-            if (!footballPlayersByTeam[player.team]) {
-                footballPlayersByTeam[player.team] = [];
-            }
-            footballPlayersByTeam[player.team].push(player);
-        });
 
         // Process each match
         for (const match of matches) {
             const isCricket = match.gameId.equals(games.cricket._id);
             const isCompleted = match.status === 'COMPLETED';
-            const playersByTeam = isCricket ? cricketPlayersByTeam : footballPlayersByTeam;
+            const gameType = isCricket ? 'CRICKET' : 'FOOTBALL';
+            const allPlayersForGame = isCricket ? cricketPlayers : footballPlayers;
             
-            // Get teams from match
-            if (match.teams && match.teams.length >= 2) {
-                // We need to get players for both teams in the match
-                // For now, we'll use all available players for the game type
-                const gameType = isCricket ? 'CRICKET' : 'FOOTBALL';
-                const allPlayersForGame = isCricket ? cricketPlayers : footballPlayers;
-                
-                // Generate match players
-                const matchPlayers = generateMatchPlayers(
-                    match._id,
-                    match.gameId,
-                    allPlayersForGame.slice(0, 22), // Take up to 22 players
-                    gameType,
-                    isCompleted
-                );
-                
-                matchPlayerSeeds.push(...matchPlayers);
-            }
+            // Generate match players (up to 22 per match)
+            const matchPlayers = generateMatchPlayers(
+                match._id,
+                match.gameId,
+                allPlayersForGame.slice(0, 22),
+                gameType,
+                isCompleted
+            );
+            
+            matchPlayerSeeds.push(...matchPlayers);
         }
 
         // Insert match players
@@ -134,40 +137,23 @@ const seedMatchPlayers = async ({ matches, players, games }) => {
 };
 
 /**
- * Standalone seeder - fetches required data from shared database
+ * Standalone seeder - fetches data from TWO databases:
+ * - Player/Game DB: Players, Games (same DB as MatchPlayer)
+ * - Match DB: Matches (separate DB)
  */
 const seedMatchPlayersStandalone = async () => {
+    let matchConnection = null;
+    
     try {
+        // Connect to Player/Game database (default connection)
         await connect();
-        console.log('Connected to MongoDB');
+        console.log('Connected to Player/Game MongoDB');
 
-        // Define schemas for fetching related data
-        const GameSchema = new mongoose.Schema({
-            name: String
-        });
-        const Game = mongoose.models.Game || mongoose.model('Game', GameSchema);
+        // Create separate connection to Match database
+        const { matchConnection: mConn, MatchModel } = await createMatchDbConnection();
+        matchConnection = mConn;
 
-        const PlayerSchema = new mongoose.Schema({
-            name: String,
-            gameId: mongoose.Schema.Types.ObjectId,
-            roles: [String],
-            team: String,
-            baseCredits: Number
-        });
-        const Player = mongoose.models.Player || mongoose.model('Player', PlayerSchema);
-
-        const MatchSchema = new mongoose.Schema({
-            gameId: mongoose.Schema.Types.ObjectId,
-            title: String,
-            teams: [{
-                teamId: mongoose.Schema.Types.ObjectId,
-                isHome: Boolean
-            }],
-            status: String
-        });
-        const Match = mongoose.models.Match || mongoose.model('Match', MatchSchema);
-
-        // Fetch games
+        // Fetch games from Player/Game DB
         const cricketGame = await Game.findOne({ name: 'CRICKET' });
         const footballGame = await Game.findOne({ name: 'FOOTBALL' });
 
@@ -177,7 +163,10 @@ const seedMatchPlayersStandalone = async () => {
             throw new Error('Games not found');
         }
 
-        // Fetch players
+        console.log(`Found Cricket game: ${cricketGame._id}`);
+        console.log(`Found Football game: ${footballGame._id}`);
+
+        // Fetch players from Player/Game DB
         const players = await Player.find({});
         if (players.length === 0) {
             console.error('No players found. Please ensure players are seeded first.');
@@ -185,16 +174,17 @@ const seedMatchPlayersStandalone = async () => {
             throw new Error('Players not found');
         }
 
-        // Fetch matches
-        const matches = await Match.find({});
+        console.log(`Found ${players.length} players`);
+
+        // Fetch matches from Match DB (separate database)
+        const matches = await MatchModel.find({});
         if (matches.length === 0) {
-            console.error('No matches found. Please ensure matches are seeded first.');
+            console.error('No matches found in Match database. Please ensure matches are seeded first.');
             console.log('Run: node 08_Match_microservice/src/seeders/match.seed.js');
             throw new Error('Matches not found');
         }
 
-        console.log(`Found ${players.length} players`);
-        console.log(`Found ${matches.length} matches`);
+        console.log(`Found ${matches.length} matches from Match database`);
 
         // Clear existing match players
         await MatchPlayer.deleteMany({});
@@ -202,7 +192,7 @@ const seedMatchPlayersStandalone = async () => {
 
         const matchPlayerSeeds = [];
 
-        // Group players by game and team
+        // Group players by game
         const cricketPlayers = players.filter(p => p.gameId.equals(cricketGame._id));
         const footballPlayers = players.filter(p => p.gameId.equals(footballGame._id));
 
@@ -216,6 +206,11 @@ const seedMatchPlayersStandalone = async () => {
             const allPlayersForGame = isCricket ? cricketPlayers : footballPlayers;
             const gameType = isCricket ? 'CRICKET' : 'FOOTBALL';
             
+            if (allPlayersForGame.length === 0) {
+                console.log(`No players found for ${gameType} match: ${match._id}`);
+                continue;
+            }
+            
             // Generate match players (up to 22 per match)
             const matchPlayers = generateMatchPlayers(
                 match._id,
@@ -226,6 +221,7 @@ const seedMatchPlayersStandalone = async () => {
             );
             
             matchPlayerSeeds.push(...matchPlayers);
+            console.log(`Generated ${matchPlayers.length} players for match: ${match.title || match._id}`);
         }
 
         // Insert match players (handle duplicates by using ordered: false)
@@ -236,7 +232,8 @@ const seedMatchPlayersStandalone = async () => {
             } catch (error) {
                 if (error.code === 11000) {
                     // Duplicate key error - some were inserted
-                    console.log(`Seeded match players with some duplicates skipped`);
+                    const insertedCount = error.insertedDocs ? error.insertedDocs.length : 'unknown';
+                    console.log(`Seeded match players with some duplicates skipped. Inserted: ${insertedCount}`);
                 } else {
                     throw error;
                 }
@@ -248,6 +245,26 @@ const seedMatchPlayersStandalone = async () => {
         return matchPlayerSeeds;
     } catch (error) {
         console.error('Error seeding match players:', error);
+        throw error;
+    } finally {
+        // Close the separate Match database connection
+        if (matchConnection) {
+            await matchConnection.close();
+            console.log('Closed Match database connection');
+        }
+    }
+};
+
+/**
+ * Clear all match players
+ */
+const clearMatchPlayers = async () => {
+    try {
+        await connect();
+        await MatchPlayer.deleteMany({});
+        console.log('Cleared all match players');
+    } catch (error) {
+        console.error('Error clearing match players:', error);
         throw error;
     }
 };
@@ -265,4 +282,9 @@ if (require.main === module) {
         });
 }
 
-module.exports = { seedMatchPlayers, seedMatchPlayersStandalone, generateMatchPlayers };
+module.exports = { 
+    seedMatchPlayers, 
+    seedMatchPlayersStandalone, 
+    generateMatchPlayers,
+    clearMatchPlayers 
+};

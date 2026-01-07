@@ -1,4 +1,4 @@
-const { ClientErrorsCodes, ServerErrosCodes } = require('../Utlis/ServerCodes');
+const {  ClientErrorsCodes } = require('../utlis/Errors/https_codes');
 
 class KhaltiValidation {
 

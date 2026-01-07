@@ -10,6 +10,7 @@ module.exports = {
     MANGODB_URL: process.env.MANGODB_URL,
     PRIVATEJWT: process.env.PRIVATEJWT,
     RefreshPRIVATEJWT: process.env.RefreshPRIVATEJWT,
+    MATCH_DB_URL: process.env.MATCH_DB_URL,
 
     MESSAGE_BROKER_URL: process.env.MESSAGE_BROKER_URL,
     CHANNEL_NAME: process.env.CHANNEL_NAME,

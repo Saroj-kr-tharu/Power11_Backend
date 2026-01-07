@@ -3,13 +3,12 @@ class CurdRepo {
         this.model = model;
     }
 
-    async create(data) {
+    async create(data, options = {}) {
         try {
-            const result = await this.model.create(data);
-            return result;
+            const result = await this.model.create([data], options);
+            return result[0];
         } catch (error) {
             console.log('Something went wrong in repo (create)');
-
             throw error;
         }
     }

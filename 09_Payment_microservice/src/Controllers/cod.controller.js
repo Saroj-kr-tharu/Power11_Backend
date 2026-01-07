@@ -1,4 +1,4 @@
-const { ServerErrosCodes, SucessCode } = require('../Utlis/ServerCodes');
+const { ServerErrosCodes, SucessCode } = require('../utlis/Errors/https_codes');
 const {codService} = require('../Services');
 
 class CodController {

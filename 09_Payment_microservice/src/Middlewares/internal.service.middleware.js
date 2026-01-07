@@ -1,5 +1,5 @@
 
-const {ClientErrorsCodes} = require('../utlis/Errors/https_codes')
+const {  ClientErrorsCodes } = require('../utlis/Errors/https_codes');
 const {INTERNAL_SERVER_TOKEN} = require('../config/server.config')
 
 class InternalServiceMiddleware {
