@@ -1,19 +1,20 @@
 const CurdRepo = require("./curd.repo");
-const  contestModel = require('../models/contest')
+const  userContestModel = require('../models/usercontest')
 
 
 class UserContestRepo extends CurdRepo { 
     constructor(){
-        super(contestModel)
+        super(userContestModel)
     }; 
 
-    async getByMatch(matchId){
+    async getByUser(userId, teamId, matchId,contestId){
             try {
-               const res = await contestModel.find({matchId});
+               const res = await userContestModel.find({userId, teamId, matchId,contestId });
+
                return res; 
     
             } catch (error) {
-                console.log("something went wrong in service  level  (getByMatch) ")
+                console.log("something went wrong in service  level  (getByUser) ")
                  throw error;
                
             }

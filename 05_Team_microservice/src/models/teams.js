@@ -65,7 +65,17 @@ const TeamSchema = new mongoose.Schema(
     totalCredits: {
       type: Number,
       required: true
-    }
+    },
+    lockStatus: {
+      type: String,
+      enum: ['unlocked', 'soft', 'hard'],
+      default: 'unlocked'
+    },
+
+    lockedAt: {
+      type: Date,
+      default: null
+    },
   },
   { timestamps: true }
 );

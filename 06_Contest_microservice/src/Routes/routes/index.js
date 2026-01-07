@@ -2,12 +2,12 @@ const express = require('express');
 
 const router = express.Router();
 
-const {userMw, internalTokenMw} = require('../../middlewares/index')
+const {userMw, internalTokenMw, contestMw} = require('../../middlewares/index')
 const {contestCtrl,userContestCtrl } = require("../../controllers/index")
 
 
 router.get("/contest/check", (req, res) => {
-  return res.json({ message: "contest   Server is good to GO" });
+  return res.json({ message: "contest  Server is good to GO" });
 });
 
 
@@ -18,6 +18,6 @@ router.patch( "/contest/:contestId",internalTokenMw.checkInternalServiceToken, u
 
 
 // join userContest
-router.post( "/usercontest",internalTokenMw.checkInternalServiceToken, userMw.validateToken,   userContestCtrl.joinUserContest );
+router.post( "/contest/usercontest",internalTokenMw.checkInternalServiceToken, userMw.validateToken, contestMw.joinContest,    userContestCtrl.joinUserContest );
  
 module.exports = router;

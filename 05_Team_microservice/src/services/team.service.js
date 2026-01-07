@@ -177,17 +177,7 @@ class TeamService extends curdService{
                 });
                 return team; 
 
-                // const data = {userId, contestId, matchId, gameId, teamId: team._id, joinFee}
-                // // 13. join contest 
-                // const contestData = await InternalServiceClient.internalClient.post(
-                //     `${InternalServiceClient.SERVICES.CONTEST}/usercontest`,
-                //     { data }, 
-                //     { headers: { 'x-access-token': token } }
-                // )
-
-                // 13.1  create usercontest 
-
-                // 14 increament contest joined coount 
+                
 
         } catch (error) {
                 console.log("something went wrong in service  level  (createTeam) ")
@@ -195,6 +185,23 @@ class TeamService extends curdService{
         }
     }
 
+
+
+     async updateTeam({TeamId, data}){
+        try {
+            const team = await teamRepo.get(TeamId);
+            if(!team) throw new Error("Team is not Found");
+
+            if(team.lockStatus != 'unlocked') throw new Error("Readonly unable to edit")
+            
+            const res = await teamRepo.update(TeamId, data)
+            return res ;
+        
+        } catch (error) {
+                console.log("something went wrong in service  level  (createTeam) ")
+                throw error;
+        }
+    }
 }
 
 const teamService = new TeamService()

@@ -19,7 +19,7 @@ router.post( "/", userMw.verifyAdmin,   contestProxy );
 router.get( "/",  contestProxy );
 router.delete( "/:contestId",userMw.verifyAdmin,  contestProxy );
 router.patch( "/:contestId", userMw.verifyAdmin, contestProxy );
-
+router.post( "/usercontest",userMw.verifyUser ,contestProxy);
 
 
 

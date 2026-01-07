@@ -52,11 +52,35 @@ class TeamController {
         }
     }
 
+
+    async getTeamById(req,res) {
+        try {
+            const { teamId } = req.params; 
+            const response = await teamService.getByidService(teamId);
+            return res.status(SucessCode.OK).json({
+                message: "Successfully getTeamById",
+                success: true,
+                data: response,
+                err: {},
+            });
+
+        } catch (error) {
+            console.log("something went wrong in controller  level  (getTeamById) ")
+            return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
+                message: error.message,
+                sucess: false,
+                data: {},
+                err: error.explanation,
+            });
+        }
+    }
+
     async updateTeam(req,res) {
         try {
             const { teamId } = req.params; 
             const data = req?.body; 
-            const response = await teamService.updateService(teamId,data);
+           
+            const response = await teamService.updateTeam({TeamId:teamId, data});
             return res.status(SucessCode.OK).json({
                 message: "Successfully updateGame",
                 success: true,

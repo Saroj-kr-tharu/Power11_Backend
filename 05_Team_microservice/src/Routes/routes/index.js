@@ -12,7 +12,8 @@ router.get("/team/check", (req, res) => {
 
 // team 
 router.post( "/team",internalTokenMw.checkInternalServiceToken,userMw.validateToken, teamMw.addTeam,  teamCtrl.addTeam );
-router.get( "/team",userMw.validateToken,   teamCtrl.getAllTeam );
+router.get( "/team",internalTokenMw.checkInternalServiceToken,userMw.validateToken,   teamCtrl.getAllTeam );
+router.get( "/team/:teamId",internalTokenMw.checkInternalServiceToken,userMw.validateToken,   teamCtrl.getTeamById );
 router.delete( "/team/:teamId",internalTokenMw.checkInternalServiceToken,userMw.validateToken,  teamCtrl.deleteTeam );
 router.patch( "/team/:teamId",internalTokenMw.checkInternalServiceToken,userMw.validateToken,  teamCtrl.updateTeam );
 

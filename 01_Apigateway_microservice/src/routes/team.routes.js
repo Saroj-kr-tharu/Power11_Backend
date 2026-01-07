@@ -17,6 +17,7 @@ const teamProxy = createProxyMiddleware({
 // team 
 router.post( "/",userMw.verifyUser,   teamProxy);
 router.get( "/",userMw.verifyUser,   teamProxy );
+router.get( "/:teamId",userMw.verifyUser,   teamProxy );
 router.delete( "/:teamId",userMw.verifyUser,  teamProxy );
 router.patch( "/:teamId",userMw.verifyUser,  teamProxy );
 

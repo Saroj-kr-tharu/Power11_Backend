@@ -71,7 +71,7 @@ UserContestSchema.index(
   { unique: true }
 );
 
-const userContest =  mongoose.model("UserContest", UserContestSchema);
-module.exports = userContest; 
+const userContestModel =  mongoose.model("UserContest", UserContestSchema);
+module.exports = userContestModel; 
 
 
