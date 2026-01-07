@@ -6,7 +6,8 @@ class TeamController {
     async addTeam(req,res) {
         try {
 
-            const {userId, players,matchId, contestId, gameId, totalCredits} = req?.body; 
+            const { players,matchId, contestId, gameId, totalCredits} = req?.body; 
+            const userId = req.userId;
             const token = req?.headers['x-access-token'];
             const response = await teamService.createTeam({userId, players, contestId,matchId, gameId, totalCredits, token});
             

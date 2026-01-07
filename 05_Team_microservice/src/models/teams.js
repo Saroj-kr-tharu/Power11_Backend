@@ -36,6 +36,13 @@ const TeamSchema = new mongoose.Schema(
           ref: "MatchPlayer",
           required: true
         },
+        playerSnapshot: {
+          playerId: { type: mongoose.Schema.Types.ObjectId },
+          name: { type: String },
+          teamName: { type: String },
+          image: { type: String },
+          roles: [{ type: String }]
+        },
         role: {
           type: String,
           required: true

@@ -14,7 +14,9 @@ The seeders must be run in a specific order due to data dependencies:
 
 1. **Player_Game Microservice** (Games → TeamMasters → Players)
 2. **Match Microservice** (depends on Games and TeamMasters)
-3. **Contest Microservice** (depends on Games and Matches)
+3. **Player_Game Microservice** (MatchPlayers - depends on Matches and Players)
+4. **Contest Microservice** (depends on Games and Matches)
+5. **Leaderboard Microservice** (depends on Contests)
 
 ## Running Seeders
 
@@ -26,10 +28,19 @@ From the root backend directory:
 node seed-all.js
 ```
 
+This will seed all data in the correct order:
+- Games (Cricket & Football)
+- Team Masters (IPL & EPL teams)
+- Players (Cricket & Football players)
+- Matches (Upcoming, Live, Completed)
+- Match Players (Player assignments per match)
+- Contests (Various contest types per match)
+- Leaderboards (Rankings for completed/live contests)
+
 ### Option 2: Run Individual Seeders
 
 #### 1. Player_Game Microservice (Run First)
-```bash
+```bash   
 cd 04_Player_Game_microservice
 npm run seed
 # OR
@@ -52,6 +63,14 @@ npm run seed
 node src/seeders/index.js
 ```
 
+#### 4. Leaderboard Microservice (Run Fourth)
+```bash
+cd 07_Leaderboard_microservice
+npm run seed
+# OR
+node src/seeders/index.js
+```
+
 ### Option 3: Run Specific Seed Files
 
 ```bash
@@ -64,11 +83,17 @@ node 04_Player_Game_microservice/src/seeders/teammaster.seed.js
 # Seed only players
 node 04_Player_Game_microservice/src/seeders/player.seed.js
 
+# Seed only match players (requires matches to be seeded first)
+node 04_Player_Game_microservice/src/seeders/matchplayer.seed.js
+
 # Seed only matches
 node 08_Match_microservice/src/seeders/match.seed.js
 
 # Seed only contests
 node 06_Contest_microservice/src/seeders/contest.seed.js
+
+# Seed only leaderboards (requires contests to be seeded first)
+node 07_Leaderboard_microservice/src/seeders/leaderboard.seed.js
 ```
 
 ## Seeded Data Overview
@@ -89,10 +114,20 @@ node 06_Contest_microservice/src/seeders/contest.seed.js
 - **Cricket Matches**: 6 matches (5 upcoming, 1 completed)
 - **Football Matches**: 7 matches (5 upcoming, 1 completed, 1 live)
 
+### Match Players
+- Links players to specific matches with:
+  - Match-specific credits
+  - Playing status (ANNOUNCED, UNANNOUNCED, BENCH)
+  - Points (for completed matches)
+  - Active status
+
 ### Contests (65 total)
 - 5 contest types per match
 - Cricket Contests: ~30
 - Football Contests: ~35
+- Each contest includes:
+  - `rulesVersion`: Version of scoring rules
+  - `maxTeamsPerUser`: Max teams allowed per user (1-5)
 
 Contest types:
 - Mega/Grand Prize Contest (high entry, high prize)
@@ -100,6 +135,49 @@ Contest types:
 - Winners Take All / Premium League
 - Free Entry / Practice Contest
 - Small/Mini League
+
+### Leaderboards
+- Generated for completed and live contests
+- Includes:
+  - `contestId`: Reference to contest
+  - `teamId`: User's fantasy team
+  - `userId`: User identifier
+  - `totalPoints`: Accumulated points
+  - `rank`: Position in leaderboard (for completed contests)
+
+## Schema Validation
+
+All seed data is validated against the following schemas:
+
+### Contest Schema Fields (Required)
+- `name`: String
+- `matchId`: ObjectId (ref: Match)
+- `gameId`: ObjectId (ref: Game)
+- `rulesVersion`: Number (required)
+- `maxTeamsPerUser`: Number (default: 1)
+- `entryFee`: Number (min: 0)
+- `prizePool`: Number (min: 0)
+- `maxParticipants`: Number
+- `startTime`: Date
+- `endTime`: Date
+- `status`: SCHEDULED | LIVE | COMPLETED | CANCELLED
+
+### MatchPlayer Schema Fields (Required)
+- `matchId`: ObjectId (ref: Match)
+- `playerId`: ObjectId (ref: Player)
+- `gameId`: ObjectId (ref: Game)
+- `credits`: Number
+- `roles`: Array of Strings (min 1 role)
+- `playingStatus`: ANNOUNCED | UNANNOUNCED | BENCH
+- `points`: Number (default: 0)
+- `isActive`: Boolean (default: true)
+
+### Leaderboard Schema Fields (Required)
+- `contestId`: ObjectId (ref: Contest)
+- `teamId`: ObjectId (ref: Team)
+- `userId`: String
+- `totalPoints`: Number (default: 0)
+- `rank`: Number (nullable)
 
 ## Troubleshooting
 
@@ -113,6 +191,12 @@ node 04_Player_Game_microservice/src/seeders/game.seed.js
 Run the match seeder first:
 ```bash
 node 08_Match_microservice/src/seeders/match.seed.js
+```
+
+### "Contests not found" Error
+Run the contest seeder first:
+```bash
+node 06_Contest_microservice/src/seeders/contest.seed.js
 ```
 
 ### Connection Errors

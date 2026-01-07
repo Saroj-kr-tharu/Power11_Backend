@@ -6,7 +6,9 @@
  * 2. Team Masters
  * 3. Players
  * 4. Matches
- * 5. Contests
+ * 5. Match Players
+ * 6. Contests
+ * 7. Leaderboards
  * 
  * Usage: node seed-all.js
  */
@@ -33,15 +35,19 @@ const runAllSeeders = async () => {
         const Game = require('./04_Player_Game_microservice/src/models/game');
         const TeamMaster = require('./04_Player_Game_microservice/src/models/teammaster');
         const Player = require('./04_Player_Game_microservice/src/models/player');
+        const MatchPlayer = require('./04_Player_Game_microservice/src/models/MatchPlayer');
         const Match = require('./08_Match_microservice/src/models/match');
         const Contest = require('./06_Contest_microservice/src/models/contest');
+        const Leaderboard = require('./07_Leaderboard_microservice/src/models/leaderboard');
 
         // Import seed data generators
         const { gameSeeds } = require('./04_Player_Game_microservice/src/seeders/game.seed');
         const { getTeamMasterSeeds } = require('./04_Player_Game_microservice/src/seeders/teammaster.seed');
         const { getPlayerSeeds } = require('./04_Player_Game_microservice/src/seeders/player.seed');
+        const { generateMatchPlayers } = require('./04_Player_Game_microservice/src/seeders/matchplayer.seed');
         const { getMatchSeeds } = require('./08_Match_microservice/src/seeders/match.seed');
         const { getContestSeeds } = require('./06_Contest_microservice/src/seeders/contest.seed');
+        const { generateLeaderboardEntries } = require('./07_Leaderboard_microservice/src/seeders/leaderboard.seed');
 
         // ========== STEP 1: Seed Games ==========
         console.log('─'.repeat(50));
@@ -106,9 +112,41 @@ const runAllSeeders = async () => {
         console.log(`  - Cricket Matches: ${cricketMatches.length}`);
         console.log(`  - Football Matches: ${footballMatches.length}\n`);
 
-        // ========== STEP 5: Seed Contests ==========
+        // ========== STEP 5: Seed Match Players ==========
         console.log('─'.repeat(50));
-        console.log('STEP 5: Seeding Contests');
+        console.log('STEP 5: Seeding Match Players');
+        console.log('─'.repeat(50));
+
+        await MatchPlayer.deleteMany({});
+        
+        // Group players by game
+        const cricketPlayers = players.filter(p => p.gameId.equals(cricketGame._id));
+        const footballPlayers = players.filter(p => p.gameId.equals(footballGame._id));
+        
+        const matchPlayerSeeds = [];
+        for (const match of matches) {
+            const isCricket = match.gameId.equals(cricketGame._id);
+            const isCompleted = match.status === 'COMPLETED';
+            const allPlayersForGame = isCricket ? cricketPlayers : footballPlayers;
+            const gameType = isCricket ? 'CRICKET' : 'FOOTBALL';
+            
+            const matchPlayers = generateMatchPlayers(
+                match._id,
+                match.gameId,
+                allPlayersForGame.slice(0, 22),
+                gameType,
+                isCompleted
+            );
+            matchPlayerSeeds.push(...matchPlayers);
+        }
+        
+        const insertedMatchPlayers = await MatchPlayer.insertMany(matchPlayerSeeds);
+        console.log(`✓ Seeded ${insertedMatchPlayers.length} match players`);
+        console.log(`  - Across ${matches.length} matches\n`);
+
+        // ========== STEP 6: Seed Contests ==========
+        console.log('─'.repeat(50));
+        console.log('STEP 6: Seeding Contests');
         console.log('─'.repeat(50));
 
         await Contest.deleteMany({});
@@ -118,18 +156,53 @@ const runAllSeeders = async () => {
         console.log(`  - Cricket Contests: ${contests.filter(c => c.gameId.equals(cricketGame._id)).length}`);
         console.log(`  - Football Contests: ${contests.filter(c => c.gameId.equals(footballGame._id)).length}\n`);
 
+        // ========== STEP 7: Seed Leaderboards ==========
+        console.log('─'.repeat(50));
+        console.log('STEP 7: Seeding Leaderboards');
+        console.log('─'.repeat(50));
+
+        await Leaderboard.deleteMany({});
+        
+        const leaderboardSeeds = [];
+        const completedContests = contests.filter(c => c.status === 'COMPLETED');
+        const liveContests = contests.filter(c => c.status === 'LIVE');
+        
+        // Generate leaderboard entries for completed contests
+        for (const contest of completedContests) {
+            const participantCount = Math.min(contest.joinedParticipants || 10, 50);
+            const entries = generateLeaderboardEntries(contest._id, participantCount, true);
+            leaderboardSeeds.push(...entries);
+        }
+        
+        // Generate partial leaderboard for live contests
+        for (const contest of liveContests) {
+            const participantCount = Math.min(contest.joinedParticipants || 5, 20);
+            const entries = generateLeaderboardEntries(contest._id, participantCount, false);
+            entries.forEach(entry => {
+                entry.totalPoints = Math.floor(Math.random() * 100);
+            });
+            leaderboardSeeds.push(...entries);
+        }
+        
+        const insertedLeaderboards = await Leaderboard.insertMany(leaderboardSeeds);
+        console.log(`✓ Seeded ${insertedLeaderboards.length} leaderboard entries`);
+        console.log(`  - From ${completedContests.length} completed contests`);
+        console.log(`  - From ${liveContests.length} live contests\n`);
+
         // ========== Summary ==========
         console.log('='.repeat(60));
         console.log('                    SEEDING COMPLETE!');
         console.log('='.repeat(60));
         console.log('\nSummary:');
-        console.log(`  ✓ Games:       ${games.length}`);
-        console.log(`  ✓ Teams:       ${teams.length}`);
-        console.log(`  ✓ Players:     ${players.length}`);
-        console.log(`  ✓ Matches:     ${matches.length}`);
-        console.log(`  ✓ Contests:    ${contests.length}`);
+        console.log(`  ✓ Games:         ${games.length}`);
+        console.log(`  ✓ Teams:         ${teams.length}`);
+        console.log(`  ✓ Players:       ${players.length}`);
+        console.log(`  ✓ Matches:       ${matches.length}`);
+        console.log(`  ✓ Match Players: ${insertedMatchPlayers.length}`);
+        console.log(`  ✓ Contests:      ${contests.length}`);
+        console.log(`  ✓ Leaderboards:  ${insertedLeaderboards.length}`);
         console.log(`  ─────────────────────`);
-        console.log(`  Total Records: ${games.length + teams.length + players.length + matches.length + contests.length}`);
+        console.log(`  Total Records:   ${games.length + teams.length + players.length + matches.length + insertedMatchPlayers.length + contests.length + insertedLeaderboards.length}`);
         console.log('='.repeat(60));
 
     } catch (error) {

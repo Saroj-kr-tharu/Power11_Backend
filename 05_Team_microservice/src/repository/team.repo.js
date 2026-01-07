@@ -6,6 +6,16 @@ class TeamRepo extends CurdRepo {
     constructor(){
         super(teamModel)
     }; 
+
+    async getByUserId(userId){
+        try {
+           const res = await this.model.find({userId});
+           return res; 
+        } catch (error) {
+            console.log("something went wrong in service  level  (getByUserId) ")
+             throw error;
+        }
+    }
  
 
 

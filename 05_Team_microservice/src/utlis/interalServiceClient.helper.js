@@ -22,7 +22,7 @@ const internalClient = axios.create({
 internalClient.interceptors.response.use(
     (response) => response.data,
     (error) => {
-        console.error(`Internal service call failed: ${error.message}`);
+        console.error(`Internal service call failed: ${error}`);
         throw error;
     }
 );

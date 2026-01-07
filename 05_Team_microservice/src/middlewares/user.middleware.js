@@ -35,6 +35,7 @@ class UserMiddleware {
             if(response) {
                 req.userId= response?.data?.id;
                 req.email = response?.data?.email;
+             
                 return  next();
             } 
            throw new Error("Token Expired")

@@ -1,11 +1,21 @@
 const curdService = require("./curd.service");
-const {gameRepo} = require('../repository')
+const {matchPlayerRepo} = require('../repository')
 
 
 class MatchPlayerService extends curdService{
 
-       constructor(){
-        super(gameRepo) 
+    constructor(){
+        super(matchPlayerRepo) 
+    }
+
+    async getMatchFilter(filter){
+        try {
+            const res = await matchPlayerRepo.getMatchByfilter(filter)
+            return res;
+        } catch (error) {
+            console.log("something went wrong in service  level  (getMatchFilter) ")
+             throw error;
+        }
     }
 
 }

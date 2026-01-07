@@ -23,6 +23,11 @@ const ContestSchema = new mongoose.Schema(
       type: Number,
       required: true
     },
+    maxTeamsPerUser: {
+      type: Number,
+      required: true,
+      default: 1
+    },
 
     entryFee: {
       type: Number,

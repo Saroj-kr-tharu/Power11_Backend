@@ -1,7 +1,7 @@
 const express = require('express');
 
 const router = express.Router();
-const {gameCtrl, playerCtrl, teamMasterCtrl} = require('../../controllers/index')
+const {gameCtrl, playerCtrl, teamMasterCtrl, matchPlayerCtrl} = require('../../controllers/index')
 const { internalTokenMw, gameMw, userMw} = require('../../middlewares/index')
 
 
@@ -30,6 +30,9 @@ router.get( "/teammaster/:gameId",internalTokenMw.checkInternalServiceToken, use
 router.delete( "/teammaster/:teammasterId",internalTokenMw.checkInternalServiceToken, userMw.verifyToken, gameMw.teammasterId,  teamMasterCtrl.deleteTeamMaster );
 router.patch( "/teammaster/:teammasterId",internalTokenMw.checkInternalServiceToken, userMw.verifyToken, gameMw.teammasterId,  teamMasterCtrl.updateTeamMaster );
 
+
+// matchPlayer
+router.post( "/matchPlayer",internalTokenMw.checkInternalServiceToken, userMw.verifyToken,  matchPlayerCtrl.getAllMatchPlayer );
 
  
 module.exports = router;

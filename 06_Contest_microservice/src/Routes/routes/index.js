@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const {userMw, internalTokenMw} = require('../../middlewares/index')
-const {contestCtrl} = require("../../controllers/index")
+const {contestCtrl,userContestCtrl } = require("../../controllers/index")
 
 
 router.get("/contest/check", (req, res) => {
@@ -16,5 +16,8 @@ router.get( "/contest/",   contestCtrl.getAllContest );
 router.delete( "/contest/:contestId",internalTokenMw.checkInternalServiceToken,userMw.validateToken,  contestCtrl.deleteContest );
 router.patch( "/contest/:contestId",internalTokenMw.checkInternalServiceToken, userMw.validateToken, contestCtrl.updateContest );
 
+
+// join userContest
+router.post( "/usercontest",internalTokenMw.checkInternalServiceToken, userMw.validateToken,   userContestCtrl.joinUserContest );
  
 module.exports = router;
