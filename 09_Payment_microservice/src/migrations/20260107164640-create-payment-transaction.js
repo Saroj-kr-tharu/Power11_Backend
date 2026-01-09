@@ -7,50 +7,46 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER
+      },
+      userId: {
+        type: Sequelize.STRING,
         allowNull: false
       },
       userEmail: {
         type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-          isEmail: true
-        }
+        allowNull: false
       },
-      currency: {
-        type: Sequelize.STRING,
-        defaultValue: 'npr',
-      },
-
-      transactionId: {
-        type: Sequelize.STRING,
-        unique: true,
+      paymentMethod: {
+        type: Sequelize.ENUM('STRIPE', 'KHALTI', 'ESEWA'),
         allowNull: false
       },
       orderId: {
         type: Sequelize.STRING,
-        unique: false,
         allowNull: false
+      },
+      transactionId: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
+      },
+      gatewayPayload: {
+        type: Sequelize.JSON
+      },
+      currency: {
+        type: Sequelize.STRING,
+        defaultValue: 'NPR'
       },
       amount: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(12, 2),
         allowNull: false
       },
-
-
+      
       status: {
-        type: Sequelize.ENUM({
-          values: ['FAILED', 'SUCCESS', 'PENDING', 'REFUND']
-        }),
-        defaultValue: 'PENDING',
+        type: Sequelize.ENUM('PENDING', 'SUCCESS', 'FAILED', 'REFUND'),
+        allowNull: false,
+        defaultValue: "PENDING"
       },
-      paymentMethod: {
-        type: Sequelize.ENUM({
-          values: ['ESEWA', 'KHALTI', 'STRIPE', 'COD']
-        }),
-        allowNull: false
-      },
-
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

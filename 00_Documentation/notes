@@ -1,0 +1,32 @@
+🔹 Add Money Flow
+
+Create paymentTransaction (PENDING)
+Gateway callback → SUCCESS
+Create walletTransaction (CREDIT)
+Update wallet.balance
+paymentTransaction → wallet Transaction → wallet
+
+🔹 Join Contest Flow
+Check wallet.balance
+Lock entryFee
+Create walletTransaction (DEBIT)
+Update wallet
+wallet.balance -= entryFee
+wallet.lockedBalance += entryFee
+
+🔹 Contest Result Flow
+Case	Wallet Action
+Win	CREDIT balance
+Lose	lockedBalance released
+Refund	CREDIT balance
+
+🔹 Withdraw Flow
+Create withdrawalRequest
+Debit wallet
+Admin approves
+Money sent externally
+
+
+paymentTransactions (1) ────< walletTransactions (*)
+wallets (1) ───────────────< walletTransactions (*)
+wallets (1) ───────────────< withdrawalRequests (*)
