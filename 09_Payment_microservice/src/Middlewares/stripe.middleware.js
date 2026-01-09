@@ -3,8 +3,7 @@ const {  ClientErrorsCodes } = require('../utlis/Errors/https_codes');
 class StripeValidation {
 
     intilize(req, res, next) {
-          let { transactionId,items, amount, userEmail } = req.body;
-        // console.log(`data =>  ${items}, ${amount}, ${userEmail} `)
+        let { transactionId,items, amount, userEmail } = req.body;
 
         if (!transactionId || !items || !userEmail || !amount  ) {
             return res.status(ClientErrorsCodes.BAD_REQUEST).json({
@@ -19,7 +18,7 @@ class StripeValidation {
 
     completePayment(req, res, next) {
          const { session_id,transId } = req.query;
-         console.log('data => ',session_id,transId)
+        
        
         if (!session_id || !transId ) {
             return res.status(ClientErrorsCodes.BAD_REQUEST).json({

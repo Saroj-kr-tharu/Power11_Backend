@@ -50,7 +50,7 @@ module.exports = {
         allowNull: false
       },
       referenceType: {
-        type: Sequelize.ENUM("CONTEST", "MATCH", "WITHDRAW"),
+        type: Sequelize.ENUM("CONTEST", "MATCH", "WITHDRAW", "PAYMENT"),
         allowNull: false
       },
       referenceId: {

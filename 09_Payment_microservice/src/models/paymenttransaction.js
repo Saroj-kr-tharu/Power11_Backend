@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     transactionId: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: true
     },
     gatewayPayload: {
@@ -49,7 +49,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
-    modelName: 'PaymentTransaction'
+    modelName: 'PaymentTransaction',
+    tableName: 'paymentTransactions'
   });
 
   return PaymentTransaction;

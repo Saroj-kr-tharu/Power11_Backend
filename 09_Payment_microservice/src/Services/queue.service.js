@@ -12,7 +12,7 @@ const  sendMessageToQueueService =   async (data, service) =>  {
         service: service ,
       };
 
-      console.log("Sending data to publish ", payload);
+      // console.log("Sending data to publish ", payload);
 
       publishMessage(channel, REMINDER_BINDING_KEY, JSON.stringify(payload));
 

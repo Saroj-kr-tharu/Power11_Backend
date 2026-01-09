@@ -131,10 +131,6 @@ class StripeService {
             return link;
 
 
-
-
-
-
         } catch (error) {
             console.log("Something went wrong in service layer (completePaymentService)");
             throw error;

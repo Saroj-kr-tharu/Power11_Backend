@@ -1,15 +1,26 @@
 const Service = require('./curd.service');
-const paymentTransactionRepo = require('../Repository/payment.transtion.repo');
+const paymentTransRepo = require('../Repository/payment.transtion.repo');
 
 class PaymentTransactionService extends Service {
   constructor() {
-    super(paymentTransactionRepo);
+    super(paymentTransRepo);
   }
 
-  async updateByTransId(transId, data) {
+  async updateByTransId(transId, data, ) {
     try {
 
-      const res = await paymentTransactionRepo.updateByTrans(transId, data);
+      const res = await paymentTransRepo.updateByTrans(transId, data);
+      return res;
+    } catch (error) {
+      console.log("Something went wrong in service layer (updateByTransId)");
+      throw error;
+    }
+  }
+
+  async updateByOrderId(orderId, data) {
+    try {
+
+      const res = await paymentTransRepo.updateByOrderId(orderId, data);
       return res;
     } catch (error) {
       console.log("Something went wrong in service layer (updateByTransId)");
@@ -20,7 +31,7 @@ class PaymentTransactionService extends Service {
   async getDetailsByTransid(transId) {
     try {
 
-      const res = await paymentTransactionRepo.getDetailsByTransid(transId);
+      const res = await paymentTransRepo.getDetailsByTransid(transId);
       return res;
     } catch (error) {
       console.log("Something went wrong in service layer (getDetailsByTransid)");
@@ -29,10 +40,7 @@ class PaymentTransactionService extends Service {
   }
  
 
-
-
-
 }
 
-const paymentTransactionService = new PaymentTransactionService();
-module.exports = paymentTransactionService;
+const paymentTransService = new PaymentTransactionService();
+module.exports = paymentTransService;

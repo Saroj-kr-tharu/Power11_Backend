@@ -28,8 +28,8 @@ router.post("/stripe-initiate/",userMw.verifyUser,paymentProxy);
 router.get("/stripe-complete-payment",paymentProxy);
 router.get("/stripe-failed-payment",paymentProxy);
 
-//cod 
-router.post("/cod-initiate",userMw.verifyUser,paymentProxy);
+// payment
+router.post("/initialize", userMw.verifyUser,paymentProxy);
 
 
 module.exports = router;

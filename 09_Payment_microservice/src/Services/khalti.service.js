@@ -1,8 +1,10 @@
 const { KHALTI_PAYMENT_URL, KHALTI_SECRET_KEY, KHALTI_VERIFICATION_URL } = require('../config/khalti.config');
 const axios = require('axios');
-const { MARKETMANDU_URL } = require('../config/server.config');
-const paymentTransactionService = require('./payment.transaction.service');
-const rabbitMqService = require('../Utlis/messageQueue');
+const paymentTransService = require('./payment.transaction.service');
+const walletService = require('./wallet.service');
+const walletTransService = require('./wallet.transaction.service');
+const sendMessageToQueueService = require('./queue.service');
+const { sequelize } = require('../models');
 
 class KhaltiService {
 
@@ -11,7 +13,6 @@ class KhaltiService {
         try {
 
             // 1. initialize-khalti
-            console.log('from khalti intialize data => ',data);
 
             // -> make a request call to 
             var options = {
@@ -23,26 +24,19 @@ class KhaltiService {
                 },
                 data: JSON.stringify({
                     "return_url": data.return_url,
-                    "website_url": data.website_url,
+                    "website_url": data.website_url, 
                     "amount": data.amount ,
-                    "purchase_order_id": data.transactionId ? data.transactionId.toString() : data.purchase_order_id,
+                    "purchase_order_id":  data.purchase_order_id,
                     "purchase_order_name": data.purchase_order_name,
-                    "customer_info": data.custumer_info
+    
                 })
             }
 
             const response = await axios(options);
-
-
             const result = response?.data;
-            // console.log('result => ', result);
-
-            // -> make a record at transitionTable
-            let finalData = { amount: parseInt(data.amount)/100, userEmail: data.customer_info.userEmail,status:'PENDING', transactionId: result.pidx, paymentMethod: "KHALTI", orderId: data.orderId };
-            // console.log('final data => ', finalData);
-            await paymentTransactionService.createService(finalData);
-
-            // // -> return the response pxid,paymentUrl
+          
+            // set the transitionId 
+            await paymentTransService.updateByOrderId(data.purchase_order_id, {transactionId: result.pidx } );
             return result;
 
 
@@ -50,7 +44,7 @@ class KhaltiService {
 
         } catch (error) {
             console.log("Something went wrong in service layer (intializePaymentService)");
-            console.log("error => ", error);
+           
             throw error;
         }
     }
@@ -87,56 +81,97 @@ class KhaltiService {
 
 
     async completePaymentService(data) {
+        const transaction = await sequelize.transaction();
+        
         try {
 
- 
             // Verify payment with khalti
             const response = await this.#verifyKhaltiPayment(data.pidx);
-            console.log('response from verify data => ', response)
+            // console.log('response from verify data => ', response)
 
             // check the status 
             if (response.status != 'Completed') {
-                await paymentTransactionService.updateByTransId(response.pidx, { status: 'FAILED' });
-                // send queue to send msg to remainder service 
-                // -> transition id , amount , date , gateway , email_status
+                await paymentTransService.updateByTransId(response.pidx, { status: 'FAILED' }, { transaction });
+                await transaction.commit();
                 return 'Payment Failed '
             }
+          
 
-            // update  payment record in the database from pending to complete
-            await paymentTransactionService.updateByTransId(response.pidx, { status: 'SUCCESS' });
+            let getdata = await paymentTransService.getDetailsByTransid(response.pidx, { transaction });
+            getdata= getdata?.dataValues; 
+            console.log("get data = >", getdata)
+
+            // 1. Gateway callback (SUCCESS)
+            // 2. Start DB transaction
+            // 3. Find wallet by userId
+            //    ├─ If NOT exists → CREATE wallet
+            const wallet = await walletService.getByData({ userId: getdata?.userId  }, { transaction });
+
+            if(!wallet){
+                await walletService.createService({
+                    userId: getdata?.userId,
+                    balance: 0,
+                    lockedBalance: 0,
+                    currency: getdata?.currency || 'NPR',
+                    status: 'ACTIVE'
+                }, { transaction });
+            }
+
+            // 4. Create walletTransaction (CREDIT)
+            const currentWallet = await walletService.getByData({ userId: getdata?.userId }, { transaction });
+            const balanceBefore = parseFloat(currentWallet?.balance) || 0;
+            const balanceAfter = balanceBefore + (parseFloat(getdata?.amount) || 0);
 
 
-            // send queue to send msg to remainder service 
-            // -> transition id , amount , date , gateway , email_status
+            await walletTransService.createService({
+                walletId: currentWallet?.id,
+                paymentTransactionId: getdata?.id,
+                type: 'CREDIT',
+                reason: 'ADD_MONEY',
+                amount: getdata?.amount,
+                balanceBefore: balanceBefore,
+                balanceAfter: balanceAfter,
+                referenceType: 'PAYMENT',
+                referenceId: getdata?.orderId,
+                status: 'SUCESS'
+            }, { transaction })
 
-            const getdata = await paymentTransactionService.getDetailsByTransid(response.pidx);
+            
+            // 5. Update wallet.balance
+            await walletService.updateService(currentWallet?.dataValues?.id, {balance:balanceAfter }, { transaction });
+            // 6. Mark paymentTransaction SUCCESS
+            await paymentTransService.updateByTransId(response.pidx, { status: 'SUCCESS' }, { transaction });
+            // 7. Commit transaction
+            await transaction.commit();
 
-            // console.log('data from db => ', getdata)
-
+            // console.log('getdaa = >', getdata)
             const payload = {
                 subject: "Payment Notification System",
                 email: getdata.userEmail,
                 notificationTime: new Date(),
-                gateway: 'KHALTI',
+                gateway: getdata.gateway, 
                 transactionId:getdata.transactionId,
                 amount: getdata.amount,
-                currency: 'npr', 
-                status: 'COMPLETE'
+                currency: getdata.currency,
+                status: getdata.status
             };
 
-             await rabbitMqService.sendMessageToQueueService(payload);
+            await sendMessageToQueueService(payload, "CREATE_TICKET_PAYMENT");
+
             // Respond with success messagev
-              console.log('trans => from completed payment ', getdata.dataValues.orderId)
-              const orderId = encodeURIComponent(getdata?.dataValues?.orderId ?? '');
-              const totalAmount = Number.parseInt(response?.total_amount ?? 0) / 100;
-              const link = `${MARKETMANDU_URL}/orders/orderFinal?orderNO=${orderId}&total_amount=${totalAmount}&trans_id=${getdata.transactionId}`;
+              const orderId = getdata?.orderId;
+              const totalAmount = Number.parseInt(response?.total_amount) ;
+             
  
-            //    console.log(' link =>  ', link) 
-            return link;
+           return {
+            orderId, 
+            totalAmount, 
+           }
 
 
 
         } catch (error) {
+            await transaction.rollback();
             console.log("Something went wrong in service layer (completePaymentService)");
             throw error;
         }

@@ -37,7 +37,7 @@ class StripeControllers {
             if (!result) {
                 return res.redirect(302, '/payment-error'); // Fallback URL
             }
-            return res.redirect(302, result);
+            return  result;
 
         } catch (error) {
             console.log('Something went wrong in controller (create)');

@@ -1,9 +1,9 @@
-const { walletTransaction } = require("../models/index");
+const { WalletTransaction } = require("../models/index");
 const CurdRepo = require('./curd.repo');
 
 class WalletTransactionRepo extends CurdRepo {
   constructor() {
-    super(walletTransaction);
+    super(WalletTransaction);
   }
 
   async updateByTrans(id, data) {

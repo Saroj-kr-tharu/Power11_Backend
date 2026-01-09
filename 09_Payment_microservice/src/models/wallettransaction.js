@@ -44,7 +44,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     referenceType: {
-      type: DataTypes.ENUM('CONTEST', 'MATCH', 'WITHDRAW'),
+      type: DataTypes.ENUM('CONTEST', 'MATCH', 'WITHDRAW', "PAYMENT"),
+    
       allowNull: false
     },
     referenceId: {
@@ -57,7 +58,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
-    modelName: 'WalletTransaction'
+    modelName: 'WalletTransaction',
+    tableName: 'walletTransactions'
   });
 
   return WalletTransaction;

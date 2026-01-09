@@ -1,10 +1,13 @@
 🔹 Add Money Flow
+1. Gateway callback (SUCCESS)
+2. Start DB transaction
+3. Find wallet by userId
+   ├─ If NOT exists → CREATE wallet
+4. Create walletTransaction (CREDIT)
+5. Update wallet.balance
+6. Mark paymentTransaction SUCCESS
+7. Commit transaction
 
-Create paymentTransaction (PENDING)
-Gateway callback → SUCCESS
-Create walletTransaction (CREDIT)
-Update wallet.balance
-paymentTransaction → wallet Transaction → wallet
 
 🔹 Join Contest Flow
 Check wallet.balance

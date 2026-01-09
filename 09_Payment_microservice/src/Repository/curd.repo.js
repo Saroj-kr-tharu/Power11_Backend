@@ -5,8 +5,9 @@ class CurdRepo{
         this.model = model;
     }
 
-    async create(data) {
+    async create(data, session=null) {
         try {
+         
           const res = await this.model.create(data);
           return res;
         } catch (error) {

@@ -27,7 +27,7 @@ module.exports = {
       },
       transactionId: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true
       },
       gatewayPayload: {

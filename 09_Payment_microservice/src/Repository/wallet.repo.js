@@ -1,23 +1,21 @@
-const { wallet } = require("../models/index");
+const { Wallet } = require("../models/index");
 const CurdRepo = require('./curd.repo');
+
+
 
 class Wallet_repo extends CurdRepo {
   constructor() {
-    super(wallet);
+    super(Wallet);
+    
   }
 
-  async updateByTrans(id, data) {
+  async getBydata(data) {
     try {
-    
-      const res = await this.model.update(data, {
-        where: {
-          transactionId: id,
-        },
-      });
-
+     
+      const res = await this.model.findOne({ where: data });
       return res;
     } catch (error) {
-      console.log("Something went wrong in Repo level (updateByTrans) ");
+      console.log("Something went wrong in Repo level (getBydata) ");
       throw error;
     }
   }

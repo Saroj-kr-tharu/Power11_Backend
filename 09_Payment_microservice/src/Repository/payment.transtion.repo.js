@@ -1,14 +1,14 @@
-const { paymentTransaction } = require("../models/index");
+const { PaymentTransaction } = require("../models/index");
 const CurdRepo = require('./curd.repo');
 
 class PaymentTransaction_repo extends CurdRepo {
   constructor() {
-    super(paymentTransaction);
+    super(PaymentTransaction);
   }
 
   async updateByTrans(id, data) {
     try {
-      // console.log(`id => ${id} data => ${data}`);
+    
       const res = await this.model.update(data, {
         where: {
           transactionId: id,
@@ -18,6 +18,22 @@ class PaymentTransaction_repo extends CurdRepo {
       return res;
     } catch (error) {
       console.log("Something went wrong in Repo level (create) ");
+      throw error;
+    }
+  }
+
+  async updateByOrderId(id, data) {
+    try {
+    
+      const res = await this.model.update(data, {
+        where: {
+          orderId: id,
+        },
+      });
+
+      return res;
+    } catch (error) {
+      console.log("Something went wrong in Repo level (updateByOrderId) ");
       throw error;
     }
   }
@@ -35,10 +51,11 @@ class PaymentTransaction_repo extends CurdRepo {
     }
   }
 
+  
+
 
 }
 
 
-const paymentTransactionRepo = new PaymentTransaction_repo();
-
-module.exports = paymentTransactionRepo;
+const paymentTransRepo = new PaymentTransaction_repo();
+module.exports = paymentTransRepo;

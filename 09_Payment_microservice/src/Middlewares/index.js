@@ -4,4 +4,6 @@ module.exports = {
    khaltiMw : require("./khalti.middleware"),
    stripeMw: require("./stripe.middleware"),
    internalMw: require("./internal.service.middleware"),
+   paymentMw: require("./payment.middleware"),
+   userMw: require("./user.middleware"),
 }
