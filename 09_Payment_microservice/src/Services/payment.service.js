@@ -5,7 +5,7 @@ const {PAYMENT_BACKEND_URL} = require("../config/server.config")
 const Service = require('./curd.service');
 const khaltiService  =require('./khalti.service')
 const stripeService  =require('./stripe.service')
-const esewaService  =require('./esewa.service')
+
 
 const {PaymentTranstionRepo} = require('../Repository/index');
 
@@ -23,7 +23,7 @@ class PaymentService extends Service {
             //5 paymentTransaction → wallet Transaction → wallet
 
             const orderId = "ORD" + crypto.randomBytes(8).toString('hex');
-            const result = await PaymentTranstionRepo.create({
+            let result =  await PaymentTranstionRepo.create({
                 userId: data.userId,
                 userEmail: data.email,
                 paymentMethod: gateway.toUpperCase(),
@@ -31,22 +31,18 @@ class PaymentService extends Service {
                 amount: parseInt(data.amount, 10)* 100
             });
 
-           
+            result = result?.dataValues; 
+            console.log("res => ", result )
+            
          
             
             let link ; 
+            let payload; 
             switch (gateway.toUpperCase()) {
-                case 'ESEWA':
-                    // link = `${PAYMENT_BACKEND_URL}/initialize-esewa`;
-                    // reqBody = {
-                    //     transactionId: data.transactionId,
-                    //     totalPrice: parseInt(data.Total_Price, 10),
-                    //     userEmail: data.userEmail
-                    // };
-                    break;
+               
 
                 case 'KHALTI':
-                    const payload = { 
+                    payload = { 
                         return_url: `${PAYMENT_BACKEND_URL}/khalti/complete/payment?transId=${encodeURIComponent(orderId.toString())}`,
                         website_url: data.website_url || "https://www.fortend.com",
                         amount: parseInt(data.amount, 10), // Convert amount to integer
@@ -54,20 +50,18 @@ class PaymentService extends Service {
                         purchase_order_name: "Khalti-"+orderId, 
                         orderId: orderId
                     }
-                    
                     link  = await khaltiService.intializePaymentService(payload)
-                   
-                   
                     break;
 
                 case 'STRIPE':
-                    // link = `${PAYMENT_BACKEND_URL}/stripe-initiate/`
-                    // reqBody = {
-                    //     transactionId: data.transactionId,
-                    //     userEmail: data.userEmail,
-                    //     amount: data.Total_Price,
-                    //     items: data.Seats
-                    // }
+                    
+                    payload = {
+                        transactionId: result?.orderId,
+                        userEmail: data.email,
+                        amount: data.amount,
+                    }
+                    
+                    link = await stripeService.intializePaymentService(payload)
                     break;
             }
 

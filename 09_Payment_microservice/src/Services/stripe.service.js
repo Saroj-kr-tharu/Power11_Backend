@@ -1,9 +1,10 @@
-const paymentTransactionService = require('./payment.transaction.service');
-const { MARKETMANDU_URL, APIGATEWAY_BACKEND_URL } = require('../config/server.config');
+const paymentTransService = require('./payment.transaction.service');
 const { STRIPE_FAILED_URL, STRIPE_SUCCESS_URL } = require('../config/stripe.config');
 const stripe = require('../config/stripe.connect');
-const rabbitMqService = require('../Utlis/messageQueue');
-const axios = require('axios');
+const walletService = require('./wallet.service');
+const walletTransService = require('./wallet.transaction.service');
+const sendMessageToQueueService = require('./queue.service');
+const { sequelize } = require('../models');
 
 class StripeService {
 
@@ -12,68 +13,31 @@ class StripeService {
         try {
             // 1. initialize-stripe
             console.log('data fro stripe intialize => ', data)
-            const products = await Promise.all(
-                data.items.map(async (item) => {
-                    
-                    // const linkRes = `${MARKETMANDU_URL}/product?id=${item.productId}`;
-                    const linkRes = `${APIGATEWAY_BACKEND_URL}/marketmandu/product?id=${item.productId}`; 
-
-                    const response = await axios.get(linkRes);
-
-                    if (!response.data) throw new Error("Product not found");
-
-                    const product = response.data.data; 
-
-                    // console.log('item => ', product)
-
-                    return {
-                        name: product.name,
-                        unit_amount: Math.round(product.price * 100),
-                        quantity: item.quantity
-                    };
-                })
-            );
-
-            console.log('all products => ', products)
-
-
-
-            // get product details 
-            
-
-            // -> create session 
-            // const quan= data.items.length;
-            console.log('data item => ', data ) ;
+        
+           
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ["card"],
                 mode: "payment",
-                line_items: products.map(p => ({
+               line_items: [
+                {
                     price_data: {
                         currency: "NPR",
-                        product_data: { name: p.name },
-                        unit_amount: p.unit_amount
+                        product_data: {
+                            name: "Wallet Deposit",
+                            description: "Add funds to your account"
+                        },
+                        unit_amount: data.amount * 100,
                     },
-                    quantity: p.quantity
-                })),
+                    quantity: 1
+                }
+            ],
                 success_url: `${STRIPE_SUCCESS_URL}?session_id={CHECKOUT_SESSION_ID}&transId=${data.transactionId}`,
                 cancel_url: `${STRIPE_FAILED_URL}?session_id={CHECKOUT_SESSION_ID}`,
             })
 
-            // console.log('session => ', session);
 
-            // -> create Record at transitionTable 
-            const transactionId = await session.id;
-            let finalData = {
-                 userId: data.userId, amount: data.amount,userEmail:data.userEmail, status:'PENDING', currency: 'USD', transactionId, paymentMethod: "STRIPE", orderId:data.orderId };
-
-            await paymentTransactionService.createService(finalData);
-
-
-            return session.url
-
-
-
-
+            await paymentTransService.updateByOrderId(data.transactionId, {transactionId: session.id } );
+            return session.url;
 
         } catch (error) {
             console.log("Something went wrong in service layer (intializePaymentService)");
@@ -95,43 +59,79 @@ class StripeService {
         }
     }
 
-    async completePaymentService(data,transactionId) {
+    async completePaymentService(data, transactionId) {
+        const transaction = await sequelize.transaction();
         try {
-
-            // 
             const response = await this.#checkPaymentStatus(data);
-            // console.log('response => ', response);
-
             // check the status 
-            if (response != 'paid') return;
+            if (response != 'paid') {
+                await transaction.rollback();
+                return "failed Payment";
+            }
 
-            // update status 
-            await paymentTransactionService.updateByTransId(data, { status: 'SUCCESS' });
+            // Get payment details
+            let getdata = await paymentTransService.getDetailsByTransid(data);
+            getdata = getdata.dataValues;
 
-            // send queue to send msg to remainder service 
-            // -> transition id , amount , date , gateway , email_status
-            const getdata = await paymentTransactionService.getDetailsByTransid(data);
-            const Details = getdata.dataValues;
+            // 1. Gateway callback (SUCCESS)
+            // 2. DB transaction started above
+            // 3. Find wallet by userId - If NOT exists → CREATE wallet
+            let wallet = await walletService.getByData({ userId: getdata?.userId }, { transaction });
 
+            if (!wallet) {
+                wallet = await walletService.createService({
+                    userId: getdata?.userId,
+                    balance: 0,
+                    lockedBalance: 0,
+                    currency: getdata?.currency || 'NPR',
+                    status: 'ACTIVE'
+                }, { transaction });
+            }
+
+            // 4. Create walletTransaction (CREDIT)
+            const currentWallet = await walletService.getByData({ userId: getdata?.userId }, { transaction });
+            const balanceBefore = parseFloat(currentWallet?.balance) || 0;
+            const balanceAfter = balanceBefore + (parseFloat(getdata?.amount) || 0);
+
+            await walletTransService.createService({
+                walletId: currentWallet?.id,
+                paymentTransactionId: getdata?.id,
+                type: 'CREDIT',
+                reason: 'ADD_MONEY',
+                amount: getdata?.amount,
+                balanceBefore: balanceBefore,
+                balanceAfter: balanceAfter,
+                referenceType: 'PAYMENT',
+                referenceId: getdata?.orderId,
+                status: 'SUCESS' 
+            }, { transaction });
+
+            // 5. Update wallet.balance
+            await walletService.updateService(currentWallet?.dataValues?.id, { balance: balanceAfter }, { transaction });
+
+            // 6. Mark paymentTransaction SUCCESS
+            await paymentTransService.updateByTransId(data, { status: 'SUCCESS' }, { transaction });
+            console.log('done ')
+            // 7. Commit transaction
+            await transaction.commit();
+
+            // Send notification after successful commit
             const payload = {
                 subject: "Payment Notification System",
-                email: Details.userEmail,
+                email: getdata.userEmail,
                 notificationTime: new Date(),
                 gateway: 'Stripe',
-                transactionId: Details.transactionId,
-                amount: Details.amount,
+                transactionId: getdata.transactionId,
+                amount: getdata.amount,
                 currency: 'npr',
-                status: 'COMPLETE', 
- 
+                status: 'COMPLETE',
             };
-             await rabbitMqService.sendMessageToQueueService(payload);
-            // Respond with success message
-            // const link = `${MOVIE_BOOKING_URL}/FinalComplete?transId=${encodeURIComponent(transactionId)}`
-            const link = `${MARKETMANDU_URL}/orders/orderFinal?orderNO=${Details.orderId}&total_amount=${Details.amount}&trans_id=${Details.transactionId}`;
-            return link;
-
+            // await sendMessageToQueueService(payload, "CREATE_TICKET_PAYMENT");
+               console.log('done again')
+            return   'Payment completed successfully' ;
 
         } catch (error) {
+            await transaction.rollback();
             console.log("Something went wrong in service layer (completePaymentService)");
             throw error;
         }

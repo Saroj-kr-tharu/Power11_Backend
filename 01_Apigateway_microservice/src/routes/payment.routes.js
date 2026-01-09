@@ -15,8 +15,7 @@ const paymentProxy = createProxyMiddleware({
 
 
 
-router.post("/initialize-esewa", userMw.verifyUser , paymentProxy);
-router.get("/complete-payment",  paymentProxy);
+
 
 
 // khalti
