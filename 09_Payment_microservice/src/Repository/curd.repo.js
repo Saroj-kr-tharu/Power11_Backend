@@ -1,77 +1,65 @@
+class CurdRepo { 
+  constructor(model) {
+    this.model = model;
+  }
 
-class CurdRepo{ 
-    
-    constructor(model){
-        this.model = model;
+  async create(data, options = {}) {
+    try {
+      return await this.model.create(data, {
+        transaction: options.transaction
+      });
+    } catch (error) {
+      console.log("Repo error (create)");
+      throw error;
     }
+  }
 
-    async create(data, session=null) {
-        try {
-         
-          const res = await this.model.create(data);
-          return res;
-        } catch (error) {
-          console.log("Something went wrong in Repo level (create) ");
-          throw error;
-        }
-      }
-    
-      async update(id, data) {
-        try {
-          const res = await this.model.update(data, {
-            where: {
-              id,
-            },
-          });
-    
-          return res;
-        } catch (error) {
-          console.log("Something went wrong in Repo level (create) ");
-          throw error;
-        }
-      }
-    
-      async delete(id) {
-        try {
-          console.log('id => ', id);
-          const res = await this.model.destroy({
-            where: {
-              id,
-            },
-          });
-    
-          return res;
-        } catch (error) {
-          console.log("Something went wrong in Repo level (delete) ");
-          throw error;
-        }
-      }
-    
-      async getAll() {
-        try {
-          const user = await this.model.findAll();
-    
-          return user;
-        } catch (error) {
-          console.log("Something went wrong in Repo level (getAll) ");
-          throw error;
-        }
-      }
-    
-      async getByid(id) {
-        try {
-          const user = await this.model.findOne({
-            where: { id },
-          });
-    
-          return user;
-        } catch (error) {
-          console.log("Something went wrong in Repo level (getAll) ");
-          throw error;
-        }
-      }
-    
+  async update(id, data, options = {}) {
+    try {
+      return await this.model.update(data, {
+        where: { id },
+        transaction: options.transaction
+      });
+    } catch (error) {
+      console.log("Repo error (update)");
+      throw error;
+    }
+  }
+
+  async delete(id, options = {}) {
+    try {
+      return await this.model.destroy({
+        where: { id },
+        transaction: options.transaction
+      });
+    } catch (error) {
+      console.log("Repo error (delete)");
+      throw error;
+    }
+  }
+
+  async getAll(options = {}) {
+    try {
+      return await this.model.findAll({
+        transaction: options.transaction
+      });
+    } catch (error) {
+      console.log("Repo error (getAll)");
+      throw error;
+    }
+  }
+
+  async getByid(id, options = {}) {
+    try {
+      return await this.model.findOne({
+        where: { id },
+        transaction: options.transaction
+      });
+    } catch (error) {
+      console.log("Repo error (getById)");
+      throw error;
+    }
+  }
 }
 
-
-module.exports=  CurdRepo;
+module.exports = CurdRepo;

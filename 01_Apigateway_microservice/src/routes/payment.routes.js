@@ -34,5 +34,9 @@ router.get("/withdrawals", userMw.verifyUser,paymentProxy);
 
 router.get("/withdrawal/:requestId",  userMw.verifyUser,paymentProxy);
 
+router.patch("/withdrawal/:requestId", userMw.verifyAdmin,paymentProxy);
+
+
+
 
 module.exports = router;

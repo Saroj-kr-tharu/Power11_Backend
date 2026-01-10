@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     balanceBefore: {
-      type: DataTypes.DECIMAL(12, 2),
+      type: DataTypes.DECIMAL(12, 2), 
       allowNull: false
     },
     balanceAfter: {

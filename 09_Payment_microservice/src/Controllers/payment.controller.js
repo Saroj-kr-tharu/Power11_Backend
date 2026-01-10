@@ -1,5 +1,6 @@
 const { ServerErrosCodes, SucessCode } = require('../utlis/Errors/https_codes');
 const {paymentService,walletService, walletWithdrawService } = require('../Services');
+const walletWithDrawService = require('../Services/wallet.withdraw.service');
 
 
 class PaymentController {
@@ -155,6 +156,32 @@ class PaymentController {
             console.log('Something went wrong in controller (withdrawRequest)',error);
             return res.status(ServerErrosCodes.NOT_IMPLEMENTED).json({
                 message: "Failed to withdrawRequest",
+                success: false,
+                data: {},
+                err: error.message || error,
+            });
+        }
+    }
+
+    async adminUpdate(req, res) {
+        try {
+            
+            const { requestId } = req.params;
+            const { status } = req?.body; 
+           
+
+            const result = await walletWithDrawService.withdrawAction(requestId, status, );
+            return res.status(SucessCode.CREATED).json({
+                message: "Successfully All adminUpdate  ",
+                success: true,
+                data: result,
+                err: {},
+            });
+
+        } catch (error) {
+            console.log('Something went wrong in controller (adminUpdate)',error);
+            return res.status(ServerErrosCodes.NOT_IMPLEMENTED).json({
+                message: "Failed to adminUpdate",
                 success: false,
                 data: {},
                 err: error.message || error,

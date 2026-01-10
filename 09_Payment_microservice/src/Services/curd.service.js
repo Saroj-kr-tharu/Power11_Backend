@@ -5,16 +5,15 @@ class Service {
         this.repo = repo;
     }
 
-    async createService(data) {
+    async createService(data, options = {}) {
         try {
-
-            const res = await this.repo.create(data);
-            return res;
+            return await this.repo.create(data, options);
         } catch (error) {
-            console.log("Something went wrong in service layer (createService)");
+            console.log("Service error (createService)");
             throw error;
         }
     }
+
 
     async deleteService(id) {
         try {

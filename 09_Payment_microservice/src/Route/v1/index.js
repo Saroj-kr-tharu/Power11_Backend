@@ -40,9 +40,8 @@ router.post("/withdrawals/request", internalMw.checkInternalServiceToken, userMw
 router.get("/withdrawals", internalMw.checkInternalServiceToken, userMw.validateToken , paymentCtrl.getWithdraw);
 router.get("/withdrawal/:requestId", internalMw.checkInternalServiceToken, userMw.validateToken , paymentCtrl.getWithdrawById);
 
-// // Admin routes
-// router.patch("/withdrawals/:requestId/approve", internalMw.checkInternalServiceToken, internalMw.checkAdmin, withdrawalCtrl.approveWithdrawal);
-// router.patch("/withdrawals/:requestId/reject", internalMw.checkInternalServiceToken, internalMw.checkAdmin, withdrawalCtrl.rejectWithdrawal);
+// Admin routes
+router.patch("/withdrawal/:requestId", internalMw.checkInternalServiceToken, userMw.validateToken, paymentCtrl.adminUpdate);
 
 
 module.exports = router; 
