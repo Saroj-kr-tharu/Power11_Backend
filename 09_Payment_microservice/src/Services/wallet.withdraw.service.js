@@ -165,6 +165,95 @@ class WalletWithDrawService extends Service {
   }
 
 
+  async withdrawActionReject(requestId, status) {
+    const transaction = await sequelize.transaction();
+    try {
+      // STEP 1: Open withdraw request with lock to prevent race conditions
+      let withdrawRequest = await WithdrawalRequestRepo.getByid(requestId, { 
+        transaction,
+        lock: transaction.LOCK.UPDATE 
+      });
+      
+      if (!withdrawRequest) 
+        throw new Error("Withdrawal request not found");
+      
+      withdrawRequest = withdrawRequest?.dataValues;
+     
+      
+      if (withdrawRequest.status !== "REQUESTED" && withdrawRequest.status !== "PROCESSING") 
+        throw new Error("Withdrawal request is already Success or Rejected");
+
+      // Validate rejection status early
+      const validRejectionStatuses = ['REJECTED', 'FAILED'];
+      if (!validRejectionStatuses.includes(status.toUpperCase())) 
+        throw new Error("Invalid rejection status");
+
+      // STEP 2: Fetch wallet with lock to prevent race conditions
+      let wallet = await walletService.getByData(
+        { userId: withdrawRequest.userId },
+        { transaction, lock: transaction.LOCK.UPDATE }
+      );
+      
+      if (!wallet) 
+        throw new Error("Wallet not found");
+      
+      wallet = wallet?.dataValues;
+
+      // STEP 3: Verify wallet is active
+      if (wallet.status !== "ACTIVE") 
+        throw new Error("Wallet is suspended");
+
+      // STEP 4: Validate locked balance before proceeding
+      const requestedAmount = parseFloat(withdrawRequest.amount);
+      if (parseFloat(wallet.lockedBalance) < requestedAmount) 
+        throw new Error("Insufficient locked balance for refund");
+
+      // STEP 5: Mark request as REJECTED/FAILED
+      await WithdrawalRequestRepo.update(requestId, { status: status.toUpperCase() }, { transaction });
+
+      // STEP 6: Restore wallet balance
+      const updatedLockedBalance = parseFloat(wallet.lockedBalance) - requestedAmount;
+      const updatedBalance = parseFloat(wallet.balance) + requestedAmount;
+
+      // STEP 7: Final wallet update
+      const result=  await walletService.updateService(wallet.id, { 
+        lockedBalance: updatedLockedBalance,
+        balance: updatedBalance
+      }, { transaction });
+      console.log("result => ", result)
+
+      // STEP 8: Create ledger entry (wallet transaction)
+      
+      const balanceBefore = parseFloat(wallet.balance);
+      const balanceAfter = updatedBalance;
+      
+      const res = await walletTransService.createService({
+        walletId: wallet.id,
+        type: 'CREDIT',
+        reason: 'REFUND',
+        amount: requestedAmount,
+        balanceBefore: balanceBefore,
+        balanceAfter: balanceAfter,
+        referenceType: 'WITHDRAW',
+        referenceId: requestId,
+        status: 'SUCESS',
+        paymentTransactionId: null
+      }, { transaction });
+
+      // STEP 9: Notify user
+      // TODO: Notify user that withdrawal was rejected with reason
+
+      await transaction.commit();
+      return res;
+
+    } catch (error) {
+      await transaction.rollback();
+      console.log('Something went wrong in service (withdrawActionReject)', error);
+      throw error;
+    }
+  }
+
+
 
 }
 

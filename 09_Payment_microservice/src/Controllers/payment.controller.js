@@ -169,8 +169,12 @@ class PaymentController {
             const { requestId } = req.params;
             const { status } = req?.body; 
            
+            let result;
+            if(status == 'SUCCESS')
+                result = await walletWithDrawService.withdrawAction(requestId, status, );
+            else if(status == 'REJECTED')
+                result = await walletWithDrawService.withdrawActionReject(requestId, status, );
 
-            const result = await walletWithDrawService.withdrawAction(requestId, status, );
             return res.status(SucessCode.CREATED).json({
                 message: "Successfully All adminUpdate  ",
                 success: true,
