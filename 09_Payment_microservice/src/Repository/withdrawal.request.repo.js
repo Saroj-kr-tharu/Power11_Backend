@@ -1,9 +1,9 @@
-const { withdrawalRequest } = require("../models/index");
+const { WithdrawalRequest } = require("../models/index");
 const CurdRepo = require('./curd.repo');
 
 class WithdrawalRequestRepo extends CurdRepo {
   constructor() {
-    super(withdrawalRequest);
+    super(WithdrawalRequest);
   }
 
  
@@ -17,6 +17,18 @@ class WithdrawalRequestRepo extends CurdRepo {
       return user;
     } catch (error) {
       console.log("Something went wrong in Repo level (getDetailsByTransid) ");
+      throw error;
+    }
+  }
+  
+  async getBydata(data) {
+    try {
+     
+      const res = await this.model.findAll({ where: data });
+      
+      return res;
+    } catch (error) {
+      console.log("Something went wrong in Repo level (getBydata) ");
       throw error;
     }
   }

@@ -22,6 +22,18 @@ class WalletTransactionRepo extends CurdRepo {
     }
   }
 
+  async getBydata(data) {
+    try {
+     
+      const res = await this.model.findAll({ where: data });
+      
+      return res;
+    } catch (error) {
+      console.log("Something went wrong in Repo level (getBydata) ");
+      throw error;
+    }
+  }
+
 
 }
 

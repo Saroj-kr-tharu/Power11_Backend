@@ -31,7 +31,6 @@ class StripeControllers {
         try {
 
             const { session_id, transId } = req.query;
-
             const result = await stripeService.completePaymentService(session_id, transId);
 
             if (!result) {

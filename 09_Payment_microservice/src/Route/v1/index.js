@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const path = require('path');
+
 
 const {    khaltiCtrl,  stripeCtrl, paymentCtrl } = require('../../Controllers/index')
 const {   khaltiMw,  stripeMw, internalMw, paymentMw, userMw } = require('../../Middlewares/index');
@@ -12,7 +12,8 @@ router.get('/info', async (req, res) => {
         });
 })
 
-
+// wallet
+router.post("/initialize", internalMw.checkInternalServiceToken,userMw.validateToken,  paymentMw.intilize, paymentCtrl.intilizePayment);
 
 // khalti
 router.get("/khalti/complete/payment",internalMw.checkInternalServiceToken, khaltiMw.completePayment, khaltiCtrl.completePayment);
@@ -23,11 +24,8 @@ router.get("/stripe-failed-payment",internalMw.checkInternalServiceToken, stripe
 
 
 // user Controller 
-// router.get("/wallet", internalMw.checkInternalServiceToken, walletCtrl.getWallet);
-// router.get("/wallet/balance", internalMw.checkInternalServiceToken, walletCtrl.getBalance);
-// router.get("/wallet/transactions", internalMw.checkInternalServiceToken, walletCtrl.getTransactionHistory);
-
-router.post("/initialize", internalMw.checkInternalServiceToken,userMw.validateToken,  paymentMw.intilize, paymentCtrl.intilizePayment);
+router.get("/wallet", internalMw.checkInternalServiceToken, userMw.validateToken, paymentCtrl.getWallet );
+router.get("/wallet/transactions", internalMw.checkInternalServiceToken,userMw.validateToken ,paymentCtrl.getWalletTransation);
 
 // // Contest results
 // router.post("/contests/result/win", internalMw.checkInternalServiceToken, contestMw.validateResult, contestCtrl.processWin);
@@ -37,10 +35,10 @@ router.post("/initialize", internalMw.checkInternalServiceToken,userMw.validateT
 // Release locked balance (internal use)
 // router.post("/contests/release-lock", internalMw.checkInternalServiceToken, contestCtrl.releaseLock);
 
-// // withdrawal
-// router.post("/withdrawals/request", internalMw.checkInternalServiceToken, withdrawalMw.validate, withdrawalCtrl.createRequest);
-// router.get("/withdrawals", internalMw.checkInternalServiceToken, withdrawalCtrl.getWithdrawals);
-// router.get("/withdrawals/:requestId", internalMw.checkInternalServiceToken, withdrawalCtrl.getWithdrawalStatus);
+// withdrawal
+router.post("/withdrawals/request", internalMw.checkInternalServiceToken, userMw.validateToken,  paymentCtrl.withdrawRequest);
+router.get("/withdrawals", internalMw.checkInternalServiceToken, userMw.validateToken , paymentCtrl.getWithdraw);
+router.get("/withdrawal/:requestId", internalMw.checkInternalServiceToken, userMw.validateToken , paymentCtrl.getWithdrawById);
 
 // // Admin routes
 // router.patch("/withdrawals/:requestId/approve", internalMw.checkInternalServiceToken, internalMw.checkAdmin, withdrawalCtrl.approveWithdrawal);

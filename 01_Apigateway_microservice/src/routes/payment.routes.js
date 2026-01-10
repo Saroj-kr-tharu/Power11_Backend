@@ -15,20 +15,24 @@ const paymentProxy = createProxyMiddleware({
 
 
 
-
-
-
 // khalti
-router.post("/epayment/initiate/",userMw.verifyUser, paymentProxy);
 router.get("/khalti/complete/payment",paymentProxy);
 
 //stripe
-router.post("/stripe-initiate/",userMw.verifyUser,paymentProxy);
 router.get("/stripe-complete-payment",paymentProxy);
 router.get("/stripe-failed-payment",paymentProxy);
 
 // payment
 router.post("/initialize", userMw.verifyUser,paymentProxy);
+
+router.get("/wallet", userMw.verifyUser,paymentProxy);
+
+router.get("/wallet/transactions", userMw.verifyUser,paymentProxy);
+
+router.post("/withdrawals/request",  userMw.verifyUser,paymentProxy);
+router.get("/withdrawals", userMw.verifyUser,paymentProxy);
+
+router.get("/withdrawal/:requestId",  userMw.verifyUser,paymentProxy);
 
 
 module.exports = router;

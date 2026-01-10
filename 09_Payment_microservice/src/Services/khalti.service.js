@@ -99,7 +99,7 @@ class KhaltiService {
 
             let getdata = await paymentTransService.getDetailsByTransid(response.pidx, { transaction });
             getdata= getdata?.dataValues; 
-            console.log("get data = >", getdata)
+            // console.log("get data = >", getdata)
 
             // 1. Gateway callback (SUCCESS)
             // 2. Start DB transaction
@@ -160,7 +160,7 @@ class KhaltiService {
 
             // Respond with success messagev
               const orderId = getdata?.orderId;
-              const totalAmount = Number.parseInt(response?.total_amount) ;
+              const totalAmount = response?.total_amount;
              
  
            return {

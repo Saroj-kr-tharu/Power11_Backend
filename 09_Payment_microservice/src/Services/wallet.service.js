@@ -17,6 +17,8 @@ class WalletService extends Service {
     }
   }
 
+  
+
 }
 
 const walletService = new WalletService();

@@ -54,6 +54,7 @@ class Service {
 
     async updateService(id, data) {
         try {
+            
             const res = await this.repo.update(id, data);
             return res;
         } catch (error) {

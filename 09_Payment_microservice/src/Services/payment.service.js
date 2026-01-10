@@ -28,7 +28,7 @@ class PaymentService extends Service {
                 userEmail: data.email,
                 paymentMethod: gateway.toUpperCase(),
                 orderId,
-                amount: parseInt(data.amount, 10)* 100
+                amount: data.amount
             });
 
             result = result?.dataValues; 
@@ -45,7 +45,7 @@ class PaymentService extends Service {
                     payload = { 
                         return_url: `${PAYMENT_BACKEND_URL}/khalti/complete/payment?transId=${encodeURIComponent(orderId.toString())}`,
                         website_url: data.website_url || "https://www.fortend.com",
-                        amount: parseInt(data.amount, 10), // Convert amount to integer
+                        amount: data.amount,
                         purchase_order_id: orderId,
                         purchase_order_name: "Khalti-"+orderId, 
                         orderId: orderId

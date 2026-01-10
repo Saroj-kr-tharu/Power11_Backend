@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     method: {
-      type: DataTypes.ENUM('STRIPE', 'ESEWA', 'KHALTI'),
+      type: DataTypes.ENUM('STRIPE', 'ESEWA', 'KHALTI', 'BANK_TRANSFER'),
       allowNull: false
     },
     accountDetails: {
