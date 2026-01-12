@@ -8,7 +8,7 @@ class PaymentController {
     async intilizePayment(req, res) {
         try {
 
-            const {gateway, amount } = req.body;
+            const {gateway, amount, idempotencyKey } = req.body;
 
             const amountNumber = Number(amount);
             if (Number.isNaN(amountNumber) || amountNumber <= 0) 
@@ -19,7 +19,7 @@ class PaymentController {
             const userId = req?.userId;
             const email = req?.email; 
             
-            const result = await paymentService.paymentIntialize(gateway, {userId, email, amount:amountInPaisa});
+            const result = await paymentService.paymentIntialize(gateway, {userId, email, amount:amountInPaisa, idempotencyKey});
 
             return res.status(SucessCode.CREATED).json({
                 message: "Successfully to Intialize Payment ",

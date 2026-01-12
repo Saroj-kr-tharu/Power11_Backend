@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-
 const {    khaltiCtrl,  stripeCtrl, paymentCtrl } = require('../../Controllers/index')
 const {   khaltiMw,  stripeMw, internalMw, paymentMw, userMw } = require('../../Middlewares/index');
 

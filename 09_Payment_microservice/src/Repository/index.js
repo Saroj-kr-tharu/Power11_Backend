@@ -4,5 +4,6 @@ module.exports = {
    WalletRepo : require("./wallet.repo"),
    WalletTransactionRepo: require("./wallet.transaction.repo"),
    WithdrawalRequestRepo: require("./withdrawal.request.repo"),
+   IdempotancyKeyRepo: require("./idempotancy.key.repo"),
   
 }
