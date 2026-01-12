@@ -1,4 +1,38 @@
-const WelcomeEmailTemplate = (username = "Player") => `
+const WelcomeEmailTemplate = (data = {}) => {
+    const { username = "Player", body = "", app_url = "#" } = data;
+    
+    // Replace {{username}} placeholder in body
+    const processedBody = body.replace(/\{\{username\}\}/g, username);
+    
+    // Convert plain text to HTML with proper formatting
+    const formattedBody = processedBody
+        .split('\n')
+        .map(line => {
+            line = line.trim();
+            if (!line) return '<br/>';
+            if (line.startsWith('- ')) {
+                return `<div style="margin-left: 20px; margin-bottom: 8px;">• ${line.substring(2)}</div>`;
+            }
+            if (line.startsWith('—')) {
+                return `<p style="margin: 20px 0 0; font-weight: 700;">${line}</p>`;
+            }
+            if (line.includes('Need help?')) {
+                return `<p style="margin: 8px 0 0; color: #94a3b8;">${line}</p>`;
+            }
+            if (line.includes('What you can do')) {
+                return `<p style="margin: 26px 0 14px; color: #ffffff; font-weight: 700;">${line}</p>`;
+            }
+            if (line.startsWith('Hey ')) {
+                return `<p style="margin: 0 0 18px; color: #e5e7eb; font-size: 17px;">${line}</p>`;
+            }
+            if (line.includes('Let the games')) {
+                return `<p style="margin: 20px 0 0;">${line}</p>`;
+            }
+            return `<p style="margin: 0 0 18px;">${line}</p>`;
+        })
+        .join('');
+    
+    return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,51 +70,16 @@ const WelcomeEmailTemplate = (username = "Player") => `
                                 Welcome to Power11, ${username}! 🔥
                             </h2>
 
-                            <p style="margin: 0 0 18px; color: #e5e7eb; font-size: 17px; line-height: 1.8;">
-                                Hey <strong>${username}</strong>,
-                            </p>
-
-                            <p style="margin: 0 0 18px; color: #cbd5f5; font-size: 16px; line-height: 1.8;">
-                                You’re officially in the arena! 🏟️  
-                                Power11 is where strategy meets skill. Create your dream team, compete in high-energy contests, and rise to the top of the leaderboard.
-                            </p>
-
-                            <p style="margin: 26px 0 14px; color: #ffffff; font-size: 18px; font-weight: 700;">
-                                What you can do in Power11 💪
-                            </p>
-
-                            <ul style="margin: 0 0 24px; padding-left: 20px;">
-                                <li style="color: #cbd5f5; margin-bottom: 12px; font-size: 16px;">
-                                    ⚔️ Create your ultimate fantasy team
-                                </li>
-                                <li style="color: #cbd5f5; margin-bottom: 12px; font-size: 16px;">
-                                    🧠 Use strategy to outplay opponents
-                                </li>
-                                <li style="color: #cbd5f5; margin-bottom: 12px; font-size: 16px;">
-                                    🏆 Compete in daily & mega contests
-                                </li>
-                                <li style="color: #cbd5f5; margin-bottom: 12px; font-size: 16px;">
-                                    💰 Win exciting rewards & bragging rights
-                                </li>
-                                <li style="color: #cbd5f5; margin-bottom: 12px; font-size: 16px;">
-                                    🔒 100% secure & fair gameplay
-                                </li>
-                            </ul>
+                            <div style="color: #cbd5f5; font-size: 16px; line-height: 1.8;">
+                                ${formattedBody}
+                            </div>
 
                             <!-- CTA -->
                             <div style="text-align: center; margin: 32px 0;">
-                                <a href="#" style="display: inline-block; background: linear-gradient(135deg, #ef4444, #f59e0b); color: #ffffff; padding: 16px 44px; text-decoration: none; border-radius: 10px; font-size: 16px; font-weight: 700; box-shadow: 0 8px 20px rgba(239,68,68,0.4);">
+                                <a href="${app_url}" style="display: inline-block; background: linear-gradient(135deg, #ef4444, #f59e0b); color: #ffffff; padding: 16px 44px; text-decoration: none; border-radius: 10px; font-size: 16px; font-weight: 700; box-shadow: 0 8px 20px rgba(239,68,68,0.4);">
                                     Enter the Arena ⚡
                                 </a>
                             </div>
-
-                            <p style="margin: 20px 0 0; color: #cbd5f5; font-size: 16px;">
-                                Let the games begin 🚀  
-                            </p>
-
-                            <p style="margin: 8px 0 0; color: #ffffff; font-size: 16px; font-weight: 700;">
-                                — Team Power11
-                            </p>
                         </td>
                     </tr>
 
@@ -106,5 +105,6 @@ const WelcomeEmailTemplate = (username = "Player") => `
 </body>
 </html>
 `;
+};
 
 module.exports = WelcomeEmailTemplate;

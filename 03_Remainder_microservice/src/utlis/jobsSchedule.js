@@ -4,6 +4,7 @@ const { Sender, } = require("../config/email.config");
 const { EMAIL_SENDER, FORGET_LINK } = require('../config/server.config');
 
 const notificationService = require("../Services/notification.service")
+const notificationTemplateService = require("../Services/notification.template.service")
 
 const {
   welcomeEmail,
@@ -24,12 +25,19 @@ const setUptask = () => {
       const mail = await notificationService.PendingMail();
 
       for (const email of mail) {
-        console.log("email => ", email)
-
-        // if (email.typeMail == "FORGET") {
-        //   link = `${FORGET_LINK}?token=${email.token}`;
-        //   emailType = forgetEmail(email.username, link);
-        // }
+        let emailInfo = email?.dataValues; 
+     
+        let mailRender = null; 
+        if (emailInfo.eventType == "USER_REGISTERED") {
+          let res  = await notificationTemplateService.getBydata({eventType: "USER_REGISTERED"});
+          res  = res?.dataValues; 
+          console.log('res =>v ', res )
+           mailRender = welcomeEmail({
+            username: emailInfo.email,
+            body:  res?.body,
+            app_url: 'https://power11.com/login'
+            });
+        }
 
         // if (email.typeMail == "WELCOME") {
         //   emailType = welcomeEmail(email.username);
@@ -38,30 +46,28 @@ const setUptask = () => {
         // if (email.typeMail == "SendOTP") {
         //   emailType = otpEmail(email.token);
         // }
+       
+        let mailoption = {
+          from: EMAIL_SENDER,
+          to: emailInfo?.email,
+          subject: emailInfo?.payload?.subject,
+          html: mailRender,
+        };
 
-        // let mailoption = {
-        //   from: EMAIL_SENDER,
-        //   to: email.recepientEmail,
-        //   subject: email.subject,
-        //   html: emailType,
+        console.log(`Sending mail to ${email?.dataValues?.email}  ... `, );
+        Sender.sendMail(mailoption, async (error, data) => {
+          if (error) {
+            console.error("Failed To Send Email to: ", mailoption.to);
+          } else {
+            console.log("Email Successfully Sent to : ", data.envelope.to);
+            await notificationService.updateByData({ id: emailInfo.id }, { status: "SENT" });
+           
+          }
 
-        // };
+        });
 
-        // console.log('Sending mail ...');
-        // Sender.sendMail(mailoption, async (error, data) => {
-        //   if (error) {
-        //     console.error("Failed To Send Email to: ", mailoption.to);
-        //   } else {
-        //     console.log("Email Successfully Sent to : ", data.envelope.to);
-
-
-        //     await updateNotificationService(email.id, "SUCCESS");
-        //   }
-
-        // });
-
-        // // Delay between sending emails to avoid rate limiting
-        // await delay(1000); // 1 second delay
+        // Delay between sending emails to avoid rate limiting
+        await delay(1000); // 1 second delay
         // await deleteService(email.id)
       }
 

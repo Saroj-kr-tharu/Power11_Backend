@@ -1,5 +1,5 @@
 const { Notification } = require("../models/index");
-const { Op, where } = require("sequelize");
+const { Op,  } = require("sequelize");
 const CurdRepo  = require("./curd.repo")
 
 class NotificationRepo extends CurdRepo {

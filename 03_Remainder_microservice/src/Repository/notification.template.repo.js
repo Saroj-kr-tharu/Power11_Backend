@@ -7,6 +7,26 @@ class NotificationTemplateRepo extends CurdRepo {
       super(NotificationTemplate);
     }
 
+  async getBydata(data) {
+    try {
+      const res = await this.model.findOne({ where: data });
+      return res;
+    } catch (error) {
+      console.log("Something went wrong in Repo level (getBydata) ");
+      throw error;
+    }
+  }
+  
+  async updateBydata(where, updateData) {
+    try {
+      const res = await this.model.update(updateData, { where });
+      return res;
+    } catch (error) {
+      console.log("Something went wrong in Repo level (updateBydata)");
+      throw error;
+    }
+  }
+
   async deleteDataByStatus(status){
       try {
         const res = await NotificationTickets.destroy({
