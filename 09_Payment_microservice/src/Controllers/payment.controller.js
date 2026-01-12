@@ -88,14 +88,14 @@ class PaymentController {
    async withdrawRequest(req, res) {
         try {
             const userId = req?.userId;
-            const {amount, method , details} = req?.body; 
+            const {amount, method , details, idempotencyKey} = req?.body; 
             const amountNumber = Number(amount);
             if (Number.isNaN(amountNumber) || amountNumber <= 0) 
                 throw new Error("Invalid amount");
             
             const amountInPaisa = Math.round(amountNumber * 100);
 
-            const result = await walletWithdrawService.withdrawRequest(userId, amountInPaisa, method , details);
+            const result = await walletWithdrawService.withdrawRequest(userId, amountInPaisa, method , details, idempotencyKey);
             return res.status(SucessCode.CREATED).json({
                 message: "Successfully done withdrawRequest  ",
                 success: true,
@@ -165,13 +165,13 @@ class PaymentController {
         try {
             
             const { requestId } = req.params;
-            const { status } = req?.body; 
+            const { status,  } = req?.body; 
            
             let result;
             if(status == 'SUCCESS')
-                result = await walletWithDrawService.withdrawAction(requestId, status, );
+                result = await walletWithDrawService.withdrawAction(requestId, status );
             else if(status == 'REJECTED')
-                result = await walletWithDrawService.withdrawActionReject(requestId, status, );
+                result = await walletWithDrawService.withdrawActionReject(requestId, status );
 
             return res.status(SucessCode.CREATED).json({
                 message: "Successfully All adminUpdate  ",

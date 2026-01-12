@@ -19,7 +19,7 @@ class IdempotancyKeyRepo extends CurdRepo {
   
   async updateBydata(where, updateData) {
     try {
-      console.log("where => ", where, " updatedData =>  ", updateData)
+      // console.log("where => ", where, " updatedData =>  ", updateData)
       const res = await this.model.update(updateData, { where });
       return res;
     } catch (error) {

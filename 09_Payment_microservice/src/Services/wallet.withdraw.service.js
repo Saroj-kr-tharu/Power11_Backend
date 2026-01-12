@@ -1,8 +1,11 @@
+const crypto = require("crypto")
+
 const Service = require('./curd.service');
 const {WithdrawalRequestRepo} = require('../Repository/index');
 
 const walletService = require('./wallet.service')
 const walletTransService = require('./wallet.transaction.service')
+const idempotancyKeyService = require('./idempotancy.key.service')
 const { sequelize } = require('../models');
 
 class WalletWithDrawService extends Service {
@@ -12,7 +15,6 @@ class WalletWithDrawService extends Service {
 
   async getByData(data) {
     try {
-
       const res = await WithdrawalRequestRepo.getBydata(data);
       return res;
     } catch (error) {
@@ -21,10 +23,30 @@ class WalletWithDrawService extends Service {
     }
   }
 
-  async withdrawRequest(userId, amount, method , details) {
+  async withdrawRequest(userId, amount, method , details, idempotencyKey) {
     const transaction = await sequelize.transaction();
     
     try {
+        // 0 check the idempotancy 
+          const requestHash = crypto.createHash('sha256').update(JSON.stringify({userId, amount, method , details})).digest('hex');
+          let key = null; 
+          key = await idempotancyKeyService.getByData({key: idempotencyKey});
+          
+          if(key && requestHash == key?.requestHash) {
+              if(key?.status == "IN_PROGRESS") throw new Error(" PROCESSING_THIS_REQUEST")
+              console.log("request dupplicated = hitted", )
+              return key?.responseSnapshot;
+          }
+          await idempotancyKeyService.createService({
+              key: idempotencyKey,
+              userId: userId, 
+              operation: 'WITHDRAW_REQUEST',
+              requestHash:requestHash ,
+              responseSnapshot: {},
+              status: 'IN_PROGRESS'
+          })
+
+
       // 1. check the user wallet it is active or not and check the balance avaialble
       const validMethods = ['STRIPE', 'ESEWA', 'KHALTI', 'BANK_TRANSFER'];
       if(!validMethods.includes(method.toUpperCase()))
@@ -56,8 +78,12 @@ class WalletWithDrawService extends Service {
         method: method.toUpperCase(), 
         accountDetails: details, 
       }; 
-     
       const res = await WithdrawalRequestRepo.create(data, { transaction })
+
+      await idempotancyKeyService.updateByData(
+                { key: idempotencyKey },
+                { responseSnapshot: res, status: "SUCCESS" }, 
+            );
 
       await transaction.commit();
       return res; 
@@ -70,9 +96,11 @@ class WalletWithDrawService extends Service {
     }
   }
 
-  async withdrawAction(requestId, status, ) {
+  async withdrawAction(requestId, status,userId, idempotencyKey ) {
         const transaction = await sequelize.transaction();
         try {
+
+          
       
           // STEP 0: Update request status to PROCESSING
           let withdrawRequest = await WithdrawalRequestRepo.getByid( requestId );
@@ -145,12 +173,10 @@ class WalletWithDrawService extends Service {
               paymentTransactionId: null
             }, { transaction });
 
-            
-
-
-
           // STEP 10: Notify user about successful withdrawal
           // TODO: Send notification to user
+
+          
 
           await transaction.commit();
           return res;

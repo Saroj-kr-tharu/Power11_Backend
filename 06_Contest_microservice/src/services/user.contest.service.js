@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const curdService = require("./curd.service");
 const {usercontestRepo, contestRepo} = require('../repository')
 const {InternalServiceClient, } = require('../utlis/index')
+const { v4: uuidv4 } = require('uuid');
 
 
 class UserContestService extends curdService{
@@ -46,10 +47,12 @@ class UserContestService extends curdService{
             // ========== STEP 3.1: Check Wallet ==========
                const walletValidation = await InternalServiceClient.internalClient.post(
                     `${InternalServiceClient.SERVICES.PAYMENT}/internal/wallet/execute/`,
-                    {
+                    {   
                         amount: joinFee,
                         referenceId: contestId,
-                        idempotencyKey: `${userId}_${contestId}_${teamId}_${matchId}`,
+                        // idempotencyKey:  uuidv4(),
+                        idempotencyKey:  "b6755fe8-e183-43dd-a963-79201f4164a7", 
+                   
                     },
                      { headers: { 'x-access-token': token } }
                 )

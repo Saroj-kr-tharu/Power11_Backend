@@ -18,7 +18,6 @@ class PaymentService extends Service {
   async paymentIntialize(gateway, data) {
         try {
             // 0 check the idempotancy 
-                console.log("data => ", data.idempotencyKey)
                 const requestHash = crypto.createHash('sha256').update(JSON.stringify(data)).digest('hex');
                 let key = null; 
                 key = await idempotancyKeyService.getByData({key: data.idempotencyKey});
@@ -28,7 +27,7 @@ class PaymentService extends Service {
                     console.log("request dupplicated = hitted", )
                     return key?.responseSnapshot;
                 }
-                
+
                 await idempotancyKeyService.createService({
                     key: data.idempotencyKey,
                     userId: data.userId, 
@@ -85,7 +84,7 @@ class PaymentService extends Service {
                     break;
             }
 
-             await idempotancyKeyService.updateByData(
+            await idempotancyKeyService.updateByData(
                 { key: data.idempotencyKey },
                 { responseSnapshot: link, status: "SUCCESS" }
             );

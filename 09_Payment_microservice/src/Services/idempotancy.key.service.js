@@ -17,9 +17,9 @@ class WalletWithDrawService extends Service {
     }
   }
 
-  async updateByData(where, updateData) {
+  async updateByData(where, updateData,) {
     try {
-       console.log("where => ", where, " updatedData =>  ", updateData)
+      
       const res = await IdempotancyKeyRepo.updateBydata(where, updateData);
       return res;
     } catch (error) {

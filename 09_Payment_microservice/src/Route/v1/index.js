@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const {    khaltiCtrl,  stripeCtrl, paymentCtrl } = require('../../Controllers/index')
-const {   khaltiMw,  stripeMw, internalMw, paymentMw, userMw } = require('../../Middlewares/index');
+const {  khaltiCtrl,  stripeCtrl, paymentCtrl } = require('../../Controllers/index')
+const {  khaltiMw,  stripeMw, internalMw, paymentMw, userMw } = require('../../Middlewares/index');
 
 
 router.get('/info', async (req, res) => {
@@ -27,11 +27,7 @@ router.get("/wallet/transactions", internalMw.checkInternalServiceToken,userMw.v
 
 // Contest
 router.post("/internal/wallet/execute", internalMw.checkInternalServiceToken,  userMw.validateToken, paymentCtrl.joinContestWalletOperation);
-// router.post("/contests/result/lose", internalMw.checkInternalServiceToken, contestMw.validateResult, contestCtrl.processLose);
-// router.post("/contests/refund", internalMw.checkInternalServiceToken, contestMw.validateRefund, contestCtrl.processRefund);
 
-// Release locked balance (internal use)
-// router.post("/contests/release-lock", internalMw.checkInternalServiceToken, contestCtrl.releaseLock);
 
 // withdrawal
 router.post("/withdrawals/request", internalMw.checkInternalServiceToken, userMw.validateToken,  paymentCtrl.withdrawRequest);
