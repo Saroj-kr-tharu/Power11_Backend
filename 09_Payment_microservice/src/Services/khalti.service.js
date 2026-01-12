@@ -1,10 +1,12 @@
-const { KHALTI_PAYMENT_URL, KHALTI_SECRET_KEY, KHALTI_VERIFICATION_URL } = require('../config/khalti.config');
+const { sequelize } = require('../models');
 const axios = require('axios');
+const { KHALTI_PAYMENT_URL, KHALTI_SECRET_KEY, KHALTI_VERIFICATION_URL } = require('../config/khalti.config');
 const paymentTransService = require('./payment.transaction.service');
 const walletService = require('./wallet.service');
 const walletTransService = require('./wallet.transaction.service');
 const sendMessageToQueueService = require('./queue.service');
-const { sequelize } = require('../models');
+
+const sendMessageToQueueService = require('./queue.service');
 
 class KhaltiService {
 
@@ -155,8 +157,9 @@ class KhaltiService {
                 currency: getdata.currency,
                 status: getdata.status
             };
-
             await sendMessageToQueueService(payload, "CREATE_TICKET_PAYMENT");
+
+            
 
             // Respond with success messagev
               const orderId = getdata?.orderId;

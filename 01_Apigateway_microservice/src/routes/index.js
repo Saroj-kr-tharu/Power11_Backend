@@ -7,5 +7,6 @@ module.exports = {
     contestRoutes : require('./contest.routes'),
     leaderboardRoutes : require('./leaderboard.routes'),
     matchRoutes : require('./match.routes'),
+    remainderRoutes : require('./remainder.routes'),
 
 }

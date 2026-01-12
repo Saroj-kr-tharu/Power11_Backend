@@ -10,6 +10,7 @@ module.exports = {
     CONTEST_BACKEND_URL: process.env.CONTEST_BACKEND_URL,
     LEADERBOARD_BACKEND_URL: process.env.LEADERBOARD_BACKEND_URL,
     MATCH_BACKEND_URL: process.env.MATCH_BACKEND_URL,
+    REMAINDER_BACKEND_URL: process.env.REMAINDER_BACKEND_URL,
     
     
     PORT: process.env.PORT,

@@ -3,7 +3,6 @@ const amqp = require("amqplib");
 const {
   EXCHANGE_NAME,
   MESSAGE_BROKER_URL,
-
 } = require("../config/server.config");
 
 const createChannel = async () => {
@@ -48,8 +47,8 @@ const subscribeMessage = async (channel, service, binding_key) => {
 
     channel.consume(applicationQueue.queue, (msg) => {
      
-
       const payload = JSON.parse(msg.content.toString());
+      console.log("payload => ", payload)
       service(payload);
 
       channel.ack(msg);

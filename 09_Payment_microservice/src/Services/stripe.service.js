@@ -126,7 +126,7 @@ class StripeService {
                 currency: 'npr',
                 status: 'COMPLETE',
             };
-            // await sendMessageToQueueService(payload, "CREATE_TICKET_PAYMENT");
+            await sendMessageToQueueService(payload, "CREATE_TICKET_PAYMENT");
                console.log('done again')
             return   'Payment completed successfully' ;
 

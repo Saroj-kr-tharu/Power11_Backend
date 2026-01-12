@@ -8,6 +8,8 @@ const walletTransService = require('./wallet.transaction.service')
 const idempotancyKeyService = require('./idempotancy.key.service')
 const { sequelize } = require('../models');
 
+const sendMessageToQueueService = require("./queue.service")
+
 class WalletWithDrawService extends Service {
   constructor() {
     super(WithdrawalRequestRepo);
@@ -47,46 +49,71 @@ class WalletWithDrawService extends Service {
           })
 
 
-      // 1. check the user wallet it is active or not and check the balance avaialble
-      const validMethods = ['STRIPE', 'ESEWA', 'KHALTI', 'BANK_TRANSFER'];
-      if(!validMethods.includes(method.toUpperCase()))
-        throw new Error("Invalid withdrawal method");
+          // 1. check the user wallet it is active or not and check the balance avaialble
+          const validMethods = ['STRIPE', 'ESEWA', 'KHALTI', 'BANK_TRANSFER'];
+          if(!validMethods.includes(method.toUpperCase()))
+            throw new Error("Invalid withdrawal method");
 
-      let wallet =  await walletService.getByData({userId: userId},);
-      wallet = wallet?.dataValues;
+          let wallet =  await walletService.getByData({userId: userId},);
+          wallet = wallet?.dataValues;
 
-      if(wallet.status != "ACTIVE")
-        throw new Error("Wallet Suspended")
+          if(wallet.status != "ACTIVE")
+            throw new Error("Wallet Suspended")
 
-      if(wallet.balance < amount)
-        throw new Error("Insufficient Balance")
+          if(wallet.balance < amount)
+            throw new Error("Insufficient Balance")
 
-      // 2. reduce the wallet into locked balance 
-      const balance = wallet.balance - amount ; 
-      const lockedBalance = Number(wallet.lockedBalance) + amount ;
+          // 2. reduce the wallet into locked balance 
+          const balance = wallet.balance - amount ; 
+          const lockedBalance = Number(wallet.lockedBalance) + amount ;
 
-      const lockedBalanceNum = parseFloat(lockedBalance);
-      
-      await walletService.updateService(wallet.id, {balance: balance, lockedBalance: lockedBalanceNum}, { transaction })
+          const lockedBalanceNum = parseFloat(lockedBalance);
+          
+          await walletService.updateService(wallet.id, {balance: balance, lockedBalance: lockedBalanceNum}, { transaction })
 
-      // 3.  entry into the withdrawRequest
-      const data = {
-        userId: userId,
-        walletId: wallet.id,
-        amount: amount,
-        currency: wallet.currency,
-        method: method.toUpperCase(), 
-        accountDetails: details, 
-      }; 
-      const res = await WithdrawalRequestRepo.create(data, { transaction })
+          // 3.  entry into the withdrawRequest
+          const data = {
+            userId: userId,
+            walletId: wallet.id,
+            amount: amount,
+            currency: wallet.currency,
+            method: method.toUpperCase(), 
+            accountDetails: details, 
+          }; 
+          const res = await WithdrawalRequestRepo.create(data, { transaction })
 
-      await idempotancyKeyService.updateByData(
-                { key: idempotencyKey },
-                { responseSnapshot: res, status: "SUCCESS" }, 
-            );
+          await idempotancyKeyService.updateByData(
+                  { key: idempotencyKey },
+                  { responseSnapshot: res, status: "SUCCESS" }, 
+                );
 
-      await transaction.commit();
-      return res; 
+            //     const payload = {
+            //     subject: "Payment Notification System",
+            //     email: getdata.userEmail,
+            //     notificationTime: new Date(),
+            //     gateway: getdata.gateway, 
+            //     transactionId:getdata.transactionId,
+            //     amount: getdata.amount,
+            //     currency: getdata.currency,
+            //     status: getdata.status
+            // };
+          
+          // const payload = {
+          //   subject: "Withdrawal Request Created",
+          //   email: getdata.userEmail,,
+          //   requestId: res?.dataValues?.id || res.id,
+          //   walletId: res?.dataValues?.walletId,
+          //   method: (res?.dataValues?.method || method).toUpperCase(),
+          //   amount: parseFloat(res?.dataValues?.amount || amount),
+          //   currency: res?.dataValues?.currency || wallet.currency,
+          //   accountDetails: res?.dataValues?.accountDetails || details,
+          //   status: res?.dataValues?.status || "REQUESTED",
+          //   createdAt: res?.dataValues?.createdAt || new Date()
+          // };
+          // await sendMessageToQueueService(payload, "CREATE_TICKET_WITHDRAW");
+
+          await transaction.commit();
+          return res; 
 
      
     } catch (error) {

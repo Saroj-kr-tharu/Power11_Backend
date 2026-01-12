@@ -7,20 +7,25 @@ class AuthController {
     async signup(req,res) {
         try {
             
-    
+     
             const data = req?.body;
             const response = await userService.createService(data);
 
             const payload = {
-                subject: "Welcome To MarketMandu",
-                content: "Reset",
-                recepientEmail: data.email,
-                notificationTime: new Date(),
-                typeMail: "WELCOME",
-                username: data.Username || data.email ,
-                token: "",  
+                userId: response.id,
+                email: data.email,
+                eventType: 'USER_REGISTERED',
+                channel: 'EMAIL',
+                referenceType: "USER_REGISTERED",
+                payload: {
+                    subject: "Welcome To Power11",
+                    content: "Reset",
+                    username: data.Username || data.email,
+                },
+                retryCount: 0,
+                scheduledAt: new Date(Date.now() + 5 * 60 * 60 * 1000), 
             };
-            await sendMessageToQueueService(payload, 'CREATE_TICKET');
+            await sendMessageToQueueService(payload, 'CREATE_NOTIFICATION');
             
             return res.status(SucessCode.OK).json({
                 message: "Successfully to Signup",
