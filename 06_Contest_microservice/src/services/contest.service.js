@@ -9,15 +9,14 @@ class ContestService extends curdService{
     }
 
     async getByMatch(matchId){
-                    try {
-                            const res = await contestRepo.getByMatch(matchId);
-                            if(!res) throw new Error("contest not Available")
-                            return res;
-    
-                    } catch (error) {
-                            console.log("something went wrong in service  level  (getByMatch) ")
-                            throw error;
-                    }
+        try {
+                const res = await contestRepo.getByMatch(matchId);
+                if(!res) throw new Error("contest not Available")
+                return res;
+        } catch (error) {
+                console.log("something went wrong in service  level  (getByMatch) ")
+                throw error;
+        }
     }
 
 }

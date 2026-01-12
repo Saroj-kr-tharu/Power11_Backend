@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   WithdrawalRequest.init({
+    
     userId: {
       type: DataTypes.STRING,
       allowNull: false

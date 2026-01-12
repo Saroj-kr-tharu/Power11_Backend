@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   WalletTransaction.init({
+    
     walletId: {
       type: DataTypes.INTEGER,
       allowNull: false

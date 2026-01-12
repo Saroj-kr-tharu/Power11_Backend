@@ -7,9 +7,9 @@ const {   khaltiMw,  stripeMw, internalMw, paymentMw, userMw } = require('../../
 
 
 router.get('/info', async (req, res) => {
-        return res.status(200).json({
-            message: 'Payment Service is working Well ',
-        });
+    return res.status(200).json({
+        message: 'Payment Service is working Well ',
+    });
 })
 
 // wallet
@@ -22,13 +22,12 @@ router.get("/khalti/complete/payment",internalMw.checkInternalServiceToken, khal
 router.get("/stripe-complete-payment",internalMw.checkInternalServiceToken, stripeMw.completePayment, stripeCtrl.completePayment);
 router.get("/stripe-failed-payment",internalMw.checkInternalServiceToken, stripeMw.completePayment, stripeCtrl.failedPayment);
 
-
 // user Controller 
 router.get("/wallet", internalMw.checkInternalServiceToken, userMw.validateToken, paymentCtrl.getWallet );
 router.get("/wallet/transactions", internalMw.checkInternalServiceToken,userMw.validateToken ,paymentCtrl.getWalletTransation);
 
-// // Contest results
-// router.post("/contests/result/win", internalMw.checkInternalServiceToken, contestMw.validateResult, contestCtrl.processWin);
+// Contest
+router.post("/internal/wallet/execute", internalMw.checkInternalServiceToken,  userMw.validateToken, paymentCtrl.joinContestWalletOperation);
 // router.post("/contests/result/lose", internalMw.checkInternalServiceToken, contestMw.validateResult, contestCtrl.processLose);
 // router.post("/contests/refund", internalMw.checkInternalServiceToken, contestMw.validateRefund, contestCtrl.processRefund);
 

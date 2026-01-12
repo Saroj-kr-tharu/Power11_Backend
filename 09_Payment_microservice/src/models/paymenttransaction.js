@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   PaymentTransaction.init({
+   
     userId: {
       type: DataTypes.STRING,
       allowNull: false

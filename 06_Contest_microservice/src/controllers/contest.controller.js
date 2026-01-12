@@ -62,9 +62,9 @@ class ContestController {
 
     async updateContest(req,res) {
         try {
-            const { teamId } = req.params; 
+            const { contestId } = req.params; 
             const data = req?.body; 
-            const response = await contestService.updateService(teamId,data);
+            const response = await contestService.updateService(contestId,data);
             return res.status(SucessCode.OK).json({
                 message: "Successfully updateGame",
                 success: true,

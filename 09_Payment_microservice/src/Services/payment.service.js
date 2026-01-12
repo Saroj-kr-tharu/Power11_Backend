@@ -75,8 +75,7 @@ class PaymentService extends Service {
         }
   }
 
-
- 
+  
 
  
 

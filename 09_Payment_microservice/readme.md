@@ -1,6 +1,26 @@
 <div align="center">
 
+<div align="center">
+
 # 💳 Payment Microservice
+
+<img src="https://img.shields.io/badge/Service-Payment_Processing-success?style=for-the-badge" alt="Service"/>
+
+### Power11 Fantasy Sports Platform
+
+[![Node.js](https://img.shields.io/badge/Node.js-18.x-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-5.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Sequelize](https://img.shields.io/badge/Sequelize-6.x-52B0E7?style=for-the-badge&logo=sequelize&logoColor=white)](https://sequelize.org/)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-Message_Queue-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
+
+<br/>
+
+**💳 Payments** · **💰 Wallet** · **🔐 Secure** · **📊 Transactions**
+
+*Secure payment processing, digital wallet management, and transaction handling with multi-gateway integration.*
+
+</div>
 
 <img src="https://img.shields.io/badge/Service-Payment_Processing-success?style=for-the-badge" alt="Service"/>
 
@@ -24,66 +44,35 @@
 
 ---
 
+
+---
+
 ## 📖 Overview
 
-The **Payment Microservice** handles all **payment processing, wallet management, and financial transactions** for the Power11 fantasy sports platform. It provides secure payment gateway integration, digital wallet functionality, and comprehensive transaction tracking.
+The **Payment Microservice** powers all payment, wallet, and transaction operations for the Power11 Fantasy Sports Platform. It supports multiple payment gateways (Khalti, Stripe, Esewa, Razorpay), digital wallet management, and secure transaction processing. Built with Node.js, Express, and PostgreSQL, it follows modern microservice and security best practices.
 
 ### 🎯 Key Responsibilities
 
 | Responsibility | Description |
 |:---------------|:------------|
-| 💳 **Payment Processing** | Secure payment gateway integration |
-| 💰 **Wallet Management** | Digital wallet with add/withdraw funds |
-| 📊 **Transaction History** | Complete transaction tracking |
-| 🔐 **Security** | PCI-DSS compliant payment handling |
-| 🔔 **Notifications** | Payment status updates via RabbitMQ |
+| 💳 **Payment Processing** | Multi-gateway integration (Khalti, Stripe, Esewa, Razorpay) |
+| 💰 **Wallet Management** | Add, withdraw, and track funds securely |
+| 📊 **Transaction History** | Full audit trail and reporting |
+| 🔐 **Security** | PCI-DSS compliant, JWT & signature verification |
+| 🔔 **Notifications** | Real-time updates via RabbitMQ |
 
 ---
 
+
 ## ✨ Features
 
-<table>
-<tr>
-<td align="center">💳</td>
-<td><b>Payment Gateway</b></td>
-<td>Razorpay integration for secure payments</td>
-</tr>
-<tr>
-<td align="center">💰</td>
-<td><b>Digital Wallet</b></td>
-<td>In-app wallet for quick transactions</td>
-</tr>
-<tr>
-<td align="center">➕</td>
-<td><b>Add Money</b></td>
-<td>Multiple payment methods supported</td>
-</tr>
-<tr>
-<td align="center">💸</td>
-<td><b>Withdrawals</b></td>
-<td>Secure fund withdrawal to bank accounts</td>
-</tr>
-<tr>
-<td align="center">📊</td>
-<td><b>Transaction History</b></td>
-<td>Detailed payment and transaction records</td>
-</tr>
-<tr>
-<td align="center">🔐</td>
-<td><b>Secure Processing</b></td>
-<td>Webhook verification and signature validation</td>
-</tr>
-<tr>
-<td align="center">🎁</td>
-<td><b>Bonus & Rewards</b></td>
-<td>Promotional credits and bonus management</td>
-</tr>
-<tr>
-<td align="center">📧</td>
-<td><b>Email Notifications</b></td>
-<td>Transaction receipts via RabbitMQ</td>
-</tr>
-</table>
+- **Multi-Gateway Payments:** Khalti, Stripe, Esewa, Razorpay
+- **Digital Wallet:** Add, withdraw, and transfer funds
+- **Transaction History:** Full audit trail and reporting
+- **Webhook & Signature Verification:** Secure payment callbacks
+- **Bonus & Rewards:** Promotional credits, contest winnings
+- **Notifications:** Real-time updates via RabbitMQ
+- **Modular Architecture:** Controllers, Services, Repositories, Middlewares
 
 ---
 
@@ -169,57 +158,77 @@ The **Payment Microservice** handles all **payment processing, wallet management
 
 ---
 
+
 ## 📁 Project Structure
 
 ```
 09_Payment_microservice/
 │
-├── 📄 Dockerfile                    # Docker configuration
-├── 📄 package.json                  # Dependencies and scripts
-├── 📄 README.md                     # This documentation
+├── Dockerfile
+├── package.json
+├── readme.md
 │
-└── 📁 src/
-    ├── 📄 index.js                  # 🚀 Application entry point
-    │
-    ├── 📁 config/
-    │   ├── 📄 config.json           # Database configuration
-    │   ├── 📄 docker-config.json    # Docker DB configuration
-    │   └── 📄 server.config.js      # Server settings
-    │
-    ├── 📁 Controllers/
-    │   ├── 📄 index.js              # Controller exports
-    │   └── 📄 payment.controller.js # Payment request handlers
-    │
-    ├── 📁 Middlewares/
-    │   ├── 📄 index.js              # Middleware exports
-    │   └── 📄 auth.middleware.js    # Authentication middleware
-    │
-    ├── 📁 migrations/               # Database migrations
-    │
-    ├── 📁 models/
-    │   ├── 📄 index.js              # Model exports
-    │   ├── 📄 wallet.model.js       # Wallet model
-    │   ├── 📄 transaction.model.js  # Transaction model
-    │   └── 📄 payment.model.js      # Payment model
-    │
-    ├── 📁 Repository/
-    │   ├── 📄 index.js              # Repository exports
-    │   └── 📄 payment.repository.js # Payment data access
-    │
-    ├── 📁 Route/
-    │   └── 📄 payment.routes.js     # Payment API routes
-    │
-    ├── 📁 seeders/                  # Database seeders
-    │
-    ├── 📁 Services/
-    │   ├── 📄 index.js              # Service exports
-    │   ├── 📄 payment.service.js    # Payment business logic
-    │   ├── 📄 wallet.service.js     # Wallet operations
-    │   └── 📄 razorpay.service.js   # Razorpay integration
-    │
-    └── 📁 Utlis/
-        ├── 📄 index.js              # Utility exports
-        └── 📄 constants.js          # Constants and enums
+└── src/
+  ├── index.js
+  ├── config/
+  │   ├── config.json
+  │   ├── khalti.config.js
+  │   ├── server.config.js
+  │   ├── stripe.config.js
+  │   └── stripe.connect.js
+  ├── Controllers/
+  │   ├── index.js
+  │   ├── khalti.controller.js
+  │   ├── payment.controller.js
+  │   └── stripe.controller.js
+  ├── Middlewares/
+  │   ├── esewa.middleware.js
+  │   ├── index.js
+  │   ├── internal.service.middleware.js
+  │   ├── khalti.middleware.js
+  │   ├── payment.middleware.js
+  │   ├── stripe.middleware.js
+  │   └── user.middleware.js
+  ├── migrations/
+  │   ├── 20260107164640-create-payment-transaction.js
+  │   ├── 20260107164925-create-wallet.js
+  │   ├── 20260107165012-create-wallet-transaction.js
+  │   └── 20260109053011-create-withdrawal-request.js
+  ├── models/
+  │   ├── index.js
+  │   ├── paymenttransaction.js
+  │   ├── wallet.js
+  │   ├── wallettransaction.js
+  │   └── withdrawalrequest.js
+  ├── Repository/
+  │   ├── curd.repo.js
+  │   ├── index.js
+  │   ├── payment.transtion.repo.js
+  │   ├── wallet.repo.js
+  │   ├── wallet.transaction.repo.js
+  │   └── withdrawal.request.repo.js
+  ├── Route/
+  │   ├── index.js
+  │   └── v1/
+  │       └── index.js
+  ├── seeders/
+  ├── Services/
+  │   ├── curd.service.js
+  │   ├── index.js
+  │   ├── khalti.service.js
+  │   ├── payment.service.js
+  │   ├── payment.transaction.service.js
+  │   ├── queue.service.js
+  │   ├── stripe.service.js
+  │   ├── wallet.service.js
+  │   ├── wallet.transaction.service.js
+  │   └── wallet.withdraw.service.js
+  └── utlis/
+    ├── index.js
+    ├── jwtHelper.js
+    ├── messageQueue.js
+    └── Errors/
+      └── https_codes.js
 ```
 
 ---
@@ -400,18 +409,21 @@ const verifyWebhookSignature = (body, signature, secret) => {
 
 ---
 
+
 ## 📦 Dependencies
 
-| Package | Version | Purpose |
-|:--------|:--------|:--------|
-| `express` | ^5.2.1 | Web framework |
-| `sequelize` | ^6.37.3 | PostgreSQL ORM |
-| `pg` | ^8.11.3 | PostgreSQL driver |
-| `razorpay` | ^2.9.2 | Payment gateway SDK |
-| `amqplib` | ^0.10.3 | RabbitMQ client |
-| `crypto` | built-in | Signature verification |
-| `uuid` | ^9.0.0 | Unique ID generation |
-| `dotenv` | ^17.2.3 | Environment configuration |
+| Package      | Purpose                      |
+|:------------ |:----------------------------|
+| express      | Web framework                |
+| sequelize    | PostgreSQL ORM               |
+| pg           | PostgreSQL driver            |
+| razorpay     | Payment gateway SDK          |
+| khalti       | Khalti payment integration   |
+| stripe       | Stripe payment integration   |
+| amqplib      | RabbitMQ client              |
+| crypto       | Signature verification       |
+| uuid         | Unique ID generation         |
+| dotenv       | Environment configuration    |
 
 ---
 
@@ -512,11 +524,13 @@ curl http://localhost:3006/health
 
 ---
 
+
 ## 🤝 Contributing
 
+We welcome contributions! Please:
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/payment-feature`)
-3. Commit changes (`git commit -m '💳 Add payment feature'`)
+3. Commit changes (`git commit -m 'Add payment feature'`)
 4. Push to branch (`git push origin feature/payment-feature`)
 5. Open a Pull Request
 
@@ -529,10 +543,6 @@ This project is licensed under the **MIT License**.
 ---
 
 <div align="center">
-
-**[⬆ Back to Main README](../README.md)**
-
-<br/>
 
 <sub>Part of the Power11 Fantasy Sports Platform</sub>
 

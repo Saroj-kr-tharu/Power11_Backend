@@ -1,12 +1,13 @@
 const axios = require('axios');
-const {INTERNAL_SERVER_TOKEN,CONTEST_BACKEND_URL, MATCH_BACKEND_URL,PLAYER_GAME_BACKEND_URL, TEAM_BACKEND_URL  } = require('../config/server.config')
+const {INTERNAL_SERVER_TOKEN,CONTEST_BACKEND_URL, MATCH_BACKEND_URL,PLAYER_GAME_BACKEND_URL, TEAM_BACKEND_URL, PAYMENT_BACKEND_URL  } = require('../config/server.config')
 
 // Service URLs
 const SERVICES = {
     GAME: PLAYER_GAME_BACKEND_URL,
     CONTEST: CONTEST_BACKEND_URL,
     TEAM: TEAM_BACKEND_URL,
-    MATCH:  MATCH_BACKEND_URL
+    MATCH:  MATCH_BACKEND_URL,
+    PAYMENT:  PAYMENT_BACKEND_URL,
 };
 
 // Pre-configured axios instance with internal token

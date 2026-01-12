@@ -117,8 +117,6 @@ class PaymentController {
     async getWithdraw(req, res) {
         try {
             const userId = req?.userId;
-
-
             const result = await walletWithdrawService.getByData({userId: userId});
             return res.status(SucessCode.CREATED).json({
                 message: "Successfully All getWithdraw  ",
@@ -186,6 +184,37 @@ class PaymentController {
             console.log('Something went wrong in controller (adminUpdate)',error);
             return res.status(ServerErrosCodes.NOT_IMPLEMENTED).json({
                 message: "Failed to adminUpdate",
+                success: false,
+                data: {},
+                err: error.message || error,
+            });
+        }
+    }
+
+
+    async joinContestWalletOperation(req, res) {
+        try {
+            
+            const {  amount,  referenceId, idempotencyKey  } = req?.body; 
+            const userId = req?.userId; 
+            const amountNumber = Number(amount);
+            if (Number.isNaN(amountNumber) || amountNumber <= 0) 
+                throw new Error("Invalid amount");
+            const amountInPaisa = Math.round(amountNumber * 100);
+
+            const result = await walletService.joinContestWalletOperation(userId, amountInPaisa,  referenceId, idempotencyKey  );
+
+            return res.status(SucessCode.CREATED).json({
+                message: "Successfully All joinContestWalletOperation  ",
+                success: true,
+                data: result,
+                err: {},
+            });
+
+        } catch (error) {
+            console.log('Something went wrong in controller (joinContestWalletOperation)',error);
+            return res.status(ServerErrosCodes.NOT_IMPLEMENTED).json({
+                message: "Failed to joinContestWalletOperation",
                 success: false,
                 data: {},
                 err: error.message || error,
