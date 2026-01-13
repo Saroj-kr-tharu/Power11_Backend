@@ -6,6 +6,17 @@ class PaymentTransaction_repo extends CurdRepo {
     super(PaymentTransaction);
   }
 
+  async getBydata(data) {
+    try {
+     
+      const res = await this.model.findOne({ where: data });
+      return res;
+    } catch (error) {
+      console.log("Something went wrong in Repo level (getBydata) ");
+      throw error;
+    }
+  }
+
   async updateByTrans(id, data) {
     try {
     

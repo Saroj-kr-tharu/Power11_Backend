@@ -22,6 +22,18 @@ class WalletService extends Service {
   }
 
 
+  async findorCreate(data) {
+    try {
+
+      const res = await WalletRepo.findOrCreate(data);
+      return res;
+    } catch (error) {
+      console.log("Something went wrong in service layer (updateByTransId)");
+      throw error;
+    }
+  }
+
+
   async joinContestWalletOperation(userId, amount, referenceId, idempotencyKey) {
     const transaction = await sequelize.transaction();
     try {

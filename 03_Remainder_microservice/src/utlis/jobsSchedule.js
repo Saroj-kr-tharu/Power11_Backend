@@ -1,17 +1,14 @@
 const cron = require("node-cron");
 
 const { Sender, } = require("../config/email.config");
-const { EMAIL_SENDER, FORGET_LINK } = require('../config/server.config');
+const { EMAIL_SENDER,  } = require('../config/server.config');
 
 const notificationService = require("../Services/notification.service")
 const notificationTemplateService = require("../Services/notification.template.service")
 
 const {
-  welcomeEmail,
+  emailTemplate
 } = require("./Template/index");
-
-const generatePaymentEmail = require('../utlis/Template/paymentTemplate/genPaymentTemplate')
-
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -28,29 +25,21 @@ const setUptask = () => {
         let emailInfo = email?.dataValues; 
      
         let mailRender = null; 
-        if (emailInfo.eventType == "USER_REGISTERED") {
-          let res  = await notificationTemplateService.getBydata({eventType: "USER_REGISTERED"});
-          res  = res?.dataValues; 
-          console.log('res =>v ', res )
-           mailRender = welcomeEmail({
-            username: emailInfo.email,
-            body:  res?.body,
-            app_url: 'https://power11.com/login'
-            });
-        }
-
-        // if (email.typeMail == "WELCOME") {
-        //   emailType = welcomeEmail(email.username);
-        // }
-
-        // if (email.typeMail == "SendOTP") {
-        //   emailType = otpEmail(email.token);
-        // }
        
+          let res  = await notificationTemplateService.getBydata({eventType: emailInfo.eventType});
+          res  = res?.dataValues; 
+          console.log('res =>', res )
+           mailRender = emailTemplate({
+            ...emailInfo.payload,
+              username: emailInfo.email,
+              body:  res?.body,
+              app_url: 'https://power11.com/login'
+            });
+        
         let mailoption = {
           from: EMAIL_SENDER,
           to: emailInfo?.email,
-          subject: emailInfo?.payload?.subject,
+          subject: res?.subject,
           html: mailRender,
         };
 

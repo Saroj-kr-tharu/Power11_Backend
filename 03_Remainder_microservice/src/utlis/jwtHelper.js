@@ -8,7 +8,7 @@ class JWT {
 
   async verifyToken(token ) {
     try {
-      console.log("prinvate => ", PRIVATEJWT)
+      
       const response = jwt.verify(token, PRIVATEJWT);
       if (!response) throw   new Error('Invalid Token ')
     
@@ -40,5 +40,4 @@ class JWT {
 }
 
 const jwt_helper = new JWT();
-
 module.exports = jwt_helper ;

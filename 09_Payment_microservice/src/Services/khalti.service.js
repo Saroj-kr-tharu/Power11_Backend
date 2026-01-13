@@ -6,7 +6,6 @@ const walletService = require('./wallet.service');
 const walletTransService = require('./wallet.transaction.service');
 const sendMessageToQueueService = require('./queue.service');
 
-const sendMessageToQueueService = require('./queue.service');
 
 class KhaltiService {
 
@@ -101,7 +100,7 @@ class KhaltiService {
 
             let getdata = await paymentTransService.getDetailsByTransid(response.pidx, { transaction });
             getdata= getdata?.dataValues; 
-            // console.log("get data = >", getdata)
+            console.log("get data = >", getdata)
 
             // 1. Gateway callback (SUCCESS)
             // 2. Start DB transaction
@@ -123,7 +122,7 @@ class KhaltiService {
             const currentWallet = await walletService.getByData({ userId: getdata?.userId }, { transaction });
             const balanceBefore = parseFloat(currentWallet?.balance) || 0;
             const balanceAfter = balanceBefore + (parseFloat(getdata?.amount) || 0);
-
+            console.log("current => ", currentWallet);
 
             await walletTransService.createService({
                 walletId: currentWallet?.id,
@@ -148,17 +147,20 @@ class KhaltiService {
 
             // console.log('getdaa = >', getdata)
             const payload = {
-                subject: "Payment Notification System",
-                email: getdata.userEmail,
-                notificationTime: new Date(),
-                gateway: getdata.gateway, 
-                transactionId:getdata.transactionId,
-                amount: getdata.amount,
-                currency: getdata.currency,
-                status: getdata.status
+                userId: getdata?.userId,
+                email: getdata?.userEmail,
+                eventType: 'WALLET_CREDITED',
+                channel: 'EMAIL',
+                referenceType: "ADD_MONEY",
+                payload:  {
+                    amount: getdata?.amount / 100,
+                    username: getdata?.userEmail,
+                    transaction_id: getdata?.transactionId
+                },
+                retryCount: 0,
+                scheduledAt: new Date(Date.now() + 5 * 60 * 60 * 1000), 
             };
-            await sendMessageToQueueService(payload, "CREATE_TICKET_PAYMENT");
-
+            await sendMessageToQueueService(payload, 'CREATE_NOTIFICATION');
             
 
             // Respond with success messagev

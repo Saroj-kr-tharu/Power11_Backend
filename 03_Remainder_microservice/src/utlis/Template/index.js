@@ -1,4 +1,3 @@
 module.exports = {
-  welcomeEmail: require("./emailTemplate/welcomeEmailTemplate"),
-  verifyEmail: require("./emailTemplate/verifyEmailTemplate"),
+  emailTemplate: require("./emailTemplate/emailTemplate"),
 };

@@ -6,6 +6,7 @@ const Service = require('./curd.service');
 const khaltiService  =require('./khalti.service')
 const stripeService  =require('./stripe.service')
 const idempotancyKeyService  =require('./idempotancy.key.service')
+const walletService  =require('./wallet.service')
 
 
 const {PaymentTranstionRepo} = require('../Repository/index');
@@ -42,6 +43,9 @@ class PaymentService extends Service {
             //3 Create walletTransaction (CREDIT)
             //4 Update wallet.balance
             //5 paymentTransaction → wallet Transaction → wallet
+            
+            // check wallet 
+            await walletService.findorCreate({currency:'NPR', userId:data.userId })
 
             const orderId = "ORD" + crypto.randomBytes(8).toString('hex');
             let result =  await PaymentTranstionRepo.create({

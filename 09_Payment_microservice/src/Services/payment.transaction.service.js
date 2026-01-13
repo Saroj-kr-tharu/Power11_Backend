@@ -6,6 +6,17 @@ class PaymentTransactionService extends Service {
     super(paymentTransRepo);
   }
 
+  async getByData(data) {
+    try {
+
+      const res = await paymentTransRepo.getBydata(data);
+      return res;
+    } catch (error) {
+      console.log("Something went wrong in service layer (updateByTransId)");
+      throw error;
+    }
+  }
+
   async updateByTransId(transId, data, ) {
     try {
 

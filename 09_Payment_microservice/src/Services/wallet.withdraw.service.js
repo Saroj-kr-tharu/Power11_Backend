@@ -4,7 +4,8 @@ const Service = require('./curd.service');
 const {WithdrawalRequestRepo} = require('../Repository/index');
 
 const walletService = require('./wallet.service')
-const walletTransService = require('./wallet.transaction.service')
+const walletTransService = require('./wallet.transaction.service') 
+const paymentTransService = require('./payment.transaction.service') 
 const idempotancyKeyService = require('./idempotancy.key.service')
 const { sequelize } = require('../models');
 
@@ -25,7 +26,7 @@ class WalletWithDrawService extends Service {
     }
   }
 
-  async withdrawRequest(userId, amount, method , details, idempotencyKey) {
+  async withdrawRequest(userId,email,  amount, method , details, idempotencyKey) {
     const transaction = await sequelize.transaction();
     
     try {
@@ -87,30 +88,21 @@ class WalletWithDrawService extends Service {
                   { responseSnapshot: res, status: "SUCCESS" }, 
                 );
 
-            //     const payload = {
-            //     subject: "Payment Notification System",
-            //     email: getdata.userEmail,
-            //     notificationTime: new Date(),
-            //     gateway: getdata.gateway, 
-            //     transactionId:getdata.transactionId,
-            //     amount: getdata.amount,
-            //     currency: getdata.currency,
-            //     status: getdata.status
-            // };
-          
-          // const payload = {
-          //   subject: "Withdrawal Request Created",
-          //   email: getdata.userEmail,,
-          //   requestId: res?.dataValues?.id || res.id,
-          //   walletId: res?.dataValues?.walletId,
-          //   method: (res?.dataValues?.method || method).toUpperCase(),
-          //   amount: parseFloat(res?.dataValues?.amount || amount),
-          //   currency: res?.dataValues?.currency || wallet.currency,
-          //   accountDetails: res?.dataValues?.accountDetails || details,
-          //   status: res?.dataValues?.status || "REQUESTED",
-          //   createdAt: res?.dataValues?.createdAt || new Date()
-          // };
-          // await sendMessageToQueueService(payload, "CREATE_TICKET_WITHDRAW");
+            const payload = {
+                userId: userId,
+                email: email,
+                eventType: 'WITHDRAW_REQUESTED',
+                channel: 'EMAIL',
+                referenceType: "WITHDRAW_MONEY",
+                payload:  {
+                    withdraw: amount,
+                    username: email,
+                    transaction_id: "IN_PROCESSING"
+                },
+                retryCount: 0,
+                scheduledAt: new Date(Date.now() + 5 * 60 * 60 * 1000), 
+            };
+            await sendMessageToQueueService(payload, 'CREATE_NOTIFICATION');
 
           await transaction.commit();
           return res; 
@@ -127,8 +119,6 @@ class WalletWithDrawService extends Service {
         const transaction = await sequelize.transaction();
         try {
 
-          
-      
           // STEP 0: Update request status to PROCESSING
           let withdrawRequest = await WithdrawalRequestRepo.getByid( requestId );
           if (!withdrawRequest) 
@@ -150,6 +140,8 @@ class WalletWithDrawService extends Service {
           wallet= wallet?.dataValues;
 
           // console.log(' wallet => ', wallet)
+          let paymentTrans = await paymentTransService.getByData({userId: wallet.userId});
+          paymentTrans = paymentTrans.dataValues; 
 
 
           // STEP 2: Verify wallet is active
@@ -201,8 +193,21 @@ class WalletWithDrawService extends Service {
             }, { transaction });
 
           // STEP 10: Notify user about successful withdrawal
-          // TODO: Send notification to user
-
+            const payload = {
+                userId: paymentTrans.userId,
+                email: paymentTrans.userEmail,
+                eventType: 'WITHDRAW_APPROVED',
+                channel: 'EMAIL',
+                referenceType: "WITHDRAW_MONEY",
+                payload:  {
+                    withdraw_amount: requestedAmount/100,
+                    username:  paymentTrans.userEmail,
+                    transaction_id: "SUCCESS"
+                },
+                retryCount: 0,
+                scheduledAt: new Date(Date.now() + 5 * 60 * 60 * 1000), 
+            };
+            await sendMessageToQueueService(payload, 'CREATE_NOTIFICATION');
           
 
           await transaction.commit();
@@ -251,6 +256,9 @@ class WalletWithDrawService extends Service {
         throw new Error("Wallet not found");
       
       wallet = wallet?.dataValues;
+      let paymentTrans = await paymentTransService.getByData({userId: wallet.userId});
+          paymentTrans = paymentTrans.dataValues; 
+
 
       // STEP 3: Verify wallet is active
       if (wallet.status !== "ACTIVE") 
@@ -294,8 +302,22 @@ class WalletWithDrawService extends Service {
       }, { transaction });
 
       // STEP 9: Notify user
-      // TODO: Notify user that withdrawal was rejected with reason
-
+        const payload = {
+               userId: paymentTrans.userId,
+               email: paymentTrans.userEmail,
+               eventType: 'WITHDRAW_REJECTED',
+               channel: 'EMAIL',
+               referenceType: "WITHDRAW_MONEY",
+               payload:  {
+                   withdraw_amount: requestedAmount/100,
+                   reason: "KYC documents not verified. Please complete your KYC verification.",
+                   username:  paymentTrans.userEmail,
+                   transaction_id: "FAILED"
+               },
+               retryCount: 0,
+               scheduledAt: new Date(Date.now() + 5 * 60 * 60 * 1000), 
+           };
+           await sendMessageToQueueService(payload, 'CREATE_NOTIFICATION');
       await transaction.commit();
       return res;
 

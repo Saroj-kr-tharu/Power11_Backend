@@ -20,6 +20,30 @@ class Wallet_repo extends CurdRepo {
     }
   }
 
+  async findOrCreate(data) {
+    try {
+     
+      const [wallet, created] = await this.model.findOrCreate({
+        where: {
+          userId: data.userId,
+          currency: data.currency,
+        },
+        defaults: {
+          balance: 0,
+          lockedBalance: 0,
+          status: 'ACTIVE',
+        },
+      });
+
+      return wallet;
+    } catch (error) {
+      console.log("Something went wrong in Repo level (getBydata) ");
+      throw error;
+    }
+  }
+
+
+
 
 
 

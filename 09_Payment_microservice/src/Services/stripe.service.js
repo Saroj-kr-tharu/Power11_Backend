@@ -115,19 +115,22 @@ class StripeService {
             // 7. Commit transaction
             await transaction.commit();
 
-            // Send notification after successful commit
+            // Send notification after successful commit            
             const payload = {
-                subject: "Payment Notification System",
-                email: getdata.userEmail,
-                notificationTime: new Date(),
-                gateway: 'Stripe',
-                transactionId: getdata.transactionId,
-                amount: getdata.amount,
-                currency: 'npr',
-                status: 'COMPLETE',
+                userId: getdata?.userId,
+                email: getdata?.userEmail,
+                eventType: 'WALLET_CREDITED',
+                channel: 'EMAIL',
+                referenceType: "ADD_MONEY",
+                payload:  {
+                    amount: getdata?.amount / 100,
+                    username: getdata?.userEmail,
+                    transaction_id: getdata?.transactionId
+                },
+                retryCount: 0,
+                scheduledAt: new Date(Date.now() + 5 * 60 * 60 * 1000), 
             };
-            await sendMessageToQueueService(payload, "CREATE_TICKET_PAYMENT");
-               console.log('done again')
+            await sendMessageToQueueService(payload, 'CREATE_NOTIFICATION');
             return   'Payment completed successfully' ;
 
         } catch (error) {
