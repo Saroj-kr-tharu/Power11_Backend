@@ -22,4 +22,11 @@ router.get( "/scorerule",userMw.verifyAdmin, scoringProxy );
 router.delete( "/scorerule/:scoreruleId",userMw.verifyAdmin, scoringProxy)
 router.patch( "/scorerule/:scoreruleId",userMw.verifyAdmin, scoringProxy );
 
+// matchEvent 
+router.post( "/event",  userMw.verifyAdmin, scoringProxy );
+router.get( "/event", userMw.verifyAdmin, scoringProxy );
+router.delete( "/event/:matcheventId", userMw.verifyAdmin, scoringProxy );
+router.patch( "/event/:matcheventId",  userMw.verifyAdmin, scoringProxy );
+
+
 module.exports = router;

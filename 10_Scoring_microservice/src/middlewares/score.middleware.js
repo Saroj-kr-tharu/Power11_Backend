@@ -27,12 +27,12 @@ class ScoreMiddleware {
 
 
     addMatchEvent(req, res, next) {
-        const { matchId, gameId, playerId, eventType, eventValue, fantasyPoints, metadata } = req?.body;
+        const { matchId, gameId, contestId, playerId, eventType, eventValue,  metadata, createdBy } = req?.body;
 
-        if (!matchId || !gameId || !playerId || !eventType || typeof fantasyPoints !== 'number') {
+        if (!matchId || !gameId || !contestId || !playerId || !eventType ) {
             return res.status(ClientErrorsCodes.BAD_REQUEST).json({
                 data: {},
-                message: "Required field is missing: matchId, gameId, playerId, eventType, or fantasyPoints",
+                message: "Required field is missing: matchId, gameId, contestId, playerId, eventType, or fantasyPoints",
                 success: false,
             });
         }
@@ -53,7 +53,7 @@ class ScoreMiddleware {
             });
         }
 
-        if (conditions && typeof conditions !== 'object') {
+        if (createdBy && !['ADMIN', 'SYSTEM'].includes(createdBy)) { 
             return res.status(ClientErrorsCodes.BAD_REQUEST).json({
                 data: {},
                 message: "createdBy must be either 'ADMIN' or 'SYSTEM'",

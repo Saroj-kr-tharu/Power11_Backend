@@ -37,7 +37,8 @@ class ScoringRulesService extends curdService{
                          { headers: { 'x-access-token': token } } 
                     )
                     if(!contest)  throw new Error("CONTEST_IS_NOT_FOUND")
-                    if (!contest.data || contest.data.gameId != gameId  ) throw new Error("CONTEST_DOES_NOT_BELONG_TO_GAME_OR_MATCH");
+                    if (!contest.data || contest.data.gameId != gameId  ) throw new Error("CONTEST_DOES_NOT_BELONG_TO_GAME");
+                    if (!contest.data || contest.data.status != "SCHEDULED"  ) throw new Error("CONTEST_IS_NOT_SCHEDULED");
                     if(matchId)
                         if ( contest.data.matchId != matchId ) throw new Error("CONTEST_DOES_NOT_BELONG_TO_MATCH");
                    

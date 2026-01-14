@@ -15,10 +15,17 @@ const matchProxy = createProxyMiddleware({
     logLevel: "debug",
 });
 
+// match
 router.post( "/",userMw.verifyAdmin, matchProxy );
 router.get( "/",  matchProxy );
 router.delete( "/:matchId",userMw.verifyAdmin, matchProxy );
 router.patch( "/:matchId", userMw.verifyAdmin,matchProxy);
+
+// matchlivestate
+router.post( "/livestate",userMw.verifyAdmin, matchProxy );
+router.get( "/livestate",userMw.verifyAdmin, matchProxy );
+router.delete( "/livestate/:liveStateId",userMw.verifyAdmin, matchProxy );
+router.patch( "/livestate/:liveStateId",userMw.verifyAdmin, matchProxy );
 
 
 module.exports = router;

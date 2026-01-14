@@ -14,6 +14,12 @@ const matchEventSchema = new mongoose.Schema(
       index: true
     },
 
+    contestId: { 
+        type: String,
+        required: true,
+        index: true 
+      },
+
     playerId: {
       type: String,
       required: true,
@@ -49,5 +55,8 @@ const matchEventSchema = new mongoose.Schema(
     timestamps: { createdAt: true, updatedAt: false }
   }
 );
+
+matchEventSchema.index({ matchId: 1, contestId: 1, playerId: 1 });
+matchEventSchema.index({ contestId: 1, gameId: 1, eventType: 1 });
 
 module.exports = mongoose.model('MatchEvent', matchEventSchema);

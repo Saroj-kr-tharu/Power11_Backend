@@ -1,4 +1,6 @@
 
 module.exports = {
-    scoringCtrl : require('./scoring.ctrl')
+    scoringCtrl : require('./scoring.ctrl'),
+    matchEventCtrl : require('./match.event.ctrl'),
+
 }
