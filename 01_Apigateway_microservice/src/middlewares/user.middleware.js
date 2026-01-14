@@ -19,7 +19,7 @@ class UserMiddleware {
             try {
                 const token = req?.headers['x-access-token'];
                 const response = await JwtHelper.verifyToken(token)
-                
+                console.log("respone => ", response)
                 const role = response?.data?.role;
                 if(role.toLowerCase() == 'admin') return  next(); 
 

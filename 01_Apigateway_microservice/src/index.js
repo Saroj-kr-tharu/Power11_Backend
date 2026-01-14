@@ -4,7 +4,7 @@ const { default: rateLimit } = require("express-rate-limit");
 const cors = require("cors");
 
 
-const {authRoutes, paymentRoutes, gamePlayerRoutes, teamRoutes, contestRoutes, leaderboardRoutes, matchRoutes, remainderRoutes} = require('./routes/index')
+const {authRoutes, paymentRoutes, gamePlayerRoutes, teamRoutes, contestRoutes, leaderboardRoutes, matchRoutes, remainderRoutes, scoringRoutes} = require('./routes/index')
 
 const app = express();
 const PORT = 3000;
@@ -48,6 +48,7 @@ app.use("/contest", contestRoutes);
 app.use("/leaderboard", leaderboardRoutes);
 app.use("/match", matchRoutes);
 app.use("/remainder", remainderRoutes);
+app.use("/matchevent", scoringRoutes);
 
 
 app.use(express.json());

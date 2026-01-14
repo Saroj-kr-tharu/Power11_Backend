@@ -8,5 +8,6 @@ module.exports = {
     leaderboardRoutes : require('./leaderboard.routes'),
     matchRoutes : require('./match.routes'),
     remainderRoutes : require('./remainder.routes'),
+    scoringRoutes : require('./scoring.routes'),
 
 }

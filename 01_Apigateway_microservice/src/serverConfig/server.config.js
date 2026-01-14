@@ -11,6 +11,7 @@ module.exports = {
     LEADERBOARD_BACKEND_URL: process.env.LEADERBOARD_BACKEND_URL,
     MATCH_BACKEND_URL: process.env.MATCH_BACKEND_URL,
     REMAINDER_BACKEND_URL: process.env.REMAINDER_BACKEND_URL,
+    SCORING_BACKEND_URL: process.env.SCORING_BACKEND_URL,
     
     
     PORT: process.env.PORT,
