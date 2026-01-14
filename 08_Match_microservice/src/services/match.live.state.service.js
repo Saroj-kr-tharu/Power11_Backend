@@ -43,24 +43,18 @@ class MatchLiveStateService extends curdService{
         }
 
         async getByData(data) {
-                try {
-                        const res = await matchRepo.getBydata(data);
-                        return res;
+                try {  
+                     const res = await matchLiveStateRepo.getBydata(data);
+                     return res;
                 } catch (error) {
-                        console.log("Something went wrong in service layer (getByData)");
-                        throw error;
+                     console.log("Something went wrong in service layer (getByData)");
+                     throw error;
                 }
         }
 
-        async updateByData(where, updateData,) {
-                try {
-                        const res = await matchRepo.updateBydata(where, updateData);
-                        return res;
-                } catch (error) {
-                        console.log("Something went wrong in service layer (updateByData)");
-                        throw error;
-                }
-        }
+        
+
+        
 
 
 }

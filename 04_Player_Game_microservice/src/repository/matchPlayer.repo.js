@@ -17,6 +17,20 @@ class MatchPlayerRepo extends CurdRepo {
              throw error;
         }
     }
+
+    async updateBydata(where, updateData) {
+    try {
+        const res = await this.model.findOneAndUpdate(
+            where,          
+            updateData,     
+            { new: true }   
+        );
+        return res;
+    } catch (error) {
+        console.log("Something went wrong in Repo level (updateBydata)");
+        throw error;
+    }
+}
  
 
 }

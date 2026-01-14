@@ -1,10 +1,11 @@
 const curdService = require("./curd.service");
-const {matchEventRepo} = require('../repository')
+const {matchEventRepo, scoringRepo} = require('../repository')
 const {InternalServiceClient, } = require('../utlis/index')
 const {EVENT_MAP } = require('../utlis/index')
+const sendMessageToQueueService = require('./queue.service');
 
 class MatchEventService extends curdService{
-
+  
     constructor(){
         super(matchEventRepo) 
     }
@@ -66,7 +67,17 @@ class MatchEventService extends curdService{
 
             // STEP 6: Validate event type for the given game
                 if (!EVENT_MAP[sport]?.includes(eventType)) throw new Error(`INVALID_EVENT_TYPE_FOR_${sport}`);
-            
+
+            // STEP 6.5: Get the match live Event 
+                const matchLiveState = await InternalServiceClient.internalClient.get(
+                    `${InternalServiceClient.SERVICES.MATCH}/match/livestate?matchId=${matchId}&gameId=${gameId}`,
+                    { headers: { 'x-access-token': token } }
+                );
+                if(!matchLiveState) throw new Error("INVALID_MATCH_GAME_MATCHLIVE_STATE_NOT_FOUND")
+                const matchLiveStateInfo = matchLiveState.data;
+                if ( matchLiveStateInfo.gameId != gameId  ) throw new Error("MATCHLIVESTATE_DOES_NOT_BELONG_TO_GAME");
+                if (matchLiveStateInfo.matchId != matchId  ) throw new Error("MATCHLIVESTAE_IS_NOT_BELONGS_TO_MATCH");
+
             // STEP 5: Validate event timing (over, minute, half, etc.)
                 if (sport === "CRICKET") {
                     const { innings, over, ball } = metadata.timing || {};
@@ -76,38 +87,71 @@ class MatchEventService extends curdService{
                     const format = match.data.metadata?.format; // T20 / ODI
                     const maxOvers = format === "T20" ? 20 : 50;
                     
-                    if (innings > match.data.currentInnings) throw new Error("FUTURE_INNINGS_EVENT");
+                    if (innings > matchLiveStateInfo.progress) throw new Error("FUTURE_INNINGS_EVENT");
                     if (over < 0 || over >= maxOvers) throw new Error("INVALID_OVER");
                     if (ball < 1 || ball > 6) throw new Error("INVALID_BALL");
 
 
-                    const isFutureEvent = over > match.data.currentOver || (over === match.data.currentOver && ball > match.data.currentBall);
-                    console.log("currentOver:", match.data.currentOver, "currentOver:", match.data.currentOver, "currentBall:", match.data.currentBall);
+                    const isFutureEvent = over > matchLiveStateInfo.progress.over || (over ===  matchLiveStateInfo.progress.over && ball > matchLiveStateInfo.progress.ball);
+                    console.log(
+                        "currentOver:", matchLiveStateInfo.progress.over,
+                        "currentBall:", matchLiveStateInfo.progress.ball,
+                        "eventOver:", over,
+                        "eventBall:", ball
+                    );
                     if (isFutureEvent) throw new Error("FUTURE_EVENT_NOT_ALLOWED");
                 }
 
                 if (sport === "FOOTBALL") {
                     const { minute, half } = metadata || {};
-
+ 
                     if (minute == null || half == null) throw new Error("FOOTBALL_TIMING_REQUIRED");
 
                     if (![1, 2].includes(half)) throw new Error("INVALID_HALF");
 
                     if (minute < 0 || minute > 110) throw new Error("INVALID_MINUTE");
 
-                    const isFutureEvent = half > match.data.currentHalf || (half === match.data.currentHalf && minute > match.data.currentMinute);
+                    const isFutureEvent = half > matchLiveStateInfo.progress.currentHalf || (half === matchLiveStateInfo.progress.currentHalf && minute > matchLiveStateInfo.progress.currentMinute);
 
                     if (isFutureEvent)throw new Error("FUTURE_EVENT_NOT_ALLOWED");
                 }
             // STEP 7: Fetch active scoring rules
+                const scoreRules = await scoringRepo.getBydata({gameId: gameId, contestId:contestId})
+                // console.log("scoreRules => ", scoreRules)
+                
             // STEP 8: Calculate fantasy points based on rules & conditions
+                let fantasyPoints = 0; 
+                const rules = scoreRules.find( (item) => item.eventType === eventType )
+                if(!rules ) throw new Error("RULES_NOT_FOUND")
+                fantasyPoints+= rules.points;
+                
+                
             // STEP 9: Store match event with calculated fantasy points
+                const res= await matchEventRepo.create({
+                    matchId,
+                    gameId,
+                    contestId,
+                    playerId,
+                    eventType,
+                    eventValue,
+                    fantasyPoints,
+                    metadata,
+                    createdBy
+                });
             // STEP 10: Update match-player statistics
-            // STEP 11: Update leaderboard / contest rankings
-            // STEP 12: Emit score update event (async)
+                await InternalServiceClient.internalClient.patch(
+                    `${InternalServiceClient.SERVICES.GAME}/matchPlayer`,
+                    {matchId, gameId, playerId, fantasyPoint: fantasyPoints},
+                    { headers: { 'x-access-token': token } }
+                );
+                
+            // STEP 12: Emit score update event (async) to   Update leaderboard / contest rankings
+                const payload = { matchId, gameId, playerId, fantasyPoint: fantasyPoints };
+                await sendMessageToQueueService(payload, 'UPDATE_FANTASY_POINTS');
+            return res; 
             
         } catch (error) {
-          console.log("Error in service layer (addMatchEvent):", );
+            console.log("Error in service layer (addMatchEvent):", );
 
             if (error.response && error.response.data) {
                 console.error(error.response.data.message);
@@ -117,7 +161,7 @@ class MatchEventService extends curdService{
                 throw error;
              }
          
-        }
+            }
         }
    
 

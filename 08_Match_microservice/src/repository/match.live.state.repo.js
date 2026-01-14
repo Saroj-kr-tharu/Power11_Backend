@@ -10,19 +10,18 @@ class MatchLiveStateRepo extends CurdRepo {
 
     async getBydata(data) {
         try {
-        
-        const res = await this.model.findOne({ where: data });
-        return res;
+            const res = await this.model.findOne(data );
+            return res;
         } catch (error) {
-        console.log("Something went wrong in Repo level (getBydata) ");
-        throw error;
+            console.log("Something went wrong in Repo level (getBydata) ");
+            throw error;
         }
     }
   
-    async updateBydata(where, updateData) {
+    async updateBydata(whereData, updateData) {
         try {
         // console.log("where => ", where, " updatedData =>  ", updateData)
-        const res = await this.model.update(updateData, { where });
+        const res = await this.model.update(updateData, { where: whereData });
         return res;
         } catch (error) {
         console.log("Something went wrong in Repo level (updateBydata)");
@@ -30,7 +29,7 @@ class MatchLiveStateRepo extends CurdRepo {
         }
     }
 
-     async FindAndUpdate(where, updateData, options = {}) {
+    async FindAndUpdate(where, updateData, options = {}) {
         try {
             const finalOptions = {  ...options };
             const res = await this.model.findOneAndUpdate(where, updateData, finalOptions);
@@ -39,7 +38,7 @@ class MatchLiveStateRepo extends CurdRepo {
             console.log("Something went wrong in Repo level (updateByData):", error);
             throw error;
         }
-  }
+    }
 
  
 }

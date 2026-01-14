@@ -9,7 +9,7 @@ class ScoringRepo extends CurdRepo {
  
     async getBydata(data) {
         try {
-            const res = await this.model.findOne({ where: data });
+            const res = await this.model.find(data);
             return res;
         } catch (error) {
             console.log("Something went wrong in Repo level (getBydata) ");

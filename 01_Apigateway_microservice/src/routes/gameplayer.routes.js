@@ -45,7 +45,7 @@ router.patch( "/teammaster/:teammasterId", userMw.verifyAdmin,  gamePlayerProxy)
 router.get( "/teammaster/:gameId",userMw.verifyUser,  gamePlayerProxy );
 
 // match player 
-router.post( "/matchPlayer", userMw.verifyToken,gamePlayerProxy  );
-
+router.post( "/matchPlayer", userMw.verifyAdmin,gamePlayerProxy  );
+router.patch( "/matchPlayer",userMw.verifyAdmin,gamePlayerProxy );
 
 module.exports = router;

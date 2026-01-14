@@ -18,6 +18,16 @@ class MatchPlayerService extends curdService{
         }
     }
 
+    async updateByData(matchId,gameId,playerId ,fantasyPoint){
+        try {
+            const res = await matchPlayerRepo.updateBydata({matchId: matchId, gameId:gameId, playerId:playerId}, {points: fantasyPoint})
+            return res;
+        } catch (error) {
+            console.log("something went wrong in service  level  (updateByData) ")
+             throw error;
+        }
+    }
+
 }
 
 const matchPlayerService = new MatchPlayerService()

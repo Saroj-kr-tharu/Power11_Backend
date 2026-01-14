@@ -33,6 +33,7 @@ router.patch( "/teammaster/:teammasterId",internalTokenMw.checkInternalServiceTo
 
 // matchPlayer
 router.post( "/matchPlayer",internalTokenMw.checkInternalServiceToken, userMw.verifyToken,  matchPlayerCtrl.getAllMatchPlayer );
+router.patch( "/matchPlayer",internalTokenMw.checkInternalServiceToken, userMw.verifyToken,  matchPlayerCtrl.updatePoints );
 
  
 module.exports = router;

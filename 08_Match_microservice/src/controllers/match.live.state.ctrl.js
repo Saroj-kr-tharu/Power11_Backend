@@ -33,14 +33,9 @@ class MatchLiveStateCTRL {
 
     async getAllMatchLiveState(req,res) {
         try {
-            const { gameId, MatchLiveStateId } = req.query; 
-            
-            let response;
-            if (MatchLiveStateId) {
-                response = await matchLiveStateService.getByidService(MatchLiveStateId);
-            } else if (gameId) {
-                response = await matchLiveStateService.getMatchLiveStateByGame(gameId);
-            } 
+            const { gameId, matchId } = req.query; 
+            const response = await matchLiveStateService.getByData({gameId: gameId, matchId:matchId});
+    
             return res.status(SucessCode.OK).json({
                 message: "Successfully getAllMatchLiveState",
                 success: true,
