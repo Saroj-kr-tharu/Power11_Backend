@@ -1,4 +1,4 @@
-const {MatchLiveStateLiveStateService} = require('../services/index')
+const {matchLiveStateService} = require('../services/index')
 const {SucessCode, ServerErrosCodes} = require('../utlis/Errors/https_codes')
 
 class MatchLiveStateCTRL { 
@@ -6,13 +6,9 @@ class MatchLiveStateCTRL {
     async addMatchLiveState(req,res) {
         try {
            
-            const { matchId, gameId, progress, lastEventAt } = req?.body;
-            const response = await MatchLiveStateLiveStateService.createService({
-                matchId,
-                gameId,
-                progress,
-                lastEventAt
-            });
+            const { matchId, gameId, progress } = req?.body;
+             const token = req?.headers['x-access-token']; 
+            const response = await matchLiveStateService.UpdateLiveState({matchId, gameId, progress, token });
             
         
             return res.status(SucessCode.OK).json({
@@ -41,9 +37,9 @@ class MatchLiveStateCTRL {
             
             let response;
             if (MatchLiveStateId) {
-                response = await MatchLiveStateLiveStateService.getByidService(MatchLiveStateId);
+                response = await matchLiveStateService.getByidService(MatchLiveStateId);
             } else if (gameId) {
-                response = await MatchLiveStateLiveStateService.getMatchLiveStateByGame(gameId);
+                response = await matchLiveStateService.getMatchLiveStateByGame(gameId);
             } 
             return res.status(SucessCode.OK).json({
                 message: "Successfully getAllMatchLiveState",
@@ -67,7 +63,7 @@ class MatchLiveStateCTRL {
         try {
             const { liveStateId } = req.params; 
             const data = req?.body; 
-            const response = await MatchLiveStateLiveStateService.updateService(liveStateId,data);
+            const response = await matchLiveStateService.updateService(liveStateId,data);
             return res.status(SucessCode.OK).json({
                 message: "Successfully updateMatchLiveState",
                 success: true,
@@ -90,7 +86,7 @@ class MatchLiveStateCTRL {
         try {
             const { liveStateId } = req.params; 
             
-            const response = await MatchLiveStateLiveStateService.deleteService(liveStateId);
+            const response = await matchLiveStateService.deleteService(liveStateId);
             return res.status(SucessCode.OK).json({
                 message: "Successfully deleteMatchLiveState",
                 success: true,

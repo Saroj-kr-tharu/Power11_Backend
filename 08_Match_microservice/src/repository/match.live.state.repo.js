@@ -30,6 +30,17 @@ class MatchLiveStateRepo extends CurdRepo {
         }
     }
 
+     async FindAndUpdate(where, updateData, options = {}) {
+        try {
+            const finalOptions = {  ...options };
+            const res = await this.model.findOneAndUpdate(where, updateData, finalOptions);
+            return res;
+        } catch (error) {
+            console.log("Something went wrong in Repo level (updateByData):", error);
+            throw error;
+        }
+  }
+
  
 }
 

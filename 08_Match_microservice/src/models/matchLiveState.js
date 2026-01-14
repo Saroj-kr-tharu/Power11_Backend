@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const MatchLiveStateSchema = new mongoose.Schema(
   {
     matchId: {

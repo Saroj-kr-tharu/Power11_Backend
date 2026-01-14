@@ -17,10 +17,10 @@ router.delete( "/match/:matchId",internalTokenMw.checkInternalServiceToken,userM
 router.patch( "/match/:matchId",internalTokenMw.checkInternalServiceToken, userMw.validateToken, matchCtrl.updateMatch );
 
 // matchlivestate
-router.post( "/livestate",internalTokenMw.checkInternalServiceToken, userMw.validateToken,   matchLiveStateCtrl.addMatchLiveState );
-router.get( "/livestate",internalTokenMw.checkInternalServiceToken,  matchLiveStateCtrl.getAllMatchLiveState );
-router.delete( "/livestate/:liveStateId",internalTokenMw.checkInternalServiceToken,userMw.validateToken,  matchLiveStateCtrl.deleteMatchLiveState );
-router.patch( "/livestate/:liveStateId",internalTokenMw.checkInternalServiceToken, userMw.validateToken, matchLiveStateCtrl.updateMatchLiveState );
+router.post( "/match/livestate",internalTokenMw.checkInternalServiceToken, userMw.validateToken,   matchLiveStateCtrl.addMatchLiveState );
+router.get( "/match/livestate",internalTokenMw.checkInternalServiceToken,  matchLiveStateCtrl.getAllMatchLiveState );
+router.delete( "/match/livestate/:liveStateId",internalTokenMw.checkInternalServiceToken,userMw.validateToken,  matchLiveStateCtrl.deleteMatchLiveState );
+router.patch( "/match/livestate/:liveStateId",internalTokenMw.checkInternalServiceToken, userMw.validateToken, matchLiveStateCtrl.updateMatchLiveState );
 
  
 module.exports = router;
