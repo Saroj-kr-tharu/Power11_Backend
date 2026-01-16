@@ -8,16 +8,15 @@ class UserContestRepo extends CurdRepo {
     }; 
 
     async getByUser(userId, teamId, matchId,contestId){
-            try {
-               const res = await userContestModel.find({userId, teamId, matchId,contestId });
+        try {
+           const res = await userContestModel.find({userId, teamId, matchId,contestId });
+           return res; 
 
-               return res; 
-    
-            } catch (error) {
-                console.log("something went wrong in service  level  (getByUser) ")
-                 throw error;
-               
-            }
+        } catch (error) {
+            console.log("something went wrong in service  level  (getByUser) ")
+             throw error;
+           
+        }
     }
  
 

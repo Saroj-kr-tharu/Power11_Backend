@@ -2,12 +2,11 @@ const express = require('express')
 const bodyParser = require('body-parser')
 
 
-
 const { createChannel, subscribeMessage } = require("./utlis/messageQueue");
-const { subscribeEvent } = require("./Services/remainder.service");
+const { subscribeEvent } = require("./services/remainder.service.js");
 
 
-const {PORT, REMINDER_BINDING_KEY}= require('./config/server.config')
+const {PORT, REMINDER_BINDING_KEY, REDIS_URL}= require('./config/server.config')
 const connect = require('../src/config/database.js');
 const appRoutes = require('./Routes/index')
 

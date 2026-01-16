@@ -66,6 +66,12 @@ const TeamSchema = new mongoose.Schema(
       type: Number,
       required: true
     },
+    teamScore: {
+      type: Number,
+      default: 0,
+      index: true
+    },
+
     lockStatus: {
       type: String,
       enum: ['unlocked', 'soft', 'hard'],

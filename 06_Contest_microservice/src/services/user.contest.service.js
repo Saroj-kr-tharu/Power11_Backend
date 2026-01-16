@@ -45,13 +45,13 @@ class UserContestService extends curdService{
                     throw new Error(" Contest is Full  ") 
 
             // ========== STEP 3.1: Check Wallet ==========
-               const walletValidation = await InternalServiceClient.internalClient.post(
+                const walletValidation = await InternalServiceClient.internalClient.post(
                     `${InternalServiceClient.SERVICES.PAYMENT}/internal/wallet/execute/`,
                     {   
                         amount: joinFee,
                         referenceId: contestId,
-                        // idempotencyKey:  uuidv4(),
-                        idempotencyKey:  "b6755fe8-e183-43dd-a963-79201f4164a7", 
+                        idempotencyKey:  uuidv4(),
+                        // idempotencyKey:  "b6755fe8-e183-43dd-a963-79201f4164a7", 
                    
                     },
                      { headers: { 'x-access-token': token } }

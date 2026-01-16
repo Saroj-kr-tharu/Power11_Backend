@@ -79,8 +79,32 @@ class TeamController {
         try {
             const { teamId } = req.params; 
             const data = req?.body; 
-           
+            console.log('data => ', data, "  teamId => ", teamId)
             const response = await teamService.updateTeam({TeamId:teamId, data});
+            return res.status(SucessCode.OK).json({
+                message: "Successfully updateGame",
+                success: true,
+                data: response,
+                err: {},
+            });
+
+        } catch (error) {
+            console.log("something went wrong in controller  level  (updateGame) ")
+            return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
+                message: error.message,
+                sucess: false,
+                data: {},
+                err: error.explanation,
+            });
+        }
+    }
+
+     async updateTeamAdmin(req,res) {
+        try {
+            const { teamId } = req.params; 
+            const data = req?.body; 
+            console.log('data => ', data, "  teamId => ", teamId)
+            const response = await teamService.updateTeamByAdmin({TeamId:teamId, data});
             return res.status(SucessCode.OK).json({
                 message: "Successfully updateGame",
                 success: true,
@@ -113,6 +137,28 @@ class TeamController {
 
         } catch (error) {
             console.log("something went wrong in controller  level  (deleteGame) ")
+            return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
+                message: error.message,
+                sucess: false,
+                data: {},
+                err: error.explanation,
+            });
+        }
+    }
+
+    async getBydata(req,res) {
+        try {
+            const {data} = req?.body;
+            const response = await teamService.getBydata(data);
+            return res.status(SucessCode.OK).json({
+                message: "Successfully getBydata",
+                success: true,
+                data: response,
+                err: {},
+            });
+
+        } catch (error) {
+            console.log("something went wrong in controller  level  (getBydata) ")
             return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
                 message: error.message,
                 sucess: false,

@@ -48,9 +48,8 @@ const subscribeMessage = async (channel, service, binding_key) => {
     channel.consume(applicationQueue.queue, (msg) => {
      
       const payload = JSON.parse(msg.content.toString());
-      console.log("payload => ", payload)
+      // console.log("payload => ", payload)
       service(payload);
-
       channel.ack(msg);
     });
   } catch (error) {

@@ -16,6 +16,16 @@ class TeamRepo extends CurdRepo {
              throw error;
         }
     }
+
+    async getBydata(data) {
+        try {
+            const res = await this.model.find(data);
+            return res;
+        } catch (error) {
+            console.log("Something went wrong in Repo level (getBydata) ");
+            throw error;
+        }
+    }
  
 
 

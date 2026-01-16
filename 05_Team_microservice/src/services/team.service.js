@@ -183,9 +183,7 @@ class TeamService extends curdService{
         }
     }
 
-
-
-     async updateTeam({TeamId, data}){
+    async updateTeam({TeamId, data}){
         try {
             const team = await teamRepo.get(TeamId);
             if(!team) throw new Error("Team is not Found");
@@ -200,6 +198,30 @@ class TeamService extends curdService{
                 throw error;
         }
     }
+
+    async updateTeamByAdmin({TeamId, data}){
+        try {
+            const team = await teamRepo.get(TeamId);
+            if(!team) throw new Error("Team is not Found");            
+            const res = await teamRepo.update(TeamId, data)
+            return res ;
+        
+        } catch (error) {
+                console.log("something went wrong in service  level  (createTeam) ")
+                throw error;
+        }
+    }
+
+    async getBydata(data){
+        try {
+            const res = await teamRepo.getBydata( data)
+            return res ;
+        } catch (error) {
+                console.log("something went wrong in service  level  (getBydata) ")
+                throw error;
+        }
+    }
+
 }
 
 const teamService = new TeamService()

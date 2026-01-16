@@ -5,12 +5,12 @@ const subscribeEvent = async (payload) => {
     let service = payload.service;
     let data = payload.data;
 
-    console.log(`service => ${service} '\n' data => ${data}`);
+    // console.log(`service => ${service} '\n' data => ${data}`);
 
     switch (service) {
       case "UPDATE_FANTASY_POINTS":
-        console.log("data => ", data);
-        await leaderboardService.updateLeaderboard({matchId: data.matchId,contestId: data.contestId, gameId: data.gameId,playerId: data.playerId,fantasyPoint: data.fantasyPoint  });
+        // console.log("data => ", data);
+        await leaderboardService.updateLeaderboard({matchId: data.matchId,contestId: data.contestId, gameId: data.gameId,playerId: data.playerId,fantasyPoint: data.fantasyPoint,   });
       break;
 
       default:
