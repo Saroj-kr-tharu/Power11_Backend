@@ -11,13 +11,8 @@ router.get("/leaderboard/check", (req, res) => {
 });
 
 
-router.post( "/leaderboard",internalTokenMw.checkInternalServiceToken, userMw.validateToken,   leaderboardCtrl.addLeaderboard );
-router.get( "/leaderboard",   leaderboardCtrl.getAllLeaderboard );
-router.delete( "/leaderboard/:leaderboardId",internalTokenMw.checkInternalServiceToken,userMw.validateToken,  leaderboardCtrl.deleteLeaderboard );
-router.patch( "/leaderboard/:leaderboardId",internalTokenMw.checkInternalServiceToken, userMw.validateToken, leaderboardCtrl.updateLeaderboard);
+router.get( "/leaderboard/:contestId",internalTokenMw.checkInternalServiceToken,   leaderboardCtrl.getAllLeaderboard );
 
  
-
- 
- 
+  
 module.exports = router;

@@ -15,11 +15,7 @@ const leaderboardProxy = createProxyMiddleware({
 
 
 // contest routes
-router.post( "/", userMw.verifyAdmin,   leaderboardProxy );
-router.get( "/",  userMw.verifyToken,   leaderboardProxy );
-router.delete( "/:leaderboardId",userMw.verifyAdmin,  leaderboardProxy );
-router.patch( "/:leaderboardId", userMw.verifyAdmin, leaderboardProxy );
-
+router.get( "/:contestId",  userMw.verifyToken,   leaderboardProxy );
 
 
 

@@ -39,56 +39,107 @@ class LeaderboardService extends curdService{
               
 
         // 4. Calculate team-level points || 5  Update team score
-            const updatePromises = teams.map(async (teamDoc) => {
-                 let points = +fantasyPoint || 0;
-                 // Find the player entry in this specific team's lineup
-                 const playerInLineup = teamDoc.players.find(
-                     (p) => p.playerSnapshot.playerId == playerId
-                 );
-
-                 if (playerInLineup) {
-                     // Apply Multipliers
-                    if (playerInLineup.isCaptain) 
-                        points *= 2;
-                    else if (playerInLineup.isViceCaptain) 
-                         points *= 1.5;
-                 }
+                const updatePromises = teams.map(async (teamDoc) => {
+                    let points = +fantasyPoint || 0;
+                    // Find the player entry in this specific team's lineup
+                    const playerInLineup = teamDoc.players.find(
+                        (p) => p.playerSnapshot.playerId == playerId
+                    );
+                    if (playerInLineup) {
+                        // Apply Multipliers
+                        if (playerInLineup.isCaptain) 
+                            points *= 2;
+                        else if (playerInLineup.isViceCaptain) 
+                            points *= 1.5;
+                }
                 //  console.log('teams => ', teamDoc)
                  // Calculate New Total
                  const newTeamScore = (+teamDoc.teamScore || 0) + points;
                  // Update the Team Service
-                 return InternalServiceClient.internalClient.patch(
+                  await InternalServiceClient.internalClient.patch(
                      `${InternalServiceClient.SERVICES.TEAM}/team/admin/${teamDoc._id}`,
-                     { teamScore: newTeamScore }
+                     { teamScore: newTeamScore } 
                  );
+                 // Update leaderboard points
+                return await leaderboardRepo.findOrCreate(
+                        { contestId, teamId: teamDoc._id },
+                        { $set: { totalPoints: newTeamScore } },
+                        { upsert: true, new: true }
+                    );
+                
              });
 
             // Execute all updates in parallel for better performance 
-            await Promise.all(updatePromises);
+                await Promise.all(updatePromises);
+
+            // 4. Rank the leaderboard
+                const leaderboardContest =  await leaderboardRepo.findDataByContest(contestId)
+                let currentRank = 1;
+                let lastPoints = null;
+                const bulkOps = [];
+
+                leaderboardContest.forEach((team, index) => {
+                    if (lastPoints !== null && team.totalPoints < lastPoints) currentRank = index + 1;
+    
+                    bulkOps.push({
+                        updateOne: {
+                            filter: { _id: team._id },
+                            update: { $set: { rank: currentRank } }
+                        }
+                    });
+
+                    lastPoints = team.totalPoints;
+                });
+
+                if (bulkOps.length) await leaderboardRepo.bulkWrite(bulkOps);
+                
+                
+            const rankLeardboard = await leaderboardRepo.findDataByRank(contestId);
+            console.log("rank Leaderboard => ", rankLeardboard)
+
+            const cacheKey = `leaderboard:${contestId}`;
+            await redisClient.set(
+                cacheKey,
+                JSON.stringify(rankLeardboard), 
+                'EX',
+                30
+            )
         
-        
-        // 6. Update leaderboard ranking
-        //    - Recalculate rank for this contest
-        //    - Use incremental ranking (e.g., Redis sorted set)
-        //    - Example: ZINCRBY contest:123:leaderboard FinalPoints userContestId
-        // 
-        // 7. Handle tie logic (if needed)
-        //    - If scores tie, use predefined tie-breakers:
-        //        - Earlier join time
-        //        - Fewer teams
-        //        - Same rank & split prize (handled during prize distribution)
-        // 
-        // 8. Cache / broadcast updates (optional)
-        //    - Push live leaderboard updates to WebSocket, Redis cache, or notification service
-        // 
-        // 9. Mark event as processed (idempotency)
-        //    - Store eventId or hash to prevent double counting if message is re-delivered
-        // 
+    
         } catch (error) {
             console.log("something went wrong in service level (updateLeaderboard)");
             throw error;
         }
     }
+
+    async getbyContestId(contestId) {
+    try {
+        
+        const cacheKey = `leaderboard:${contestId}`;
+        let response = null; 
+        
+        const cache = await redisClient.get(cacheKey); 
+        if (cache) {
+          
+            response = JSON.parse(cache);
+        }
+        else {
+            response = await leaderboardRepo.findDataByRank(contestId);
+            await redisClient.set(
+                cacheKey,
+                JSON.stringify(response), 
+                'EX',
+                30
+            )
+        }
+        
+        
+        return response; 
+    } catch (error) {
+        console.log("something went wrong in service level (getbyContestId)");
+        throw error;
+    }
+}
 
 }
 
