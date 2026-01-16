@@ -146,7 +146,7 @@ class MatchEventService extends curdService{
                 );
                 
             // STEP 12: Emit score update event (async) to   Update leaderboard / contest rankings
-                const payload = { matchId, gameId, playerId, fantasyPoint: fantasyPoints };
+                const payload = { matchId, gameId, playerId,contestId, fantasyPoint: fantasyPoints };
                 await sendMessageToQueueService(payload, 'UPDATE_FANTASY_POINTS');
             return res; 
             
