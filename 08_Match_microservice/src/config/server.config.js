@@ -18,6 +18,7 @@ module.exports = {
     
     MATCH_BACKEND_URL: process.env.MATCH_BACKEND_URL,
     PLAYER_GAME_BACKEND_URL: process.env.PLAYER_GAME_BACKEND_URL,
+    CONTEST_BACKEND_URL: process.env.CONTEST_BACKEND_URL,
 
 
 }

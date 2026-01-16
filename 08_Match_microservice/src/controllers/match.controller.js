@@ -66,7 +66,7 @@ class MatchController {
             const data = req?.body; 
             let response = null; 
             if(data.status == "COMPLETED") {
-                
+               response = await matchService.matchCompleted(matchId);
             } else{
                 response = await matchService.updateService(matchId,data);
             }
