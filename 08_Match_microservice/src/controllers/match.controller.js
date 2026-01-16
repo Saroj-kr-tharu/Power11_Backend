@@ -64,7 +64,12 @@ class MatchController {
         try {
             const { matchId } = req.params; 
             const data = req?.body; 
-            const response = await matchService.updateService(matchId,data);
+            let response = null; 
+            if(data.status == "COMPLETED") {
+                
+            } else{
+                response = await matchService.updateService(matchId,data);
+            }
             return res.status(SucessCode.OK).json({
                 message: "Successfully updateGame",
                 success: true,

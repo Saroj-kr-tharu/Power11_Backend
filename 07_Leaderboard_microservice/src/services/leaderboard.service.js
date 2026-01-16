@@ -101,8 +101,7 @@ class LeaderboardService extends curdService{
             await redisClient.set(
                 cacheKey,
                 JSON.stringify(rankLeardboard), 
-                'EX',
-                30
+                {'EX':300}
             )
         
     
@@ -120,7 +119,6 @@ class LeaderboardService extends curdService{
         
         const cache = await redisClient.get(cacheKey); 
         if (cache) {
-          
             response = JSON.parse(cache);
         }
         else {
@@ -128,8 +126,7 @@ class LeaderboardService extends curdService{
             await redisClient.set(
                 cacheKey,
                 JSON.stringify(response), 
-                'EX',
-                30
+                {'EX':300}
             )
         }
         

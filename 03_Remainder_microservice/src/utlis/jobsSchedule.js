@@ -2,6 +2,7 @@ const cron = require("node-cron");
 
 const { Sender, } = require("../config/email.config");
 const { EMAIL_SENDER,  } = require('../config/server.config');
+const redisClient = require('../config/redis.config');
 
 const notificationService = require("../Services/notification.service")
 const notificationTemplateService = require("../Services/notification.template.service")
@@ -25,10 +26,24 @@ const setUptask = () => {
         let emailInfo = email?.dataValues; 
      
         let mailRender = null; 
-       
-          let res  = await notificationTemplateService.getBydata({eventType: emailInfo.eventType});
-          res  = res?.dataValues; 
-          console.log('res =>', res )
+          const cacheKey = `notification_template:${emailInfo.eventType}`;
+          let res = null ;
+          const cache = await redisClient.get(cacheKey); 
+          
+          if (cache) {
+            // console.log('from cache => ', cache)  
+            res = JSON.parse(cache);
+          }
+          else {
+              res  = await notificationTemplateService.getBydata({eventType: emailInfo.eventType});
+              res  = res?.dataValues; 
+              await redisClient.set(
+                  cacheKey,
+                  JSON.stringify(res), 
+                  {'EX':86400}
+              )
+          }
+          
            mailRender = emailTemplate({
             ...emailInfo.payload,
               username: emailInfo.email,

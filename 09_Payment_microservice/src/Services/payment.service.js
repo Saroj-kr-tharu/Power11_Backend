@@ -11,6 +11,8 @@ const walletService  =require('./wallet.service')
 
 const {PaymentTranstionRepo} = require('../Repository/index');
 
+ 
+
 class PaymentService extends Service {
   constructor() {
     super(PaymentTranstionRepo);
