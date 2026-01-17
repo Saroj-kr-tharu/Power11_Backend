@@ -33,12 +33,15 @@ class ContestController {
     async getAllContest(req,res) {
         try {
             const { contestId, matchId } = req.query; 
-            
+           
+
             let response;
             if (contestId) {
                 response = await contestService.getByidService(contestId);
             } else if (matchId) {
-                response = await contestService.getByMatch(matchId);
+                const {  status } = req.query;
+                
+                response = await contestService.getByMatch(matchId, status);
             } else {
                 throw new Error("Either contestId or matchId query parameter is required");
             }

@@ -146,6 +146,22 @@ class UserContestService extends curdService{
             // session.endSession();
         }
     }
+
+
+    async updateService(userId,contestId, data){
+       
+        try {
+            // console.log("userId => ", userId, " data => ", data)
+           const res = await  usercontestRepo.updateByUserId(userId,contestId, data);
+           return res; 
+
+        } catch (error) {
+            console.log("something went wrong in service level (updateService)")
+            throw error;
+        } 
+    }
+
+
 }
 
 const userContestService = new UserContestService()

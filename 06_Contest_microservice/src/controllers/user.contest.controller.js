@@ -32,6 +32,35 @@ class UserContestController {
     }
 
 
+    async updateUserContest(req,res) {
+        try {
+
+            const { userId, contestId } = req.params;  
+            const data = req?.body; 
+            // console.log("userId => ", userId , " data => ", data)
+            const response = await usercontestService.updateService(userId,contestId, data);
+            // console.log("res => ", response)
+        
+            return res.status(SucessCode.OK).json({
+                message: "Successfully joinUserContest",
+                success: true,
+                data: response,
+                err: {},
+            });
+
+        } catch (error) {
+            console.log("something went wrong in controller  level  (joinUserContest) ")
+            
+            return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
+                message: error.message,
+                sucess: false,
+                data: {},
+                err: error.explanation,
+            });
+        }
+    }
+
+
 
 }
 

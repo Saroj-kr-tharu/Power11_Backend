@@ -7,9 +7,10 @@ class ContestRepo extends CurdRepo {
         super(contestModel)
     }; 
 
-    async getByMatch(matchId){
+    async getByMatch(matchId, filter={}){
             try {
-               const res = await contestModel.find({matchId});
+                //  console.log(`matchId => ${matchId} filter => ${filter}`)
+               const res = await contestModel.find({matchId, ...filter});
                return res; 
     
             } catch (error) {

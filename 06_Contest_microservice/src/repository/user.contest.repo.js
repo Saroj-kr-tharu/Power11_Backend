@@ -18,6 +18,23 @@ class UserContestRepo extends CurdRepo {
            
         }
     }
+
+    async updateByUserId(userId,contestId, data) {
+        try {
+            // console.log("userId => ", userId ,"contestId => ", contestId,  " data => ", data)
+            const res = await userContestModel.updateOne(
+                { userId, contestId },          
+                { $set: data },      
+                { runValidators: true }
+            );
+
+            return res;
+        } catch (error) {
+            console.log("Something went wrong in service level (updateByUserId)");
+            throw error;
+        }
+    }
+
  
 
 

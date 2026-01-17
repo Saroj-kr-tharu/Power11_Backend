@@ -8,9 +8,9 @@ class ContestService extends curdService{
         super(contestRepo) 
     }
 
-    async getByMatch(matchId){
-        try {
-                const res = await contestRepo.getByMatch(matchId);
+    async getByMatch(matchId, filter){
+        try { 
+                const res = await contestRepo.getByMatch(matchId, {status: filter});
                 if(!res) throw new Error("contest not Available")
                 return res;
         } catch (error) {

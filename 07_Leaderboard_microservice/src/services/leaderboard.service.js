@@ -52,7 +52,7 @@ class LeaderboardService extends curdService{
                         else if (playerInLineup.isViceCaptain) 
                             points *= 1.5;
                 }
-                //  console.log('teams => ', teamDoc)
+                 
                  // Calculate New Total
                  const newTeamScore = (+teamDoc.teamScore || 0) + points;
                  // Update the Team Service
@@ -60,10 +60,12 @@ class LeaderboardService extends curdService{
                      `${InternalServiceClient.SERVICES.TEAM}/team/admin/${teamDoc._id}`,
                      { teamScore: newTeamScore } 
                  );
+
                  // Update leaderboard points
+                //  console.log('teams => ', teamDoc.userId)
                 return await leaderboardRepo.findOrCreate(
-                        { contestId, teamId: teamDoc._id },
-                        { $set: { totalPoints: newTeamScore } },
+                        { contestId,    teamId: teamDoc._id },
+                        { $set: { totalPoints: newTeamScore, userId:teamDoc?.userId } },
                         { upsert: true, new: true }
                     );
                 

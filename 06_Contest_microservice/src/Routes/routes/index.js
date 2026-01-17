@@ -18,6 +18,7 @@ router.patch( "/contest/:contestId",internalTokenMw.checkInternalServiceToken, u
 
 
 // join userContest
-router.post( "/contest/usercontest",internalTokenMw.checkInternalServiceToken, userMw.validateToken, contestMw.joinContest,    userContestCtrl.joinUserContest );
+router.post( "/contest/usercontest",internalTokenMw.checkInternalServiceToken, userMw.validateToken, contestMw.joinContest,    userContestCtrl.joinUserContest ); 
+router.patch( "/contest/usercontest/:userId/:contestId",internalTokenMw.checkInternalServiceToken, userMw.validateToken,    userContestCtrl.updateUserContest ); 
  
 module.exports = router;

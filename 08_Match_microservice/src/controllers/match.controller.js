@@ -62,11 +62,12 @@ class MatchController {
 
     async updateMatch(req,res) {
         try {
+            const token = req?.headers['x-access-token'];
             const { matchId } = req.params; 
             const data = req?.body; 
             let response = null; 
             if(data.status == "COMPLETED") {
-               response = await matchService.matchCompleted(matchId);
+               response = await matchService.matchCompleted(matchId, token);
             } else{
                 response = await matchService.updateService(matchId,data);
             }
@@ -112,7 +113,7 @@ class MatchController {
     }
 
 
-}
+} 
 
 
 const matchController = new MatchController();

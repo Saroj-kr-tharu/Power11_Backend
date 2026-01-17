@@ -32,58 +32,124 @@ class MatchService extends curdService{
                 }
         }
 
-        async matchCompleted(matchId) {
+        calculateWiningPrice(rank, contest) {
+                const name = contest.name.toLowerCase();
+                const pool = contest.prizePool;
+
+                // 1. "Winners Take All" or "Head to Head" logic
+                if (name.includes("winners take all") || name.includes("head to head")) {
+                        return rank === 1 ? pool : 0;
+                }
+
+                // 2. "Mega Contest" or "Free Entry" logic
+                if (name.includes("mega") || name.includes("free") || name.includes("small")) {
+                        
+                        const totalWinners = Math.ceil(contest.joinedParticipants * 0.2); 
+                        
+                        if (rank > totalWinners) return 0;
+
+                        if (rank === 1) return pool * 0.20; 
+                        if (rank === 2) return pool * 0.10; 
+                        if (rank === 3) return pool * 0.05; 
+                        
+                        
+                        const remainingPool = pool * 0.65;
+                        const otherWinnersCount = totalWinners - 3;
+                        return otherWinnersCount > 0 ? (remainingPool / otherWinnersCount) : 0;
+                }
+
+                return 0;
+                }
+
+        async matchCompleted(matchId, token) {
                 try {
-                        // ================= STEP 1: Validate match =================
-                        // - Check match exists
+                        // STEP 1: Validate match 
                         const match = await matchRepo.get(matchId);
-                        console.log('match => ', match) 
+                        // console.log('match => ', match) 
                         if(!match) throw new Error(" MATCH_IS_NOT_FOUND ");
                         if(match.status != "LIVE")  throw new Error("MATCH_IS_NOT_LIVE");
 
-                        // ================= STEP 3: Update match status =================
-                        // - Mark match as COMPLETED
-                        await matchRepo.update(matchId, {status :  "COMPLETED" } ); 
+                        // STEP 2: Update match status
+                        // await matchRepo.update(matchId, {status :  "COMPLETED" } ); 
 
-                        // ================= STEP 4: Fetch all LIVE contests =================
-                        // - Get contests linked to this match
-                        // - Only contests with status LIVE are eligible
-
-                        const game = await InternalServiceClient.internalClient.get(
-                                    `${InternalServiceClient.SERVICES.GAME}/game/${gameId}`,
+                        // STEP 4: Fetch all LIVE contests
+                        const contest = await InternalServiceClient.internalClient.get(
+                                    `${InternalServiceClient.SERVICES.CONTEST}/contest/?matchId=${matchId}&status=LIVE`,
                                      { headers: { 'x-access-token': token } } 
                                 )
-                            if(!game)  throw new Error("GAME_IS_NOT_FOUND")
-                            if (!game.data || !game.data.status) throw new Error("GAME_IS_INACTIVE");
+                            if(!contest)  throw new Error("CONTEST_IS_NOT_FOUND")
+                            console.log("contest => ", contest.data);
+                        const contests = contest.data;
 
-                        // ================= STEP 5: Finalize leaderboard =================
-                        // - Read final scores from Redis (or live store)
-                        // - Sort teams by totalPoints
-                        // - Assign ranks
-                        // - Persist leaderboard to DB
+                        if (!contests || contests.length === 0) {
+                                console.log("No live contests found for this match.");
+                                return  "No contests to process." ;
+                                }
 
-                        // ================= STEP 6: Update userContest =================
-                        // - Update rank per user
-                        // - Store final points
-                        // - Mark userContest status as COMPLETED
+                        
+                        for (const contest of contests) {
+                                console.log(`Processing Contest: ${contest._id}`);
 
-                        // ================= STEP 7: Handle tie-breakers =================
-                        // - Detect equal scores
-                        // - Apply tie rules (same rank / split prize / join time)
+                                // STEP 5: Fetch leaderboard for the specific contest
+                                const leaderboardResponse = await InternalServiceClient.internalClient.get(
+                                        `${InternalServiceClient.SERVICES.LEADERBOARD}/leaderboard/${contest._id}`,
+                                        { headers: { 'x-access-token': token } }
+                                );
+                                const leaderboard = leaderboardResponse.data; // Array of user rankings
 
-                        // ================= STEP 8: Prize calculation =================
-                        // - Calculate winnings based on contest prize structure
-                        // - Determine winning users and amounts
+                                // STEP 7 & 8: Calculate Prizes and Update User Contest Records
+                                for (const entry of leaderboard) {
+                                        // console.log("entry => ", entry)
+                                        const userId = entry.userId;
+                                        const rank = entry.rank;
+                                        const points = entry.totalPoints;
 
-                        // ================= STEP 9: Wallet credit =================
-                        // - Create paymentTransaction (SUCCESS)
-                        // - Create walletTransaction (CREDIT)
-                        // - Update wallet balance
-                        // - Ensure idempotency (no double credit)
+                                        console.log(`User: ${userId}, Rank: ${rank}, Points: ${points}`);
+                                
+                                        
+                                       const winningAmount = this.calculateWiningPrice(rank, contest);
 
-                        // ================= STEP 10: Update contest status =================
-                        // - Mark contest as COMPLETED
-                        // - Store payout summary
+                                        // Update userContest record
+                                        await InternalServiceClient.internalClient.patch(
+                                        `${InternalServiceClient.SERVICES.CONTEST}/contest/usercontest/${userId}/${contest._id}`,
+                                                {       rank: rank,
+                                                        finalPoint: points,
+                                                        winningPoint: winningAmount,
+                                                        status: "COMPLETED" 
+                                                },
+                                                { headers: { 'x-access-token': token } }
+                                        );
+
+                                        // STEP 9: Wallet credit (Only if they won money)
+                                        if (winningAmount > 0) {
+                                                await InternalServiceClient.internalClient.post(
+                                                        `${InternalServiceClient.SERVICES.PAYMENT}/winner`,
+                                                        {
+                                                        userId: userId,
+                                                        amount: winningAmount,
+                                                        type: "WINNING",
+                                                        // Idempotency key to prevent double crediting if the script re-runs
+                                                        referenceId: `WIN_${contest._id}_${userId}`, 
+                                                        description: `Winnings for contest ${contest._id}`
+                                                        },
+                                                        { headers: { 'x-access-token': token } }
+                                                );
+                                        }
+                                }
+
+                                // STEP 10: Update contest status to COMPLETED
+                                // await InternalServiceClient.internalClient.put(
+                                //         `${InternalServiceClient.SERVICES.CONTEST}/contest/${contest._id}`,
+                                //         { 
+                                //         status: "COMPLETED",
+                                //         payoutCompleted: true,
+                                //         completedAt: new Date()
+                                //         },
+                                //         { headers: { 'x-access-token': token } }
+                                // );
+                                
+                                console.log(`Contest ${contest._id} finalized and paid out.`);
+                        }
 
                         // ================= STEP 11: Send notifications =================
                         //   - Notify users about:
@@ -95,18 +161,10 @@ class MatchService extends curdService{
                         // - Remove Redis leaderboard keys
                         // - Remove match live state data
 
-                        // ================= STEP 13: Emit match completed event =================
-                        // - Publish MATCH_COMPLETED event
-                        // - Used by analytics, audit, notifications
-
-                        // ================= STEP 14: Return success response =================
-                        // - Match finalized successfully
+    
+                       
 
                 } catch (error) {
-                        // ================= ERROR HANDLING =================
-                        // - Log error
-                        // - Ensure partial failures are recoverable
-                        // - Do not double-process payouts
                         throw error;
                 }
         }

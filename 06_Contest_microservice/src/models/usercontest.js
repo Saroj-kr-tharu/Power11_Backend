@@ -46,9 +46,9 @@ const UserContestSchema = new mongoose.Schema(
       default: Date.now
     },
 
-    status: {
+    status: { 
       type: String,
-      enum: ["JOINED", "CANCELLED", "REFUNDED"],
+      enum: ["JOINED", "CANCELLED", "REFUNDED", "COMPLETED"],
       default: "JOINED",
       index: true
     },
@@ -56,8 +56,12 @@ const UserContestSchema = new mongoose.Schema(
     rank: {
       type: Number
     },
-
-    winnings: {
+    
+    winningPoint: {
+      type: Number,
+      default: 0
+    },
+    finalPoint: {
       type: Number,
       default: 0
     }
