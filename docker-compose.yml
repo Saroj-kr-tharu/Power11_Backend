@@ -5,7 +5,7 @@ networks:
       driver: bridge
 
 volumes:
-  postgresl_db_vol:
+  postgres_db_vol:
   redis_db_vol:
   rabbitmq_vol:
   mongodb_vol:
@@ -34,10 +34,10 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgresl_db_vol:/var/lib/postgresql/data
+      - postgres_db_vol:/var/lib/postgresql/data
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app_user -d app_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d POSTGRES_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -51,9 +51,8 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_vol:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=12345
+    env_file:
+      - ./envirnoment/.env.mongodb
         
     command: >
       mongod --logpath /var/log/mongodb/mongod.log --quiet --logappend
@@ -67,13 +66,18 @@ services:
       retries: 5
       start_period: 30s
 
-  redis:
+  redis_service:
     image: redis:alpine
-    container_name: redis
+    container_name: redis_service
     ports:
       - "6379:6379"
     networks:
       - Power11_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redisinsight:
     image: redis/redisinsight:latest
@@ -83,17 +87,17 @@ services:
     environment:
       - RI_ACCEPT_EULA=yes
     depends_on:
-      - redis
+      - redis_service
     volumes:
       - redis_db_vol:/data
 
-  rabbitmq:
+  rabbitmq_server:
     image: rabbitmq:3-management
     networks:
       - Power11_net
     volumes:
       - rabbitmq_vol:/var/lib/rabbitmq
-    container_name: rabbitmq
+    container_name: rabbitmq_server
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -146,11 +150,14 @@ services:
     depends_on:
       postgres_service:
         condition: service_healthy
-      rabbitmq: 
+      rabbitmq_server: 
         condition: service_healthy
     command: >
       sh -c "
         npm install &&
+        cd src &&
+        npx sequelize-cli db:create --env development || true &&
+        npx sequelize-cli db:migrate --env development &&
         npm start
       "
   
@@ -172,11 +179,16 @@ services:
     depends_on:
       postgres_service:
         condition: service_healthy
-      rabbitmq:
+      rabbitmq_server:
+        condition: service_healthy
+      redis_service: 
         condition: service_healthy
     command: >
       sh -c "
         npm install &&
+        cd src &&
+        npx sequelize-cli db:create  --env development || true &&
+        npx sequelize-cli db:migrate --env development &&
         npm start
       "
   
@@ -198,7 +210,9 @@ services:
     depends_on:
       mongodb_service: 
         condition: service_healthy
-      rabbitmq: 
+      rabbitmq_server: 
+        condition: service_healthy
+      redis_service: 
         condition: service_healthy
     command: >
       sh -c "
@@ -271,7 +285,9 @@ services:
     depends_on:
       mongodb_service: 
         condition: service_healthy
-      rabbitmq: 
+      rabbitmq_server: 
+        condition: service_healthy
+      redis_service: 
         condition: service_healthy
     command: > 
       sh -c " npm install && npm start"
@@ -294,7 +310,7 @@ services:
     depends_on:
       mongodb_service: 
         condition: service_healthy
-      rabbitmq: 
+      rabbitmq_server: 
         condition: service_healthy
     command: > 
       sh -c " npm install && npm start "
@@ -317,10 +333,16 @@ services:
     depends_on:
       postgres_service: 
         condition: service_healthy
-      rabbitmq: 
+      rabbitmq_server: 
+        condition: service_healthy
+      redis_service: 
         condition: service_healthy
     command: > 
-      sh -c " npm install && npm start "
+      sh -c " npm install &&
+        cd src &&
+        npx sequelize-cli db:create --env development || true &&
+        npx sequelize-cli db:migrate --env development &&
+        npm start "
 
   scoring_service: 
     build: 
@@ -340,10 +362,13 @@ services:
     depends_on:
       mongodb_service: 
         condition: service_healthy
-      rabbitmq: 
+      rabbitmq_server: 
+        condition: service_healthy
+      redis_service: 
         condition: service_healthy
     command: > 
-      sh -c " npm install && npm start "
+      sh -c " npm install &&
+        npm start "
 
     
   

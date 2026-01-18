@@ -3,7 +3,7 @@
     "username": "postgres",
     "password": "12345",
     "database": "authMicroserviceDB",
-    "host": "127.0.0.1",
+    "host": "postgres_service",
     "port": 5432,
     "dialect": "postgres",
     "logging": false

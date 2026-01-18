@@ -1,35 +1,4 @@
-🔹 Add Money Flow
-1. Gateway callback (SUCCESS)
-2. Start DB transaction
-3. Find wallet by userId
-   ├─ If NOT exists → CREATE wallet
-4. Create walletTransaction (CREDIT)
-5. Update wallet.balance
-6. Mark paymentTransaction SUCCESS
-7. Commit transaction
+http://localhost:5540/ (Redis insight)
 
+http://localhost:15672/ (rabbitmq management plugin)  (Username: guest Password: guest)
 
-🔹 Join Contest Flow
-Check wallet.balance
-Lock entryFee
-Create walletTransaction (DEBIT)
-Update wallet
-wallet.balance -= entryFee
-wallet.lockedBalance += entryFee
-
-🔹 Contest Result Flow
-Case	Wallet Action
-Win	CREDIT balance
-Lose	lockedBalance released
-Refund	CREDIT balance
-
-🔹 Withdraw Flow
-Create withdrawalRequest
-Debit wallet
-Admin approves
-Money sent externally
-
-
-paymentTransactions (1) ────< walletTransactions (*)
-wallets (1) ───────────────< walletTransactions (*)
-wallets (1) ───────────────< withdrawalRequests (*)
