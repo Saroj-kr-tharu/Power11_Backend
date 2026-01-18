@@ -18,6 +18,7 @@ router.post( "/auth/refresh-token",internalTokenMw.checkInternalServiceToken, us
 router.post( "/auth/login/otp",internalTokenMw.checkInternalServiceToken, authCtrl.loginByOTP );
 router.post( "/auth/login/otp-verify",internalTokenMw.checkInternalServiceToken, userMw.verifyOTP, authCtrl.VerifyOTP );
 router.post( "/auth/logout", internalTokenMw.checkInternalServiceToken, authCtrl.logout );
+router.get( "/auth/email/:userId", internalTokenMw.checkInternalServiceToken, authCtrl.getByEmail );
 
  
  

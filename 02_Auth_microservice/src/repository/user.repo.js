@@ -7,6 +7,20 @@ class UserREpo extends CURD_REPO {
     super(User);
   }
 
+
+  async getBydata(data) {
+    try {
+     
+      const res = await this.model.findOne({ where: data });
+      
+      return res;
+    } catch (error) {
+      console.log("Something went wrong in Repo level (getBydata) ");
+      throw error;
+    }
+  }
+
+
   async getByEmail(email) {
     try {
       const res = await User.findOne({

@@ -11,7 +11,7 @@ class UserContestService extends curdService{
         super(usercontestRepo) 
     }
 
-    async joinContest({userId, contestId, matchId, gameId, teamId, joinFee, token=null}){
+    async joinContest({userId, contestId, matchId, gameId, teamId, joinFee, token=null, email}){
         // const session = await mongoose.startSession();
         // session.startTransaction();
 
@@ -19,8 +19,7 @@ class UserContestService extends curdService{
         
         try {
             // ========== STEP 1: Validate contest ==========
-                const contestInfo = await contestRepo.get(contestId, 
-                    // { session }
+                const contestInfo = await contestRepo.get(contestId, // { session } 
                 );
                 if(!contestInfo) throw new Error(" Contest is not Found ");
                 console.log('contest ', contestInfo)
@@ -78,7 +77,7 @@ class UserContestService extends curdService{
 
             // ========== STEP 8: Create contest entry ==========
                 const createData = await usercontestRepo.create(
-                    {userId, contestId, matchId, gameId, teamId, joinFee},
+                    {userId, contestId, matchId, gameId, teamId, joinFee, email},
                     // { session }
                 );
 

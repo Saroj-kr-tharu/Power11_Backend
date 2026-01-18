@@ -29,6 +29,9 @@ const UserContestSchema = new mongoose.Schema(
       required: true,
       index: true
     },
+    email: {
+      type: String, 
+    },
 
     teamId: {
       type: mongoose.Schema.Types.ObjectId,

@@ -71,8 +71,7 @@ class MatchService extends curdService{
                         if(!match) throw new Error(" MATCH_IS_NOT_FOUND ");
                         if(match.status != "LIVE")  throw new Error("MATCH_IS_NOT_LIVE");
 
-                        // STEP 2: Update match status
-                        // await matchRepo.update(matchId, {status :  "COMPLETED" } ); 
+                       
 
                         // STEP 4: Fetch all LIVE contests
                         const contest = await InternalServiceClient.internalClient.get(
@@ -136,9 +135,34 @@ class MatchService extends curdService{
                                                         { headers: { 'x-access-token': token } }
                                                  );
                                         }
+
+                                        //  STEP 10: Send notifications        
+                                        let userData =  await InternalServiceClient.internalClient.get(
+                                                `${InternalServiceClient.SERVICES.AUTH}/auth/email/${userId}`,
+                                        );
+                                       
+                                        const userInfo = userData.data; 
+
+                                        const payload = {
+                                                userId: userId,
+                                                email: userInfo.email,
+                                                eventType: 'CONTEST_WON',
+                                                channel: 'EMAIL',
+                                                referenceType: "CREDIT_MONEY", 
+                                                payload: {
+                                                        amount: winningAmount,        
+                                                        rank: rank,               
+                                                        username: userInfo.username || email,
+                                                        transaction_id: "IN_PROCESSING"
+                                                },
+                                                retryCount: 0,
+                                                scheduledAt: new Date(Date.now() + 5 * 60 * 1000), 
+                                        };
+
+                                        await sendMessageToQueueService(payload, 'CREATE_NOTIFICATION');
                                 }
 
-                                // STEP 10: Update contest status to COMPLETED
+                                // STEP 11: Update contest status to COMPLETED
                                 await InternalServiceClient.internalClient.patch(
                                         `${InternalServiceClient.SERVICES.CONTEST}/contest/${contest._id}`,
                                         { 
@@ -149,25 +173,11 @@ class MatchService extends curdService{
                                 );
                                 
                                 console.log(`Contest ${contest._id} finalized and paid out.`);
+                                
+                                // STEP 2: Update match status
+                                await matchRepo.update(matchId, {status :  "COMPLETED" } ); 
 
-                                //  STEP 11: Send notifications           
-                                const payload = {
-                                        userId: userId,
-                                        email: email,
-                                        eventType: 'CONTEST_WON',
-                                        channel: 'EMAIL',
-                                        referenceType: "CREDIT_MONEY", 
-                                        payload: {
-                                                amount: winningAmount,        
-                                                rank: userRank,               
-                                                username: userName || email,
-                                                transaction_id: "IN_PROCESSING"
-                                        },
-                                        retryCount: 0,
-                                        scheduledAt: new Date(Date.now() + 5 * 60 * 1000), 
-                                };
-
-                                await sendMessageToQueueService(payload, 'CREATE_NOTIFICATION');
+                                
                         }
 
                         

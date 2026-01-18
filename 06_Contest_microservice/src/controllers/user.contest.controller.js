@@ -6,10 +6,11 @@ class UserContestController {
     async joinUserContest(req,res) {
         try {
             const userId = req?.userId;
+            const email = req?.email;
             const token = req?.headers['x-access-token']; 
             const { contestId, matchId, gameId, teamId, joinFee} = req?.body; 
 
-            const response = await usercontestService.joinContest({userId, contestId, matchId, gameId, teamId, joinFee, token});
+            const response = await usercontestService.joinContest({userId, contestId, matchId, gameId, teamId, joinFee, token, email});
             
         
             return res.status(SucessCode.OK).json({

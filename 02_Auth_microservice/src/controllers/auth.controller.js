@@ -213,6 +213,29 @@ class AuthController {
         }
     }
 
+      async getByEmail(req,res) {
+        try {
+            const {userId} = req?.params; 
+            console.log("userId => ", userId)
+            const response = await userService.getByData(userId);
+            return res.status(SucessCode.OK).json({
+                message: "Successfully getByEmail",
+                success: true,
+                data: response,
+                err: {},
+            });
+
+        } catch (error) {
+            console.log("something went wrong in controller  level  (getByEmail) ")
+            return res.status(error.statusCode  | ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
+                message: error.message,
+                sucess: false,
+                data: {},
+                err: error.explanation,
+            });
+        }
+    }
+
 
 }
 

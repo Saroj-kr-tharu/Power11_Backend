@@ -8,6 +8,16 @@ class userService extends CurdService {
         super(USER_REPO)
     }
 
+     async getByData(userId) {
+        try {
+            
+        const res = await USER_REPO.getBydata({id:  userId});
+        return res;
+        } catch (error) {
+        console.log("Something went wrong in service layer (getByData)");
+        throw error;
+        }
+    }
     
     async loginService(data, res){
         try {
