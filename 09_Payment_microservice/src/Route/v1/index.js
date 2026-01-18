@@ -28,6 +28,8 @@ router.get("/wallet/transactions", internalMw.checkInternalServiceToken,userMw.v
 // Contest
 router.post("/internal/wallet/execute", internalMw.checkInternalServiceToken,  userMw.validateToken, paymentCtrl.joinContestWalletOperation);
 
+// match 
+router.post("/internal/wallet/match/execute", internalMw.checkInternalServiceToken,  userMw.validateToken, paymentCtrl.matchCompletedWalletOperation);
 
 // withdrawal
 router.post("/withdrawals/request", internalMw.checkInternalServiceToken, userMw.validateToken,  paymentCtrl.withdrawRequest);

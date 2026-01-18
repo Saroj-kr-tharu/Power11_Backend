@@ -70,6 +70,9 @@ const ContestSchema = new mongoose.Schema(
     isFull: {
       type: Boolean,
       default: false
+    },
+    completedAt: {
+      type: Date,
     }
   },
   { timestamps: true }

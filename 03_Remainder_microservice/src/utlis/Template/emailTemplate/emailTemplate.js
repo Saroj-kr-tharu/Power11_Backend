@@ -12,6 +12,7 @@ const EmailTemplate = (data = {}) => {
         .replace(/\{\{username\}\}/g, username)
         .replace(/\{\{amount\}\}/g, data.amount || '')
         .replace(/\{\{transaction_id\}\}/g, data.transaction_id || '')
+        .replace(/\{\{rank\}\}/g, data.rank || '')
         .replace(/\{\{reset_link\}\}/g, data.reset_link || '')
         .replace(/\{\{withdraw_amount\}\}/g, data.withdraw_amount || '')
         .replace(/\{\{reason\}\}/g, data.reason || '');

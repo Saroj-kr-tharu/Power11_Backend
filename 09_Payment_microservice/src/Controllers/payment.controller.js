@@ -193,7 +193,44 @@ class PaymentController {
     }
 
 
-    async joinContestWalletOperation(req, res) {
+    async matchCompletedWalletOperation(req, res) {
+        try {
+
+         
+            
+            const { userId, amount,  referenceId, idempotencyKey,contestJoinFee  } = req?.body; 
+
+            const amountContestJoinFee = Number(contestJoinFee);
+            const amountNumber = Number(amount);
+            if (Number.isNaN(amountNumber) || amountNumber <= 0) 
+                throw new Error("Invalid amount");
+
+             if (Number.isNaN(amountContestJoinFee) || amountContestJoinFee <= 0) 
+                throw new Error("Invalid amountContestJoinFee");
+            
+
+            const result = await walletService.winContestWalletOperation(userId, amountNumber,  referenceId, amountContestJoinFee , idempotencyKey );
+
+            return res.status(SucessCode.CREATED).json({
+                message: "Successfully All matchCompletedWalletOperation  ",
+                success: true,
+                data: result,
+                err: {},
+            });
+
+        } catch (error) {
+            console.log('Something went wrong in controller (joinContestWalletOperation)',error);
+            return res.status(ServerErrosCodes.NOT_IMPLEMENTED).json({
+                message: "Failed to matchCompletedWalletOperation",
+                success: false,
+                data: {},
+                err: error.message || error,
+            });
+        }
+    }
+
+
+     async joinContestWalletOperation(req, res) {
         try {
             
             const {  amount,  referenceId, idempotencyKey  } = req?.body; 

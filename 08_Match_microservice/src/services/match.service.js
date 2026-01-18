@@ -1,6 +1,8 @@
+const crypto = require("crypto")
 const curdService = require("./curd.service");
 const {matchRepo} = require('../repository')
 const {InternalServiceClient} = require("../utlis/index")
+const sendMessageToQueueService = require('./queue.service')
 
 class MatchService extends curdService{
 
@@ -99,7 +101,7 @@ class MatchService extends curdService{
 
                                 // STEP 7 & 8: Calculate Prizes and Update User Contest Records
                                 for (const entry of leaderboard) {
-                                        // console.log("entry => ", entry)
+                                        console.log("entry => ", entry)
                                         const userId = entry.userId;
                                         const rank = entry.rank;
                                         const points = entry.totalPoints;
@@ -123,45 +125,52 @@ class MatchService extends curdService{
                                         // STEP 9: Wallet credit (Only if they won money)
                                         if (winningAmount > 0) {
                                                 await InternalServiceClient.internalClient.post(
-                                                        `${InternalServiceClient.SERVICES.PAYMENT}/winner`,
+                                                        `${InternalServiceClient.SERVICES.PAYMENT}/internal/wallet/match/execute`,
                                                         {
-                                                        userId: userId,
-                                                        amount: winningAmount,
-                                                        type: "WINNING",
-                                                        // Idempotency key to prevent double crediting if the script re-runs
-                                                        referenceId: `WIN_${contest._id}_${userId}`, 
-                                                        description: `Winnings for contest ${contest._id}`
+                                                         userId: userId,
+                                                         amount: winningAmount,
+                                                         idempotencyKey: crypto.randomUUID(),
+                                                         referenceId: `WIN_${contest._id}_${userId}`, 
+                                                         contestJoinFee: contest.entryFee
                                                         },
                                                         { headers: { 'x-access-token': token } }
-                                                );
+                                                 );
                                         }
                                 }
 
                                 // STEP 10: Update contest status to COMPLETED
-                                // await InternalServiceClient.internalClient.put(
-                                //         `${InternalServiceClient.SERVICES.CONTEST}/contest/${contest._id}`,
-                                //         { 
-                                //         status: "COMPLETED",
-                                //         payoutCompleted: true,
-                                //         completedAt: new Date()
-                                //         },
-                                //         { headers: { 'x-access-token': token } }
-                                // );
+                                await InternalServiceClient.internalClient.patch(
+                                        `${InternalServiceClient.SERVICES.CONTEST}/contest/${contest._id}`,
+                                        { 
+                                           status: "COMPLETED",
+                                           completedAt: new Date()
+                                        },
+                                        { headers: { 'x-access-token': token } }
+                                );
                                 
                                 console.log(`Contest ${contest._id} finalized and paid out.`);
+
+                                //  STEP 11: Send notifications           
+                                const payload = {
+                                        userId: userId,
+                                        email: email,
+                                        eventType: 'CONTEST_WON',
+                                        channel: 'EMAIL',
+                                        referenceType: "CREDIT_MONEY", 
+                                        payload: {
+                                                amount: winningAmount,        
+                                                rank: userRank,               
+                                                username: userName || email,
+                                                transaction_id: "IN_PROCESSING"
+                                        },
+                                        retryCount: 0,
+                                        scheduledAt: new Date(Date.now() + 5 * 60 * 1000), 
+                                };
+
+                                await sendMessageToQueueService(payload, 'CREATE_NOTIFICATION');
                         }
 
-                        // ================= STEP 11: Send notifications =================
-                        //   - Notify users about:
-                        //   - Match completion
-                        //   - Rank achieved
-                        //   - Winnings credited
-
-                        // ================= STEP 12: Cleanup live data =================
-                        // - Remove Redis leaderboard keys
-                        // - Remove match live state data
-
-    
+                        
                        
 
                 } catch (error) {
