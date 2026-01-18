@@ -141,8 +141,8 @@ services:
       - ./envirnoment/.env.auth
     networks:
       - Power11_net
-    ports:
-      - "3004:3004"
+    # ports:
+    #   - "3004:3004"
     volumes:
       - ./02_Auth_microservice:/Power11/Backend/authservice 
       - authservice_vol:/Power11/Backend/authservice/node_modules
@@ -158,6 +158,7 @@ services:
         cd src &&
         npx sequelize-cli db:create --env development || true &&
         npx sequelize-cli db:migrate --env development &&
+        npx sequelize-cli db:seed:all --env development &&
         npm start
       "
   
@@ -170,8 +171,8 @@ services:
       - ./envirnoment/.env.remainder
     networks:
       - Power11_net
-    ports:
-      - "3002:3002"
+    # ports:
+    #   - "3002:3002"
     volumes:
       - ./03_Remainder_microservice:/Power11/Backend/remainderService 
       - remainder_service_vol:/Power11/Backend/remainderService/node_modules
@@ -189,6 +190,7 @@ services:
         cd src &&
         npx sequelize-cli db:create  --env development || true &&
         npx sequelize-cli db:migrate --env development &&
+        npx sequelize-cli db:seed:all --env development && 
         npm start
       "
   
@@ -201,8 +203,8 @@ services:
       - ./envirnoment/.env.player.game
     networks:
       - Power11_net
-    ports:
-      - "3005:3005"
+    # ports:
+    #   - "3005:3005"
     volumes:
       - ./04_Player_Game_microservice:/Power11/Backend/playerGameService
       - player_game_service_vol:/Power11/Backend/playerGameService/node_modules
@@ -229,8 +231,8 @@ services:
       - ./envirnoment/.env.team
     networks:
       - Power11_net
-    ports:
-      - "3006:3006"
+    # ports:
+    #   - "3006:3006"
     volumes:
       - ./05_Team_microservice:/Power11/Backend/TeamService
       - team_service_vol:/Power11/Backend/TeamService/node_modules
@@ -253,8 +255,8 @@ services:
       - ./envirnoment/.env.contest
     networks:
       - Power11_net
-    ports:
-      - "3007:3007"
+    # ports:
+    #   - "3007:3007"
     volumes:
       - ./06_Contest_microservice:/Power11/Backend/contestService
       - contest_service_vol:/Power11/Backend/contestService/node_modules
@@ -276,8 +278,8 @@ services:
       - ./envirnoment/.env.leaderboard
     networks:
       - Power11_net
-    ports:
-      - "3008:3008"
+    # ports:
+    #   - "3008:3008"
     volumes:
       - ./07_Leaderboard_microservice:/Power11/Backend/LeaderboardService
       - leaderboard_service_vol:/Power11/Backend/LeaderboardService/node_modules
@@ -301,8 +303,8 @@ services:
       - ./envirnoment/.env.match
     networks:
       - Power11_net
-    ports:
-      - "3003:3003"
+    # ports:
+    #   - "3003:3003"
     volumes:
       - ./08_Match_microservice:/Power11/Backend/matchService
       - match_service_vol:/Power11/Backend/matchService/node_modules
@@ -353,8 +355,8 @@ services:
       - ./envirnoment/.env.scoring
     networks:
       - Power11_net
-    ports:
-      - "4000:4000"
+    # ports:
+    #   - "4000:4000"
     volumes:
       - ./10_Scoring_microservice:/Power11/Backend/scoringService
       - scoring_service_vol:/Power11/Backend/scoringService/node_modules

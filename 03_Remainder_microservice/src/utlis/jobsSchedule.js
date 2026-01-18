@@ -21,7 +21,7 @@ const setUptask = () => {
     try {
       console.log('Getting the pending data ');
       const mail = await notificationService.PendingMail();
-
+      if (!mail || mail.length === 0) return;
       for (const email of mail) {
         let emailInfo = email?.dataValues; 
      

@@ -2,3 +2,15 @@ http://localhost:5540/ (Redis insight)
 
 http://localhost:15672/ (rabbitmq management plugin)  (Username: guest Password: guest)
 
+
+test Creditials 
+gmail =>  a@gmail.com (admin)
+pass => aaaaaa
+
+gmail =>  c1@gmail.com (custumer)
+pass => aaaaaa
+
+gmail =>  c2@gmail.com (custumer)
+pass => aaaaaa
+
+
