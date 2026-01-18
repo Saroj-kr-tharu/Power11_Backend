@@ -1,29 +1,355 @@
+
+networks:
+  Power11_net:
+      name: Power11_net
+      driver: bridge
+
+volumes:
+  postgresl_db_vol:
+  redis_db_vol:
+  rabbitmq_vol:
+  mongodb_vol:
+  apigateway_vol:
+  authservice_vol:
+  remainder_service_vol:
+  player_game_service_vol:
+  team_service_vol:
+  contest_service_vol:
+  leaderboard_service_vol:
+  match_service_vol:
+  payment_service_vol:
+  scoring_service_vol:
+
+
 services:
+
+  postgres_service:
+    image: postgres:15
+    container_name: postgres_db
+    restart: unless-stopped
+    networks:
+      - Power11_net
+    env_file:
+      - ./envirnoment/.env.postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresl_db_vol:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d app_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  mongodb_service:
+    image: mongo:latest
+    container_name: mongodb_service
+    networks:
+      - Power11_net
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_vol:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=12345
+        
+    command: >
+      mongod --logpath /var/log/mongodb/mongod.log --quiet --logappend
+      --setParameter logComponentVerbosity='{network: {verbosity: -1}}' 
+      --setParameter logLevel=0
+    
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   redis:
     image: redis:alpine
     container_name: redis
     ports:
       - "6379:6379"
+    networks:
+      - Power11_net
 
   redisinsight:
     image: redis/redisinsight:latest
     container_name: redisinsight
     ports:
-      - "5540:5540"  # RedisInsight UI port
+      - "5540:5540" 
     environment:
       - RI_ACCEPT_EULA=yes
     depends_on:
       - redis
     volumes:
-      - redisinsight-data:/data
+      - redis_db_vol:/data
 
   rabbitmq:
     image: rabbitmq:3-management
+    networks:
+      - Power11_net
+    volumes:
+      - rabbitmq_vol:/var/lib/rabbitmq
     container_name: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+  
+  apigateway_service:
+    build:
+      context:  ./01_Apigateway_microservice
+      dockerfile: Dockerfile
+    container_name: apigateway_service
+    env_file:
+      - ./envirnoment/.env.apigateway
+    networks:
+      - Power11_net
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./01_Apigateway_microservice:/Power11/Backend/apigateway
+      - apigateway_vol:/Power11/Backend/apigateway/node_modules
+    restart: unless-stopped
+    depends_on: 
+      postgres_service: 
+        condition: service_healthy
+    command: >
+      sh -c "
+        npm install &&
+        npm start
+      "
+  
+  auth_service:
+    build: 
+      context: ./02_Auth_microservice
+      dockerfile: Dockerfile
+    container_name: auth_service
+    env_file:
+      - ./envirnoment/.env.auth
+    networks:
+      - Power11_net
+    ports:
+      - "3004:3004"
+    volumes:
+      - ./02_Auth_microservice:/Power11/Backend/authservice 
+      - authservice_vol:/Power11/Backend/authservice/node_modules
+    restart: unless-stopped
+    depends_on:
+      postgres_service:
+        condition: service_healthy
+      rabbitmq: 
+        condition: service_healthy
+    command: >
+      sh -c "
+        npm install &&
+        npm start
+      "
+  
+  remainder_service:
+    build: 
+      context: ./03_Remainder_microservice
+      dockerfile: Dockerfile
+    container_name: remainder_service
+    env_file:
+      - ./envirnoment/.env.remainder
+    networks:
+      - Power11_net
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./03_Remainder_microservice:/Power11/Backend/remainderService 
+      - remainder_service_vol:/Power11/Backend/remainderService/node_modules
+    restart:  unless-stopped
+    depends_on:
+      postgres_service:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    command: >
+      sh -c "
+        npm install &&
+        npm start
+      "
+  
+  player_game_service: 
+    build: 
+      context: ./04_Player_Game_microservice
+      dockerfile: Dockerfile
+    container_name: player_game_service
+    env_file:
+      - ./envirnoment/.env.player.game
+    networks:
+      - Power11_net
+    ports:
+      - "3005:3005"
+    volumes:
+      - ./04_Player_Game_microservice:/Power11/Backend/playerGameService
+      - player_game_service_vol:/Power11/Backend/playerGameService/node_modules
+    restart: unless-stopped
+    depends_on:
+      mongodb_service: 
+        condition: service_healthy
+      rabbitmq: 
+        condition: service_healthy
+    command: >
+      sh -c "
+        npm install &&
+        npm start
+      "
+  
+  team_service: 
+    build:  
+      context: ./05_Team_microservice
+      dockerfile: Dockerfile
+    container_name: team_service
+    env_file:
+      - ./envirnoment/.env.team
+    networks:
+      - Power11_net
+    ports:
+      - "3006:3006"
+    volumes:
+      - ./05_Team_microservice:/Power11/Backend/TeamService
+      - team_service_vol:/Power11/Backend/TeamService/node_modules
+    restart: unless-stopped
+    depends_on:
+      mongodb_service: 
+        condition: service_healthy
+    command: >
+      sh -c "
+        npm install &&
+        npm start
+      "
+
+  contest_service: 
+    build:
+      context:  ./06_Contest_microservice
+      dockerfile: Dockerfile
+    container_name:  contest_service
+    env_file:
+      - ./envirnoment/.env.contest
+    networks:
+      - Power11_net
+    ports:
+      - "3007:3007"
+    volumes:
+      - ./06_Contest_microservice:/Power11/Backend/contestService
+      - contest_service_vol:/Power11/Backend/contestService/node_modules
+    restart: unless-stopped
+    depends_on:
+      mongodb_service: 
+        condition: service_healthy
+    command: > 
+      sh -c "
+      npm install && npm start      
+      "
+  
+  leaderboard_service: 
+    build:
+      context: ./07_Leaderboard_microservice
+      dockerfile: Dockerfile
+    container_name: leaderboard_service
+    env_file:
+      - ./envirnoment/.env.leaderboard
+    networks:
+      - Power11_net
+    ports:
+      - "3008:3008"
+    volumes:
+      - ./07_Leaderboard_microservice:/Power11/Backend/LeaderboardService
+      - leaderboard_service_vol:/Power11/Backend/LeaderboardService/node_modules
+    restart: unless-stopped
+    depends_on:
+      mongodb_service: 
+        condition: service_healthy
+      rabbitmq: 
+        condition: service_healthy
+    command: > 
+      sh -c " npm install && npm start"
+  
+  match_service: 
+    build: 
+      context: ./08_Match_microservice
+      dockerfile: Dockerfile
+    container_name: match_service
+    env_file:
+      - ./envirnoment/.env.match
+    networks:
+      - Power11_net
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./08_Match_microservice:/Power11/Backend/matchService
+      - match_service_vol:/Power11/Backend/matchService/node_modules
+    restart: unless-stopped
+    depends_on:
+      mongodb_service: 
+        condition: service_healthy
+      rabbitmq: 
+        condition: service_healthy
+    command: > 
+      sh -c " npm install && npm start "
+  
+  payment_service: 
+    build: 
+      context: ./09_Payment_microservice
+      dockerfile: Dockerfile
+    container_name: payment_service
+    env_file:
+      - ./envirnoment/.env.payment
+    networks:
+      - Power11_net
+    ports:
+      - "3009:3009"
+    volumes:
+      - ./09_Payment_microservice:/Power11/Backend/paymentService
+      - payment_service_vol:/Power11/Backend/paymentService/node_modules
+    restart: unless-stopped
+    depends_on:
+      postgres_service: 
+        condition: service_healthy
+      rabbitmq: 
+        condition: service_healthy
+    command: > 
+      sh -c " npm install && npm start "
+
+  scoring_service: 
+    build: 
+      context: ./10_Scoring_microservice
+      dockerfile: Dockerfile
+    container_name: scoring_service
+    env_file:
+      - ./envirnoment/.env.scoring
+    networks:
+      - Power11_net
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./10_Scoring_microservice:/Power11/Backend/scoringService
+      - scoring_service_vol:/Power11/Backend/scoringService/node_modules
+    restart: unless-stopped
+    depends_on:
+      mongodb_service: 
+        condition: service_healthy
+      rabbitmq: 
+        condition: service_healthy
+    command: > 
+      sh -c " npm install && npm start "
+
+    
+  
+    
+  
+  
    
 
-volumes:
-  redisinsight-data:
+

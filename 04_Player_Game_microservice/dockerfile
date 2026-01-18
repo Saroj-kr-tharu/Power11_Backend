@@ -2,8 +2,7 @@
 FROM node:18-alpine
 
 #Working Directory Define 
-WORKDIR /Battle11/backend/developer/backend
-
+WORKDIR /Power11/Backend/playerGameService
 
 # Copy the package to install 
 COPY package* ./

@@ -1,3 +1,5 @@
+envirnoment
+
 01_Apigateway_microservice/.env
 01_Apigateway_microservice/node_modules
 01_Apigateway_microservice/.dockerignore
