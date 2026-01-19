@@ -19,6 +19,7 @@ module.exports = {
             'WITHDRAW_APPROVED',
             'WITHDRAW_REJECTED',
             'CONTEST_WON'
+            
           ),
           allowNull: false
       },

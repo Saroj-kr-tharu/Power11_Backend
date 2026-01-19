@@ -59,7 +59,7 @@ class MatchEventService extends curdService{
                         },
                     { headers: { 'x-access-token': token } }
                 );
-                if(!player)  throw new Error("PLAYER_IS_NOT_FOUND")
+                if(!player || player.data[0].length == 0 )  throw new Error("PLAYER_IS_NOT_FOUND")
                 console.log("player = > ", player.data, ' sports => ', sport)
                 if (!player.data || player.data[0].gameId != gameId  ) throw new Error("PLAYER_DOES_NOT_BELONG_TO_GAME");
                 if (!player.data || !player.data[0].isPlaying  ) throw new Error("PLAYER_IS_NOT_PALYING");

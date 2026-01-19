@@ -1,6 +1,7 @@
 const { ServerErrosCodes, SucessCode } = require('../utlis/Errors/https_codes');
-const {paymentService,walletService, walletWithdrawService } = require('../Services');
+const {paymentService,walletService, walletWithdrawService, } = require('../Services');
 const walletWithDrawService = require('../Services/wallet.withdraw.service');
+const walletTransService = require('../Services/wallet.transaction.service')
 
 
 class PaymentController {

@@ -48,7 +48,8 @@ services:
     networks:
       - Power11_net
     ports:
-      - "27017:27017"
+      # - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongodb_vol:/data/db
     env_file:
@@ -70,7 +71,8 @@ services:
     image: redis:alpine
     container_name: redis_service
     ports:
-      - "6379:6379"
+      # - "6379:6379"
+      - "6380:6379"
     networks:
       - Power11_net
     healthcheck:
@@ -86,10 +88,13 @@ services:
       - "5540:5540" 
     environment:
       - RI_ACCEPT_EULA=yes
+      - RI_AUTO_DISCOVER_REDIS=redis_service:6379
     depends_on:
-      - redis_service
+      redis_service:
+        condition: service_healthy
     volumes:
       - redis_db_vol:/data
+    restart: unless-stopped
 
   rabbitmq_server:
     image: rabbitmq:3-management
@@ -223,7 +228,6 @@ services:
     command: >
       sh -c "
         npm install &&
-        node src/seeders/index.js &&
         npm start
       "
   
@@ -330,7 +334,6 @@ services:
     command: > 
       sh -c "
         npm install &&
-        node src/seeders/index.js &&
         npm start "
   
   payment_service: 

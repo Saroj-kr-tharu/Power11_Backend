@@ -8,6 +8,7 @@ class MatchEventCtrl {
         try {
             const token = req?.headers['x-access-token']; 
             const { matchId, gameId, contestId, playerId, eventType, eventValue,  metadata, createdBy } = req.body;
+            // console.log("game id => ", gameId)
             const response = await matchEventService.addMatchEvent({
                 matchId,
                 gameId,

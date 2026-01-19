@@ -27,7 +27,8 @@ module.exports = {
           'WALLET_CREDITED',
           'WITHDRAW_REQUESTED',
           'WITHDRAW_APPROVED',
-          'WITHDRAW_REJECTED'
+          'WITHDRAW_REJECTED',
+          'CONTEST_WON'
         ),
         allowNull: false
       },

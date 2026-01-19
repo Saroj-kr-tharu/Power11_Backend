@@ -1,8 +1,8 @@
 const { sequelize } = require('../models');
 const Service = require('./curd.service');
-const walletTransService = require("./wallet.transaction.service")
+// const walletTransService = require("./wallet.transaction.service")
 const idempotancyKeyService= require("./idempotancy.key.service")
-const {WalletRepo} = require('../Repository/index');
+const {WalletRepo, WalletTransactionRepo} = require('../Repository/index');
 const crypto = require("crypto")
 
 class WalletService extends Service {
@@ -12,7 +12,7 @@ class WalletService extends Service {
 
   async getByData(data) {
     try {
-
+      
       const res = await WalletRepo.getBydata(data);
       return res;
     } catch (error) {
@@ -81,7 +81,7 @@ class WalletService extends Service {
       // STEP 7: Create walletTransaction
         const balanceBefore = parseFloat(wallet.balance);
         const balanceAfter = newAvailableBalance;
-        await walletTransService.createService({
+        await WalletTransactionRepo.create({
           userId: userId,
           walletId: wallet.id,
           type: 'DEBIT', 
@@ -169,7 +169,7 @@ class WalletService extends Service {
       // STEP 7: Create walletTransaction
         const balanceBefore = parseFloat(wallet.balance);
         const balanceAfter = newAvailableBalance;
-        await walletTransService.createService({
+        await WalletTransactionRepo.create({
           userId: userId,
           walletId: wallet.id,
           type: 'CREDIT', 
