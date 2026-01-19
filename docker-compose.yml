@@ -116,6 +116,7 @@ services:
       start_period: 10s
   
   apigateway_service:
+    image: sarojdockerworkspace/apigateway_service:1.0
     build:
       context:  ./01_Apigateway_microservice
       dockerfile: Dockerfile
@@ -141,6 +142,7 @@ services:
       "
   
   auth_service:
+    image: sarojdockerworkspace/auth_service:1.0
     build: 
       context: ./02_Auth_microservice
       dockerfile: Dockerfile
@@ -172,6 +174,7 @@ services:
       "
   
   remainder_service:
+    image: sarojdockerworkspace/remainder_service:1.0
     build: 
       context: ./03_Remainder_microservice
       dockerfile: Dockerfile
@@ -205,6 +208,7 @@ services:
       "
   
   player_game_service: 
+    image: sarojdockerworkspace/player_game_service:1.0
     build: 
       context: ./04_Player_Game_microservice
       dockerfile: Dockerfile
@@ -234,6 +238,7 @@ services:
       "
   
   team_service: 
+    image: sarojdockerworkspace/team_service:1.0
     build:  
       context: ./05_Team_microservice
       dockerfile: Dockerfile
@@ -259,6 +264,7 @@ services:
       "
 
   contest_service: 
+    image: sarojdockerworkspace/contest_service:1.0
     build:
       context:  ./06_Contest_microservice
       dockerfile: Dockerfile
@@ -286,6 +292,7 @@ services:
       "
   
   leaderboard_service: 
+    image: sarojdockerworkspace/leaderboard_service:1.0
     build:
       context: ./07_Leaderboard_microservice
       dockerfile: Dockerfile
@@ -312,6 +319,7 @@ services:
       sh -c " npm install && npm start"
   
   match_service: 
+    image: sarojdockerworkspace/match_service:1.0
     build: 
       context: ./08_Match_microservice
       dockerfile: Dockerfile
@@ -339,6 +347,7 @@ services:
         npm start "
   
   payment_service: 
+    image: sarojdockerworkspace/payment_service:1.0
     build: 
       context: ./09_Payment_microservice
       dockerfile: Dockerfile
@@ -369,6 +378,7 @@ services:
         npm start "
 
   scoring_service: 
+    image: sarojdockerworkspace/scoring_service:1.0
     build: 
       context: ./10_Scoring_microservice
       dockerfile: Dockerfile
