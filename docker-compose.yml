@@ -89,6 +89,8 @@ services:
     environment:
       - RI_ACCEPT_EULA=yes
       - RI_AUTO_DISCOVER_REDIS=redis_service:6379
+    networks:
+      - Power11_net
     depends_on:
       redis_service:
         condition: service_healthy
