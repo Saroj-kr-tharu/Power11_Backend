@@ -10,7 +10,7 @@ const runAllSeeds = async () => {
         console.log('\nNOTE: This seeder requires Game and TeamMaster data');
         console.log('from Player_Game microservice to be seeded first.\n');
 
-        console.log('--- Seeding Matches ---');
+        console.log('--- Seeding Matches ---'); 
         await seedMatchesStandalone();
 
         console.log('\n' + '='.repeat(50));

@@ -23,7 +23,7 @@ class userService extends CurdService {
         try {
             const {password, email} = data;
             const infoUser = await USER_REPO.getByEmail(email);
-
+            // console.log("user => ",infoUser?.dataValues )
             const hashpassword = infoUser?.dataValues?.password
 
             if(!hashpassword) throw new Error("Invalid Credentials")
@@ -31,6 +31,7 @@ class userService extends CurdService {
                 const isValid = await BcryptHelper.checkPasswordService(password, hashpassword );
                 
                 if (!isValid)  throw new Error("Invalid Credentials");
+                console.log("user => ",infoUser?.dataValues )
                 if (infoUser?.dataValues?.isActive)  throw new Error("You are Ban User");
 
 

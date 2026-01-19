@@ -177,6 +177,10 @@ class MatchService extends curdService{
                                 // STEP 2: Update match status
                                 await matchRepo.update(matchId, {status :  "COMPLETED" } ); 
 
+                                return {
+                                        matchId: matchId,
+                                        status: "COMPLETED",
+                                }
                                 
                         }
 

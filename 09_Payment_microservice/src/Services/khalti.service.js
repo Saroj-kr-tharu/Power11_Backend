@@ -35,7 +35,7 @@ class KhaltiService {
 
             const response = await axios(options);
             const result = response?.data;
-          
+            
             // set the transitionId 
             await paymentTransService.updateByOrderId(data.purchase_order_id, {transactionId: result.pidx } );
             return result;

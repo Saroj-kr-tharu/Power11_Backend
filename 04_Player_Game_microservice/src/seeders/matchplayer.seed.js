@@ -15,7 +15,7 @@ const {MATCH_DB_URL} = require('../config/server.config');
 
 // Database URLs
 
-const MATCH_DB_URL = 'mongodb://localhost/Battle11_MATCH';
+// const MATCH_DB_URL = 'mongodb://localhost/Battle11_MATCH';
 
 // Cricket roles for reference
 const CRICKET_ROLES = ['BATSMAN', 'BOWLER', 'ALL_ROUNDER', 'WICKET_KEEPER'];

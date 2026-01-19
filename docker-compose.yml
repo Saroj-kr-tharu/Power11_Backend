@@ -114,6 +114,7 @@ services:
       dockerfile: Dockerfile
     container_name: apigateway_service
     env_file:
+      - ./envirnoment/.env
       - ./envirnoment/.env.apigateway
     networks:
       - Power11_net
@@ -138,6 +139,7 @@ services:
       dockerfile: Dockerfile
     container_name: auth_service
     env_file:
+      - ./envirnoment/.env
       - ./envirnoment/.env.auth
     networks:
       - Power11_net
@@ -168,6 +170,7 @@ services:
       dockerfile: Dockerfile
     container_name: remainder_service
     env_file:
+      - ./envirnoment/.env
       - ./envirnoment/.env.remainder
     networks:
       - Power11_net
@@ -200,6 +203,7 @@ services:
       dockerfile: Dockerfile
     container_name: player_game_service
     env_file:
+      - ./envirnoment/.env
       - ./envirnoment/.env.player.game
     networks:
       - Power11_net
@@ -219,6 +223,7 @@ services:
     command: >
       sh -c "
         npm install &&
+        node src/seeders/index.js &&
         npm start
       "
   
@@ -228,6 +233,7 @@ services:
       dockerfile: Dockerfile
     container_name: team_service
     env_file:
+      - ./envirnoment/.env
       - ./envirnoment/.env.team
     networks:
       - Power11_net
@@ -252,6 +258,7 @@ services:
       dockerfile: Dockerfile
     container_name:  contest_service
     env_file:
+      - ./envirnoment/.env
       - ./envirnoment/.env.contest
     networks:
       - Power11_net
@@ -264,9 +271,12 @@ services:
     depends_on:
       mongodb_service: 
         condition: service_healthy
+      
+
     command: > 
       sh -c "
-      npm install && npm start      
+      npm install &&
+      npm start 
       "
   
   leaderboard_service: 
@@ -275,6 +285,7 @@ services:
       dockerfile: Dockerfile
     container_name: leaderboard_service
     env_file:
+      - ./envirnoment/.env
       - ./envirnoment/.env.leaderboard
     networks:
       - Power11_net
@@ -300,6 +311,7 @@ services:
       dockerfile: Dockerfile
     container_name: match_service
     env_file:
+      - ./envirnoment/.env
       - ./envirnoment/.env.match
     networks:
       - Power11_net
@@ -314,8 +326,12 @@ services:
         condition: service_healthy
       rabbitmq_server: 
         condition: service_healthy
+            
     command: > 
-      sh -c " npm install && npm start "
+      sh -c "
+        npm install &&
+        node src/seeders/index.js &&
+        npm start "
   
   payment_service: 
     build: 
@@ -323,11 +339,12 @@ services:
       dockerfile: Dockerfile
     container_name: payment_service
     env_file:
+      - ./envirnoment/.env
       - ./envirnoment/.env.payment
     networks:
       - Power11_net
-    ports:
-      - "3009:3009"
+    # ports:
+      # - "3009:3009"
     volumes:
       - ./09_Payment_microservice:/Power11/Backend/paymentService
       - payment_service_vol:/Power11/Backend/paymentService/node_modules
@@ -352,6 +369,7 @@ services:
       dockerfile: Dockerfile
     container_name: scoring_service
     env_file:
+      - ./envirnoment/.env
       - ./envirnoment/.env.scoring
     networks:
       - Power11_net

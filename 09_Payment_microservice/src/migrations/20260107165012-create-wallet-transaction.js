@@ -58,7 +58,7 @@ module.exports = {
         allowNull: false
       },
       status: {
-        type: Sequelize.ENUM("SUCCESS", "FAILED"),
+        type: Sequelize.ENUM("SUCESS", "FAILED"),
         allowNull: false
       },
       createdAt: {

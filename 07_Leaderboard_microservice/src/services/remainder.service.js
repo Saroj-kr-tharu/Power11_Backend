@@ -14,7 +14,6 @@ const subscribeEvent = async (payload) => {
       break;
 
       default:
-        console.log("No  valid event recevied");
         break;
     }
 

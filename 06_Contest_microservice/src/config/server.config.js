@@ -7,8 +7,11 @@ module.exports = {
     PORT  : process.env.PORT,
   
     INTERNAL_SERVER_TOKEN: process.env.INTERNAL_SERVER_TOKEN,
-    MANGODB_URL: process.env.MANGODB_URL,
     PRIVATEJWT: process.env.PRIVATEJWT,
+    
+    MANGODB_URL: process.env.MANGODB_URL,
+    MATCH_DB_URL: process.env.MATCH_DB_URL,  
+    GAME_PLAYER_DB_URL: process.env.GAME_PLAYER_DB_URL,
 
     MESSAGE_BROKER_URL: process.env.MESSAGE_BROKER_URL,
     CHANNEL_NAME: process.env.CHANNEL_NAME,

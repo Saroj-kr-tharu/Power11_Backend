@@ -1,20 +1,24 @@
 const mongoose = require('mongoose');
 const Contest = require('../models/contest');
+const {GAME_PLAYER_DB_URL, MATCH_DB_URL} = require('../config/server.config');
 const connect = require('../config/database');
+
 
 /**
  * Contest Seeder for Cricket and Football
  * 
  * This seeder connects to multiple databases:
- * - Contest DB: Main database for contests (via connect())
+ * - Contest DB: Main database for contests (via connect()) 
  * - Game DB: mongodb://localhost/Battle11_PLAYERGAME_DB
  * - Match DB: mongodb://localhost/Battle11_MATCH
  */
 
 // Database URIs
-const GAME_DB_URI = "mongodb://localhost/Battle11_PLAYERGAME_DB";
-const MATCH_DB_URI = "mongodb://localhost/Battle11_MATCH";
+const GAME_DB_URI = GAME_PLAYER_DB_URL
+const MATCH_DB_URI = MATCH_DB_URL
 
+console.log('GAME_DB_URI:', GAME_DB_URI);
+console.log('MATCH_DB_URI:', MATCH_DB_URI);
 /**
  * Create separate database connections for Game and Match databases
  */

@@ -1,6 +1,6 @@
 const crypto = require("crypto")
 
-const {PAYMENT_BACKEND_URL} = require("../config/server.config")
+const {PAYMENT_LOCAL_BACKEND_URL} = require("../config/server.config")
 
 const Service = require('./curd.service');
 const khaltiService  =require('./khalti.service')
@@ -65,10 +65,10 @@ class PaymentService extends Service {
             let payload; 
             switch (gateway.toUpperCase()) {
                
-
+ 
                 case 'KHALTI':
                     payload = { 
-                        return_url: `${PAYMENT_BACKEND_URL}/khalti/complete/payment?transId=${encodeURIComponent(orderId.toString())}`,
+                        return_url: `${PAYMENT_LOCAL_BACKEND_URL}/khalti/complete/payment?transId=${encodeURIComponent(orderId.toString())}`,
                         website_url: data.website_url || "https://www.fortend.com",
                         amount: data.amount,
                         purchase_order_id: orderId,

@@ -33,7 +33,8 @@ class TeamController {
 
     async getAllTeam(req,res) {
         try {
-            const response = await teamService.getAllService();
+            const userId = req.userId;
+            const response = await teamService.getBydata({userId: userId});
             return res.status(SucessCode.OK).json({
                 message: "Successfully getAllGame",
                 success: true,
@@ -42,7 +43,7 @@ class TeamController {
             });
 
         } catch (error) {
-            console.log("something went wrong in controller  level  (getAllGame) ")
+            console.log("something went wrong in controller  level  (getAllTeam) ")
             return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
                 message: error.message,
                 sucess: false,

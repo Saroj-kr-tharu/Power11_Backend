@@ -20,10 +20,10 @@ const runAllSeeds = async () => {
         console.log('\n--- Seeding Team Masters ---');
         await seedTeamMasters();
 
-        console.log('\n--- Seeding Players ---');
+        console.log('\n--- Seeding Players ---'); 
         await seedPlayers();
 
-        console.log('\n--- Seeding Match Players ---');
+        console.log('\n--- Seeding Match Players ---'); 
         console.log('NOTE: Match Players require Matches to be seeded first.');
         console.log('If matches are not seeded, this step will be skipped.');
         try {
