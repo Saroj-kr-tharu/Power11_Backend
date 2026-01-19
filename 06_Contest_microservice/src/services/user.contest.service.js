@@ -56,45 +56,50 @@ class UserContestService extends curdService{
                      { headers: { 'x-access-token': token } }
                 )
                
-                console.log("walletValidation => ", walletValidation)
+                // console.log("walletValidation => ", walletValidation)
 
                 
 
             // ========== STEP 4: Validate team ==========
                 const team = await InternalServiceClient.internalClient.get(
-                    `${InternalServiceClient.SERVICES.TEAM}/team/${teamId}`,
+                    `${InternalServiceClient.SERVICES.TEAM}/team/${teamId}`, 
                      { headers: { 'x-access-token': token } }
                 )
                
                 const teamInfo = team?.data;
+                // console.log("teamInfo => ", teamInfo)
                 if(!teamInfo) throw new Error(" Team is not found  ")
-                
-                if(userId != teamInfo.userId)
-                    throw new Error(" Team is not Belongs to User ")
-                
-                if(matchId != teamInfo.matchId)
-                    throw new Error(" Match is not Belongs to User ")
-
-            // ========== STEP 8: Create contest entry ==========
-                const createData = await usercontestRepo.create(
-                    {userId, contestId, matchId, gameId, teamId, joinFee, email},
-                    // { session }
-                );
-
-            // ========== STEP 9: Lock team ==========
-                const updateData = {
-                    lockStatus: 'soft',
-                    lockedAt: new Date()
-                };
-                
-                await InternalServiceClient.internalClient.patch(
-                    `${InternalServiceClient.SERVICES.TEAM}/team/${teamId}`,
-                    {...updateData},
-                    { headers: { 'x-access-token': token } }
-                );
-                teamLocked = true; // Mark as locked 
-
-            // ========== STEP 10: Update contest stats ==========
+                    
+                    if(userId != teamInfo.userId)
+                        throw new Error(" Team is not Belongs to User ")
+                    
+                    if(matchId != teamInfo.matchId)
+                        throw new Error(" Match is not Belongs to User ")
+                    
+                    // ========== STEP 8: Create contest entry ==========
+                    const createData = await usercontestRepo.create(
+                        {userId, contestId, matchId, gameId, teamId, joinFee, email},
+                        // { session }
+                    );
+                    console.log('createData => ', createData)
+                    
+                    // ========== STEP 9: Lock team ==========
+                    const updateData = {
+                            lockStatus: 'soft',
+                            lockedAt: new Date()
+                        
+                    };
+                    
+                    await InternalServiceClient.internalClient.patch(
+                        `${InternalServiceClient.SERVICES.TEAM}/team/${teamId}`,
+                        updateData,
+                        { headers: { 'x-access-token': token } }
+                    );
+                    // console.log('teamUpdate => ', teamUpdate)
+                    teamLocked = true; // Mark as locked 
+                    
+                    // console.log("teamInfo => ", teamInfo)
+                    // ========== STEP 10: Update contest stats ==========
             
                 await contestRepo.update(
                     contestId, 

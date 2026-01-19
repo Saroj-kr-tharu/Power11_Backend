@@ -80,17 +80,17 @@ class TeamController {
         try {
             const { teamId } = req.params; 
             const data = req?.body; 
-            console.log('data => ', data, "  teamId => ", teamId)
-            const response = await teamService.updateTeam({TeamId:teamId, data});
+           
+            const response = await teamService.updateTeam(teamId, data);
             return res.status(SucessCode.OK).json({
-                message: "Successfully updateGame",
+                message: "Successfully updateTeam",
                 success: true,
                 data: response,
                 err: {},
             });
 
         } catch (error) {
-            console.log("something went wrong in controller  level  (updateGame) ")
+            console.log("something went wrong in controller  level  (updateTeam) ")
             return res.status( ServerErrosCodes.INTERNAL_SERVER_ERROR).json({
                 message: error.message,
                 sucess: false,

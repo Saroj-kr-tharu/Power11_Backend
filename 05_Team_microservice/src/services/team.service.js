@@ -183,18 +183,20 @@ class TeamService extends curdService{
         }
     }
 
-    async updateTeam({TeamId, data}){
+    async updateTeam(TeamId, data){
         try {
             const team = await teamRepo.get(TeamId);
             if(!team) throw new Error("Team is not Found");
+            // console.log("team => ", team)
+            if(team.lockStatus != 'unlocked') return "Readonly unable to edit"
 
-            if(team.lockStatus != 'unlocked') throw new Error("Readonly unable to edit")
-            
-            const res = await teamRepo.update(TeamId, data)
-            return res ;
+
+            const response = await teamRepo.update(TeamId, data)
+            console.log("res => ", response)
+            return response ;
         
         } catch (error) {
-                console.log("something went wrong in service  level  (createTeam) ")
+                console.log("something went wrong in service  level  (updateTeam) ", error)
                 throw error;
         }
     }

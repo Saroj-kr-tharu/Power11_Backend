@@ -63,24 +63,30 @@ class WalletService extends Service {
         wallet = await this.getByData({userId: userId});
         if(!wallet) throw new Error("WALLET_NOT_FOUND")
         wallet = wallet?.dataValues;
-        console.log("wallet => ", wallet)
-    
-      // STEP 2: Validate wallet status
-        if(wallet?.status != "ACTIVE") throw new Error("USER IS SUSPENDED")
-        if(wallet?.balance < amount) throw new Error("INSUFFICIENT_AMOUNT")
+        // console.log("wallet => ", wallet)
+        
+        // STEP 2: Validate wallet status 
+        const walletBalance = Number(wallet?.balance)
+        const walletLockedBalance = Number(wallet?.lockedBalance)
 
-      // STEP 3: Calculate available balance
-        const newAvailableBalance = wallet?.balance - amount ; 
-        const newLockedBalance = wallet?.lockedBalance + amount ;
-      
+        if(wallet?.status != "ACTIVE") throw new Error("USER IS SUSPENDED")
+        if(walletBalance < amount) throw new Error("INSUFFICIENT_AMOUNT")
+            
+           
+            // STEP 3: Calculate available balance
+            const newAvailableBalance = walletBalance - amount ; 
+            const newLockedBalance = walletLockedBalance + amount ;
+            
+            console.log("newAvailableBalance =>", newAvailableBalance, "newLockedBalance =>", newLockedBalance);
 
       // STEP 4: update  wallet ( FOR UPDATE)
         await this.updateService(wallet?.id, {balance: newAvailableBalance, lockedBalance:newLockedBalance}, { transaction })
 
         
       // STEP 7: Create walletTransaction
-        const balanceBefore = parseFloat(wallet.balance);
+        const balanceBefore = walletBalance;
         const balanceAfter = newAvailableBalance;
+        
         await WalletTransactionRepo.create({
           userId: userId,
           walletId: wallet.id,
@@ -97,14 +103,15 @@ class WalletService extends Service {
           
         }, { transaction });
 
-      // update idempotencyKey 
+        // update idempotencyKey 
         await idempotancyKeyService.updateByData(
-            { key: idempotencyKey },
-            { responseSnapshot: { walletId:  wallet?.id, lockedAmount: amount }, status: "SUCCESS" }
-          );
-
-      // STEP 8: Commit DB transaction
+          { key: idempotencyKey },
+          { responseSnapshot: { walletId:  wallet?.id, lockedAmount: amount }, status: "SUCCESS" }
+        );
+        
+        // STEP 8: Commit DB transaction
         await transaction.commit();
+      
       // STEP 9: Return success response
        return { walletId:  wallet?.id, lockedAmount: amount }
 

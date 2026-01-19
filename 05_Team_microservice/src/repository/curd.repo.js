@@ -35,16 +35,27 @@ class CurdRepo {
         }
     }
 
-    async update(id, data, session=null) {
+    async update(id, data, session = null) {
         try {
-             
-            const tag = await this.model.findByIdAndUpdate(id, data, { new: true, session  });
-            return tag;
+            const options = { new: true, runValidators: true };
+            if (session) options.session = session;
+
+            console.log('data => ', data, "  id => ", id)
+            const updated = await this.model.findByIdAndUpdate(
+                id,
+                { $set: data },
+                options
+            );
+
+            if (!updated) throw new Error('Team not found');
+
+            return updated;
         } catch (error) {
-            console.log('Something went wrong in repo (get)');
+            console.error('Repo update error:', error.message, error.stack);
             throw error;
         }
     }
+
 
     async destroy(id, session=null) {
         try {
